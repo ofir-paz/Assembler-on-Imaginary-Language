@@ -8,7 +8,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "Error.h"
+#include "../new-data-types/Error.h"
 #include "complex.h"
 #include "error_check.h"
 /* -------------------------- */
@@ -18,7 +18,6 @@
 #define SAME_STRINGS 0
 #define ZERO_ITERATIONS 0
 #define SPACE_FOR_NULL 1
-#define DEFINED_VARIABLES 6
 #define NO_FIX NULL
 /* ------------ */
 

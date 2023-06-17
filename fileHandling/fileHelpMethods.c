@@ -7,8 +7,7 @@
 /* ---Include header files--- */
 #include <stdio.h>
 #include <stdlib.h>
-#include "../general-enums/neededFinals.h"
-#include "../errors/errors.h"
+#include "../errors/system_errors.h"
 #include "../help_methods.h"
 /* -------------------------- */
 
@@ -16,6 +15,9 @@
 #define ZERO_CODE 0
 /* ------------ */
 
+/*
+ *
+ */
 FILE *openFile(const char *file_name, const char *fileType, const char *modeType)
 {
     static FILE *file; /* Will be the file to open */

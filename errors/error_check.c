@@ -22,16 +22,6 @@
 #define EMPTY_LINE "\n\0"
 /* ------------ */
 
-/* Checks if the given pointer void *ptr has allocated space in the memory.
- * Returns TRUE if it has, otherwise FALSE. */
-boolean isAllocated(void *ptr)
-{
-    boolean allocation = FALSE; /* We presume the worst case where there is no space. */
-    if (ptr != NULL) /* If it has space in the memory */
-        allocation = TRUE; /* Set the value to return to TRUE. */
-    return allocation;
-}
-
 /* Returns TRUE if param const char *line is an empty line {enter,null}, otherwise FALSE. */
 boolean isEmptyLine(const char *line)
 {
