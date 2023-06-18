@@ -4,9 +4,9 @@
  * This file has help methods to assist various other files in this program.
  * */
 
-#ifndef MMN_14_ASSEMBLER_HANDLE_H
-#define MMN_14_ASSEMBLER_HANDLE_H
+#ifndef MMN_14_ASSEMBLER_H
+#define MMN_14_ASSEMBLER_H
 
 void assemble(const char *file_name);
 
-#endif /* MMN_14_ASSEMBLER_HANDLE_H */
+#endif /* MMN_14_ASSEMBLER_H */

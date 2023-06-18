@@ -11,8 +11,8 @@
 #include <ctype.h>
 #include "../general-enums/neededKeys.h"
 #include "../new-data-types//boolean.h"
-#include "../help_methods.h"
-#include "../transitions//diagnose_input.h"
+#include "../general_help_methods.h"
+#include "../diagnoses/diagnose_line.h"
 /* -------------------------- */
 
 /* ---Finals--- */
@@ -33,14 +33,6 @@ boolean isEmptyLine(const char *line)
 boolean isDefinedFunction(const char *command)
 {
     return (getFunction(command) != NULL)? TRUE : FALSE;
-}
-
-/* Checks if the param int i is an index of param const char *str.
- * Returns TRUE if i is an index of the given string, otherwise FALSE. */
-boolean isIndexInStr(const char *str, int i)
-{
-    /* Note that strlen(str) is also an index, and the value is '\0'. */
-    return (0 <= i && i <= strlen(str))? TRUE : FALSE;
 }
 
 /* Checks for illegal comma after the function in param const char *command.

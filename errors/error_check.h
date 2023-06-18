@@ -22,10 +22,6 @@ boolean isAllocated(void *ptr);
 /* Returns TRUE if param const char *line is an empty line {enter,null}, otherwise FALSE. */
 boolean isEmptyLine(const char *line);
 
-/* Checks if the param int i is an index of param const char *str.
- * Returns TRUE if i is an index of the given string, otherwise FALSE. */
-boolean isIndexInStr(const char *str, int i);
-
 /* Checks if the param const char *command is a valid function.
  * If it is, returns NO_ERROR, otherwise returns the specific error caught. */
 Error checkCommandError(const char *command);

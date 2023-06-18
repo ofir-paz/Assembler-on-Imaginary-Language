@@ -5,44 +5,27 @@
  * */
 
 /* ---Includes--- */
-#include <stdlib.h>
 #include <string.h>
-#include <ctype.h>
-#include "enums/neededKeys.h"
-#include "errors/error_check.h"
-#include "errors/error_handle.h"
+#include "../new-data-types/boolean.h"
+#include "../general-enums/neededFinals.h"
+#include "../general-enums/neededKeys.h"
 /* -------------- */
 
 /* ---Macros--- */
-#define SAME_STRINGS 0
+#define MIN(a, b) ((a) < (b))? a : b
+/* ------------ */
+
+/* ---Finals--- */
 #define ZERO_COUNT 0
-#define ZERO_INDEX 0
 #define SIZE_FOR_NULL 1
 /* ------------ */
 
-/* Turns every char in the given param char *str to lower case.
- * Returns the created lower case string */
-char *strToLowerCase(const char *str)
+/* Checks if the param int i is an index of param const char *str.
+ * Returns TRUE if i is an index of the given string, otherwise FALSE. */
+boolean isIndexInStr(const char *str, int i)
 {
-    int i; /* Loop variable */
-    
-    /* Assigning space in the memory for the new string */
-    char *lowerCase_str = (char *) malloc(strlen(str) + SIZE_FOR_NULL);
-    lowerCase_str[strlen(str)] = NULL_TERMINATOR;
-
-    if (isAllocated(lowerCase_str) == FALSE) /* Checking if space has been assigned. */
-        noAllocationERR(); /* If not, noAllocationERR() will terminate the program */
-
-    for (i = ZERO_INDEX; i < strlen(str); i++) /* Loop to go through all the chars in str */
-        lowerCase_str[i] = (char) tolower(str[i]); /* Assigns the curr char as lower case */
-
-    return lowerCase_str;
-}
-
-/* Returns the param int n + 1 */
-int nextInt(int n)
-{
-    return n + 1;
+    /* Note that strlen(str) is also an index, and the value is '\0'. */
+    return (ZERO_INDEX <= i && i <= strlen(str))? TRUE : FALSE;
 }
 
 /* Returns TRUE if param char ch is empty (space; tab; enter), otherwise FALSE */
@@ -56,7 +39,7 @@ boolean isEmpty(char ch)
  * otherwise returns the index of the next non-empty space in str (index of null if there isn't). */
 int nextCharIndex(const char *str, int i)
 {
-    if (isIndexInStr(str, nextInt(i)) == TRUE) /* If the next index exists */
+    if (isIndexInStr(str, i + ONE_INDEX) == TRUE) /* If the next index exists */
     {
         /* Increasing i by 1 until we get to an index of char that is a not empty or is null. */
         do
@@ -72,7 +55,7 @@ int nextCharIndex(const char *str, int i)
  * otherwise returns the index of the next empty space in str (index of null if there isn't) */
 int nextEmptyIndex(const char *str, int i)
 {
-    if (isIndexInStr(str, nextInt(i)) == TRUE) /* If the next index exists */
+    if (isIndexInStr(str, i + ONE_INDEX) == TRUE) /* If the next index exists */
     {
         /* Increasing i by 1 until we get to an index of char that is empty or null. */
         do
@@ -99,7 +82,7 @@ int nextWordIndex(const char *str, int i)
 int nextCommaIndex(const char *str, int i)
 {
     int index = i; /* Value to return */
-    if (isIndexInStr(str, nextInt(i)) == TRUE) /* If the next index exists */
+    if (isIndexInStr(str, i + ONE_INDEX) == TRUE) /* If the next index exists */
     {
         /* Increasing index by 1 until we get to an index of char that is a comma or null. */
         do
@@ -107,12 +90,6 @@ int nextCommaIndex(const char *str, int i)
         while (str[index] != COMMA && str[index] != NULL_TERMINATOR);
     }
     return index; /* Returning the found index */
-}
-
-/* Return TRUE if str1 == str2, otherwise FALSE. */
-boolean sameStrings(const char *str1, const char *str2)
-{
-    return (strcmp(str1, str2) == SAME_STRINGS)? TRUE : FALSE;
 }
 
 /* Returns TRUE if const char ch = '+' or '-', otherwise FALSE. */
@@ -150,7 +127,7 @@ boolean isCurrCharComma(const char *str, int index)
     return isComma;
 }
 
-/* Returns TRUE if the param char ch os a number, otherwise FALSE. */
+/* Returns TRUE if the param char ch is a number, otherwise FALSE. */
 boolean isCharNumber(char ch)
 {
     boolean isNum = FALSE; /* We assume the current char is not a number */
@@ -197,12 +174,6 @@ boolean isPartOfNumber(const char *str, int index)
     return isPartOfNumber;
 }
 
-/* Return the minimum of param int a and param int b. */
-int getMin(int a, int b)
-{
-    return (a < b)? a : b;
-}
-
 /* Searches for the next empty space or comma in param const char *str
  * from the starting index param in index.
  * Return the index of the found empty space or comma, or end index of str if there are not. */
@@ -211,15 +182,6 @@ int nextEmptyCommaIndex(const char *str, int index)
     int nextCommaEmptyIndex; /* Value to return */
     int nextEmpty = nextEmptyIndex(str, index); /* Next empty index of str */
     int nextComma = nextCommaIndex(str, index); /* Next Comma index of str */
-    nextCommaEmptyIndex = getMin(nextEmpty, nextComma); /* Taking the minimum of them */
+    nextCommaEmptyIndex = MIN(nextEmpty, nextComma); /* Taking the minimum of them */
     return nextCommaEmptyIndex;
-}
-
-char *connectTwoStrings(const char *str1, const char *str2)
-{
-    char *connectedString = (char *) malloc(strlen(str1) + strlen(str2) + 1);
-    handle_allocation_error(connectedString);
-    strcpy(connectedString, str1);
-    connectedString = strcat(connectedString, str2);
-    return connectedString;
 }

@@ -13,10 +13,7 @@
 #include "error_check.h"
 #include "error_handle.h"
 #include "cmd_params.h"
-#include "FunctionPtr.h"
 #include "paramType.h"
-#include "help_methods.h"
-#include "handle_command.h"
 /* -------------------------- */
 
 /* -----Macros----- */
@@ -56,42 +53,6 @@ void findCommand(const char *line, char **command)
     strncpy(*command, line + start, cmdSize);
 }
 
-/* Finds which handle function param const char *command matches with.
- * Return a pointer to the function, or NULL if it doesn't match with any. */
-FunctionPtr getFunction(const char *command)
-{
-    /* map of the defined functions.
-     * !! To insert new functions you must insert them before NULL !! */
-    const struct {
-        const char *name;
-        FunctionPtr function;
-    } functionMap[] =
-            {
-                    {"read_comp", handle_read_comp},
-                    {"print_comp", handle_print_comp},
-                    {"add_comp", handle_add_comp},
-                    {"sub_comp", handle_sub_comp},
-                    {"mult_comp_real", handle_mult_comp_real},
-                    {"mult_comp_img", handle_mult_comp_img},
-                    {"mult_comp_comp", handle_mult_comp_comp},
-                    {"abs_comp", handle_abs_comp},
-                    {"stop", handle_stop},
-                    {NULL, NULL}
-            };
-
-    FunctionPtr funcToReturn = NULL; /* ptr to functions to return */
-    int i = ZERO_INDEX; /* Loop variable */
-
-    while (functionMap[i].name != NULL && funcToReturn == NULL) {
-        /* Checks if the string command matches with defined function */
-        if (sameStrings(command, functionMap[i].name) == TRUE)
-            /* Assign the value to return to the handle function pointer */
-            funcToReturn = functionMap[i].function;
-        i++; /* Checks next function */
-    }
-
-    return funcToReturn;
-}
 
 /* Given the param const char *command and the param Error error,
  * Returns a string contains a suggested fix for the error in the command. */

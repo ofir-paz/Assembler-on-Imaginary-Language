@@ -7,7 +7,7 @@
 /* ---Include header files--- */
 #include "new-data-types/boolean.h"
 #include "general-enums/neededFinals.h"
-#include "assembler_handle.h"
+#include "assembler.h"
 #include "stdio.h"
 /* -------------------------- */
 

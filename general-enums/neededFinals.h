@@ -7,6 +7,6 @@
 #ifndef MMN_14_NEEDEDFINALS_H
 #define MMN_14_NEEDEDFINALS_H
 
-enum neededFinals {ZERO_ITERATIONS = 0, ONE_INDEX = 1, LINE_SIZE = 82};
+enum neededFinals {ZERO_INDEX = 0, ONE_INDEX = 1, LINE_SIZE = 81};
 
 #endif /* MMN_14_NEEDEDFINALS_H */

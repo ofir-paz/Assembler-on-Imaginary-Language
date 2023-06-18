@@ -7,16 +7,13 @@
 #ifndef MMN_22_HELP_METHODS_H
 #define MMN_22_HELP_METHODS_H
 
-#include "new-data-types/boolean.h"
+#include "../new-data-types/boolean.h"
 
 /* ----------Prototypes---------- */
 
-/* Turns every char in the given param char *str to lower case.
- * Returns the created lower case string */
-char *strToLowerCase(const char *str);
-
-/* Returns the param int n + 1 */
-int nextInt(int n);
+/* Checks if the param int i is an index of param const char *str.
+ * Returns TRUE if i is an index of the given string, otherwise FALSE. */
+boolean isIndexInStr(const char *str, int i);
 
 /* Finds the next index in param const char *str where it is not an empty space (tab/space/enter).
  * If param int i is not an index of str returns i,
@@ -37,9 +34,6 @@ int nextWordIndex(const char *str, int i);
  * If param int i is not an index of str returns i,
  * otherwise returns the index of the next comma in str (index of null if there isn't) */
 int nextCommaIndex(const char *str, int i);
-
-/* Return TRUE if str1 == str2, otherwise FALSE. */
-boolean sameStrings(const char *str1, const char *str2);
 
 /* Returns TRUE if const char ch = '+' or '-', otherwise FALSE. */
 boolean isPlusOrMinus(char ch);
@@ -70,7 +64,6 @@ boolean isPartOfNumber(const char *str, int index);
  * Return the index of the found empty space or comma, or end index of str if there are not. */
 int nextEmptyCommaIndex(const char *str, int index);
 
-char *connectTwoStrings(const char *str1, const char *str2);
 /* ------------------------------ */
 
 #endif /* MMN_22_HELP_METHODS_H */
