@@ -1,7 +1,7 @@
 /*
  * @author Ofir Paz
  * @Version (27/04/2023)
- * This file Has the functions to read and access data from files.
+ * This file has the methods to write to files.
  * */
 
 /* ---Include header files--- */
@@ -10,19 +10,17 @@
 /* -------------------------- */
 
 /* ---Finals--- */
-#define ZERO_CODE 0
 #define APPEND_MODE "a"
 /* ------------ */
 
-/* Writes a line to a file.
- * param const char *file_name is the name of the file to write to
- * param const char *fileType is the type of the file to write to
- * param const char *line is the line to write to the wanted file
+/* appends text to file.
+ * param const char *file_name is the name of the file to append to
+ * param const char *fileType is the type of the file to append to
+ * param const char *text is the text to append to the wanted file
  * Return nothing. */
-void writeLineToFile(const char *file_name, const char *fileType, const char *line)
+void appendToFile(const char *file_name, const char *fileType, const char *text)
 {
-    /* Opening the file */
-    FILE *fileToAddLineTO = openFile(file_name, fileType, APPEND_MODE);
-    fputs(line, fileToAddLineTO); /* Printing to the file */
-    closeFile(fileToAddLineTO); /* Closing the file */
+    FILE *fileToAppendTo = openFile(file_name, fileType, APPEND_MODE); /* Open the file */
+    fprintf(fileToAppendTo, "%s", text); /* Printing to the file */
+    closeFile(fileToAppendTo); /* Closing the file */
 }

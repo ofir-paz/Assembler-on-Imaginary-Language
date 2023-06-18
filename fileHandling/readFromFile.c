@@ -1,36 +1,34 @@
 /*
  * @author Ofir Paz
  * @Version (27/04/2023)
- * This file Has the functions to read and access data from files.
+ * This file has the methods to read and access data from files.
  * */
 
 /* ---Include header files--- */
 #include <stdio.h>
-#include <string.h>
-#include "../general-enums/neededFinals.h"
 #include "fileHelpMethods.h"
 /* -------------------------- */
 
 /* ---Finals--- */
-#define ZERO_CODE 0
+#define ZERO_LEN 0
 #define READ_MODE "r"
 /* ------------ */
 
 /* Reads the next line from a given file.
  * param const char *file_name is the name of the file to read from
  * param const char *fileType is the type of the file to read from
- * param char **line is the string that will hold the read line
- * Returns o if the line is read successfully or EOF (-1) if not. */
+ * param char **line is a pointer to string that will hold the read line
+ * Returns the length of the line if it has been read successfully or EOF (-1) if not. */
 int readNextLineFromFile(const char *file_name, const char *fileType, char **line)
 {
-    int returnCode = ZERO_CODE; /* Value to return */
+    int returnCode; /* Value to return, we assume success */
     FILE *fileToRead = openFile(file_name, fileType, READ_MODE); /* Open file */
+    size_t len = ZERO_LEN; /* Will be used with the getline() function */
+    *line = NULL;
 
-    if (fgets(*line, LINE_SIZE, fileToRead) == NULL)
-    {
+    /* Read the line. If there is no file to read, close the file. */
+    if ((returnCode = (int) getline(line, &len, fileToRead)) == EOF)
         closeFile(fileToRead);
-        returnCode = EOF;
-    }
 
     return returnCode;
 }
