@@ -8,65 +8,47 @@
 /* ---Include header files--- */
 #include <stdlib.h>
 #include <string.h>
-#include "../new-data-types/Error.h"
+#include "../new-data-types/word_number.h"
+#include "../general-enums/indexes.h"
 #include "../general-enums/neededKeys.h"
-#include "error_check.h"
-#include "error_handle.h"
 #include "cmd_params.h"
-#include "paramType.h"
+#include "../errors/system_errors.h"
+#include "diagnose_help_methods.h"
+#include "../general_help_methods.h"
 /* -------------------------- */
 
-/* -----Macros----- */
-#define MINUS_ONE_INDEX (-1)
-#define ZERO_INDEX 0
-#define ONE_INDEX 1
+/* -----Finals----- */
 #define SPACE_FOR_NULL 1
-#define CHAR_PARAM_LEN 1
 #define DEFAULT_ZERO_LEN 0
 /* ---------------- */
 
-/* Gets the command's size from the input line. Returns it in size_t type */
-size_t getCommandSize(const char *line)
+/* Gets the size of a specified word in a line string.
+ * param const char *line is the line that's the word in it
+ * param word_number wordNumber is the number of the word to seek the size of
+ * Returns the size in size_t type. */
+size_t getWordSize(const char *line, word_number wordNumber)
 {
-    /* Command starts with a non-empty space and ends with an empty space. */
-    int start = nextCharIndex(line, MINUS_ONE_INDEX); /* Start index of command. */
-    int end = nextEmptyIndex(line, start); /* End index of command. */
+    int start = findStartIndexOfWord(line, wordNumber); /* Start index of the word */
+    int end = nextEmptyIndex(line, start); /* End index of the word */
 
     return end - start; /* Returns the size (length) */
 }
 
-/* Finds the command (function to use) from the input param const char *line and
- * sets the param **command to the found command.
+/* Finds a specified word in a given line string.
+ * param const char *line is the line string that holds the word
+ * param char **word is a pointer to the string that will hold the found word
+ * param word_number wordNumber is the number of the word to seek, must be positive !
  * Returns nothing. */
-void findCommand(const char *line, char **command)
+void findWord(const char *line, char **word, word_number wordNumber)
 {
-    size_t cmdSize = getCommandSize(line); /* Finding the size of the command */
-    int start = nextCharIndex(line, MINUS_ONE_INDEX); /* Start index of command */
+    size_t wordSize = getWordSize(line, wordNumber); /* Finding the size of the word */
+    int start = findStartIndexOfWord(line, wordNumber); /* Start index of the word */
 
-    *command = (char *) malloc(cmdSize + SPACE_FOR_NULL); /* Assigning space for the string */
-    if (isAllocated(*command) == FALSE) /* Checking if space has been assigned. */
-        noAllocationERR(); /* If not, noAllocationERR() will terminate the program */
-
-    (*command)[cmdSize] = NULL_TERMINATOR; /* Adding null terminator to the end of the string */
+    allocate_space(*word, wordSize); /* Allocating space for the string */
+    (*word)[wordSize] = NULL_TERMINATOR; /* Add null terminator to the end of the string */
 
     /* Copying the command from line to string command */
-    strncpy(*command, line + start, cmdSize);
-}
-
-
-/* Given the param const char *command and the param Error error,
- * Returns a string contains a suggested fix for the error in the command. */
-char *getCmdFix(const char *command, Error error)
-{
-    char *fix; /* String to return, will contain the fix. */
-    switch (error) {
-        case WRONG_CASE_FUNC:
-            fix = strToLowerCase(command); /* The fix here is the lower case command */
-            break;
-        default:
-            fix = NULL; /* No fix to be found, String to return will be NULL. */
-    }
-    return fix;
+    strncpy(*word, line + start, wordSize);
 }
 
 /* Finds index of parameter in const char *line.
@@ -76,7 +58,8 @@ char *getCmdFix(const char *command, Error error)
  * Returns the index of the wanted parameter or index of last char ('\0') in line if there isn't. */
 int findParamIndex(const char *line, ParamNum paramNum)
 {
-    int startOfCmd = nextCharIndex(line, MINUS_ONE_INDEX); /* Start index of the command in line. */
+    /* Start index of the command in line. */
+    int startOfCmd = nextCharIndex(line, MINUS_ONE_INDEX);
 
     /* Here we make the assumption on the command's validation. */
     int index = nextWordIndex(line, startOfCmd); /* Start from first parameter */
@@ -103,12 +86,6 @@ int getFloatParamLen(const char *line, ParamNum paramNum)
     while (isPartOfNumber(line, end) == TRUE) /* While end is still in the number */
         end++; /* Move end forward */
     return end - start; /* Return the length */
-}
-
-/* Returns the length of a char param. */
-int getCharParamLen()
-{
-    return CHAR_PARAM_LEN; /* Char is always with length 1. */
 }
 
 /* Finds the length of the parameter number paramNum with type paramtype pType
@@ -148,3 +125,26 @@ char getCharParamFromLine(const char *line, ParamNum paramNum)
     return line[index];
 }
 
+/* Checks if the given line is an empty line (contains spaces and tabs only).
+ * param const char *line is the line to check if it is empty or not
+ * Returns TRUE if the line is empty, otherwise FALSE. */
+boolean isEmptyLine(const char *line)
+{
+    return (getNextChar(line, MINUS_ONE_INDEX) == NULL_TERMINATOR)? TRUE : FALSE;
+}
+
+/* Checks if the given line is a comment line (first character is ';').
+ * param const char *line is the line to check if it is a comment line
+ * Returns TRUE if the line is a comment line, otherwise FALSE. */
+boolean isCommentLine(const char *line)
+{
+    return (*line == SEMICOLON)? TRUE : FALSE;
+}
+
+/* Checks if the line needs to be skipped.
+ * param const char *line is the line to check
+ * Return TRUE if the line needs to be skipped, otherwise FALSE. */
+boolean isSkipLine(const char *line)
+{
+    return (isEmptyLine(line) || isCommentLine(line) == TRUE)? TRUE : FALSE;
+}

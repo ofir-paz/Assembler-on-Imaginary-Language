@@ -7,7 +7,8 @@
 /* ---Includes--- */
 #include <string.h>
 #include "../new-data-types/boolean.h"
-#include "../general-enums/neededFinals.h"
+#include "../new-data-types/word_number.h"
+#include "../general-enums/indexes.h"
 #include "../general-enums/neededKeys.h"
 /* -------------- */
 
@@ -35,8 +36,8 @@ boolean isEmpty(char ch)
 }
 
 /* Finds the next index in param const char *str where it is not an empty space (tab/space/enter).
- * If param int i is not an index of str returns i,
- * otherwise returns the index of the next non-empty space in str (index of null if there isn't). */
+ * If param int i is not an index of str returns i, otherwise returns
+ * the index of the next non-empty space in str (index of null if there isn't). */
 int nextCharIndex(const char *str, int i)
 {
     if (isIndexInStr(str, i + ONE_INDEX) == TRUE) /* If the next index exists */
@@ -90,6 +91,31 @@ int nextCommaIndex(const char *str, int i)
         while (str[index] != COMMA && str[index] != NULL_TERMINATOR);
     }
     return index; /* Returning the found index */
+}
+
+/* Finds the start of a specific word in a given line string.
+ * param const char *line is the line that holds the word
+ * param word_number wordNumber is the number of the word to find its start index
+ * Returns the found start index of the specific word in line. */
+int findStartIndexOfWord(const char *line, word_number wordNumber)
+{
+    int start = MINUS_ONE_INDEX; /* Value to return */
+    word_number currWord; /* Loop variable */
+
+    /* Take start forward until it reaches the right word index */
+    for (currWord = ZERO_WORD; currWord < wordNumber; currWord++)
+        start = nextWordIndex(line, start);
+
+    return start;
+}
+
+/* Gets the next non-empty char from a given index in a given string.
+ * param const char *str is the string to seek for the next char in
+ * param int i is the index to start the search from
+ * Returns the next non-empty char, or 0 ('\0') if there isn't. */
+char getNextChar(const char *str, int i)
+{
+    return str[nextCharIndex(str, i)];
 }
 
 /* Returns TRUE if const char ch = '+' or '-', otherwise FALSE. */
@@ -163,7 +189,7 @@ boolean isCurrCharDot(const char *str, int index)
  * element of a number (+; -; .; 0-9), otherwise FALSE. */
 boolean isPartOfNumber(const char *str, int index)
 {
-    boolean isPartOfNumber = FALSE; /* Value to return, assume ch is not an element of a number. */
+    boolean isPartOfNumber = FALSE; /* Value to return, assume ch is not a part of a number. */
     if (isIndexInStr(str, index) == TRUE) {
         char ch = str[index];
         /* Check if ch is an element of a number */

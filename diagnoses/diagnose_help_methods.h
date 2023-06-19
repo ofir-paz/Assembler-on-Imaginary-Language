@@ -35,6 +35,18 @@ int nextWordIndex(const char *str, int i);
  * otherwise returns the index of the next comma in str (index of null if there isn't) */
 int nextCommaIndex(const char *str, int i);
 
+/* Finds the start of a specific word in a given line string.
+ * param const char *line is the line that holds the word
+ * param word_number wordNumber is the number of the word to find its start index
+ * Returns the found start index of the specific word in line. */
+int findStartIndexOfWord(const char *line, word_number wordNumber);
+
+/* Gets the next non-empty char from a given index in a given string.
+ * param const char *str is the string to seek for the next char in
+ * param int i is the index to start the search from
+ * Returns the next non-empty char, or 0 ('\0') if there isn't. */
+char getNextChar(const char *str, int i);
+
 /* Returns TRUE if const char ch = '+' or '-', otherwise FALSE. */
 boolean isPlusOrMinus(char ch);
 

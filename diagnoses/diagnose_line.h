@@ -6,21 +6,16 @@
 #ifndef MMN_22_DIAGNOSE_INPUT_H
 #define MMN_22_DIAGNOSE_INPUT_H
 
-#include "Error.h"
-#include "cmd_params.h"
-#include "FunctionPtr.h"
-#include "paramType.h"
+#include "../new-data-types/word_number.h"
 
 /* ----------Prototypes---------- */
 
-/* Finds the command (function to use) from the input const char *line and
- * sets the param **command to the found command.
+/* Finds a specified word in a given line string.
+ * param const char *line is the line string that holds the word
+ * param char **word is a pointer to the string that will hold the found word
+ * param word_number wordNumber is the number of the word to seek, must be positive !
  * Returns nothing. */
-void findCommand(const char *line, char **command);
-
-/* Finds which handle function param const char *command matches with.
- * Return a pointer to the function, or NULL if it doesn't match with any. */
-FunctionPtr getFunction(const char *command);
+void findWord(const char *line, char **word, word_number wordNumber);
 
 /* Given the param const char *command and the param Error error,
  * Returns a string contains a suggested fix for the error in the command. */
@@ -45,6 +40,11 @@ float getFloatParamFromLine(const char *line, ParamNum paramNum);
 /* Gets the char parameter numbered paramNum from param const char *line.
  * Returns the specified char. */
 char getCharParamFromLine(const char *line, ParamNum paramNum);
+
+/* Checks if the line needs to be skipped.
+ * param const char *line is the line to check
+ * Return TRUE if the line needs to be skipped, otherwise FALSE. */
+boolean isSkipLine(const char *line);
 
 /* ------------------------------ */
 

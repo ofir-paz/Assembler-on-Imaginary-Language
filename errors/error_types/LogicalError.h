@@ -17,7 +17,7 @@ typedef enum
     /* Macro related logical errors */
         MCRO_BEFORE_DEF_ERR,
     /* Label related logical errors */
-        MULT_LABEL_DEF_ERR, LABEL_NAME_IS_OP,
+        LABEL_NAME_IS_OP, MULT_LABEL_DEF_ERR, EMPTY_LABEL,
     /* Extern label related logical errors */
 
     /* Entry label related logical errors */

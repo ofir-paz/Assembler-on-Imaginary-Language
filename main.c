@@ -6,7 +6,7 @@
 
 /* ---Include header files--- */
 #include "new-data-types/boolean.h"
-#include "general-enums/neededFinals.h"
+#include "general-enums/indexes.h"
 #include "assembler.h"
 #include "stdio.h"
 /* -------------------------- */
