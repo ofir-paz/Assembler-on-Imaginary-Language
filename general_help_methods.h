@@ -7,7 +7,11 @@
 #ifndef MMN_22_GENERAL_HELP_METHODS_H
 #define MMN_22_GENERAL_HELP_METHODS_H
 
-/* ----------Prototypes---------- */
+/* ---Macros--- */
+#define POINTER(ptr) (void **)(ptr)
+/* ------------ */
+
+/* ---------------Prototypes--------------- */
 
 /* Allocates space in the memory for a given pointer.
  * Terminates the program on allocation error !
@@ -15,6 +19,14 @@
  * param size_t size is the size of the space to allocate
  * Returns nothing. */
 void allocate_space(void *ptr, size_t size);
+
+/*
+ * Frees a given pointer.
+ *
+ * @param **ptr Pointer to free.
+ * @return 0 if the pointer was freed, (-1) if the pointer was already NULL.
+ */
+int free_ptr(void **ptr);
 
 /* Turns every char in the given param char *str to lower case.
  * Returns the created lower case string */
@@ -28,6 +40,7 @@ boolean sameStrings(const char *str1, const char *str2);
  * param const char *str2 is the second string to connect
  * Returns the new created string str1 + str2. */
 char *connectTwoStrings(const char *str1, const char *str2);
-/* ------------------------------ */
+
+/* ---------------------------------------- */
 
 #endif /* MMN_22_GENERAL_HELP_METHODS_H */

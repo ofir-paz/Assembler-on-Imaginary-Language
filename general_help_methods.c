@@ -9,14 +9,20 @@
 #include <string.h>
 #include <ctype.h>
 #include "new-data-types/boolean.h"
+#include "general-enums/indexes.h"
 #include "general-enums/neededKeys.h"
 #include "errors/system_errors.h"
 /* -------------- */
 
+/* ---Macros--- */
+#define POINTER(ptr) (void **)(ptr)
+/* ------------ */
+
 /* ---Finals--- */
-#define SAME_STRINGS 0
-#define ZERO_INDEX 0
+#define WAS_NULL_RETURN_CODE (-1)
+#define FREED_RETURN_CODE 0
 #define SIZE_FOR_NULL 1
+#define SAME_STRINGS 0
 /* ------------ */
 
 /* Allocates space in the memory for a given pointer.
@@ -24,10 +30,31 @@
  * param void *ptr is the pointer to allocate space for
  * param size_t size is the size of the space to allocate
  * Returns nothing. */
-void allocate_space(void *ptr, size_t size)
+void allocate_space(void **ptr, size_t size)
 {
-    ptr = (typeof(ptr)) malloc(size); /* Allocating the space */
+    *ptr = (typeof(*ptr)) malloc(size); /* Allocating the space */
     handle_allocation_error(ptr); /* Handling errors if there are */
+}
+
+/*
+ * Frees a given pointer.
+ *
+ * @param **ptr Pointer to free.
+ * @return 0 if the pointer was freed, (-1) if the pointer was already NULL.
+ */
+int free_ptr(void **ptr)
+{
+    int returnCode = WAS_NULL_RETURN_CODE; /* Assume the given pointer doesn't need to be free */
+
+    if (ptr != NULL && *ptr != NULL) /* Check if we were given a NULL pointer */
+    {
+        /* Free the pointer */
+        free(*ptr);
+        *ptr = NULL;
+        returnCode = FREED_RETURN_CODE;
+    }
+
+    return returnCode;
 }
 
 /* Turns every char in the given param char *str to lower case.
@@ -38,7 +65,7 @@ char *strToLowerCase(const char *str)
     
     /* Assigning space in the memory for the new string */
     char *lowerCase_str;
-    allocate_space(lowerCase_str, strlen(str) + SIZE_FOR_NULL);
+    allocate_space(POINTER(lowerCase_str), strlen(str) + SIZE_FOR_NULL);
 
     lowerCase_str[strlen(str)] = NULL_TERMINATOR; /* Adding null terminator */
 
@@ -61,7 +88,8 @@ boolean sameStrings(const char *str1, const char *str2)
 char *connectTwoStrings(const char *str1, const char *str2)
 {
     char *connectedString; /* String the return */
-    allocate_space(connectedString, strlen(str1) + strlen(str2) + SIZE_FOR_NULL);
+    allocate_space(POINTER(connectedString),
+                   strlen(str1) + strlen(str2) + SIZE_FOR_NULL);
 
     strcpy(connectedString, str1); /* Appending str1 to the connected string */
     connectedString = strcat(connectedString, str2); /* Appending str2 */
