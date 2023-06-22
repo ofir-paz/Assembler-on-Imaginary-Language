@@ -81,18 +81,48 @@ boolean sameStrings(const char *str1, const char *str2)
     return (strcmp(str1, str2) == SAME_STRINGS)? TRUE : FALSE;
 }
 
-/* Connects two given strings to a new string.
- * param const char *str1 is the first string to connect
- * param const char *str2 is the second string to connect
- * Returns the new created string str1 + str2. */
+/*
+ * Adds a given string to the first string and frees the string to add.
+ * Basically does: str1 = str1 + str2, free(str2).
+ * Handles all the cases where a pointer is NULL.
+ *
+ * @param   *str1 The first string.
+ * @param   *str2 The string to add.
+ */
+void addTwoStrings(char **str1, char **str2)
+{
+    /* If any of does pointers are NULL, we have nothing to do. */
+    if (str1 == NULL || str2 == NULL || *str2 == NULL);
+
+    /* Same as x + 0 = x. */
+    else if (*str1 == NULL) *str1 = *str2;
+
+    else /* None of the pointers are NULL. */
+    {
+        /* Allocates more space in the memory for str1 */
+        *str1 = realloc(*str1, strlen(*str1) + strlen(*str2) + SIZE_FOR_NULL);
+        handle_allocation_error(*str1);
+
+        (void) strcat(*str1, *str2); /* Adds to strings */
+        free_ptr(POINTER(*str2)); /* Frees the string to add */
+    }
+}
+
+/*
+ * Connects two given strings to a new string.
+ *
+ * @param   *str1 The first string to connect.
+ * @param   *str2 The second string to connect.
+ * @return  The new created string str1 + str2.
+ */
 char *connectTwoStrings(const char *str1, const char *str2)
 {
     char *connectedString; /* String the return */
     allocate_space(POINTER(connectedString),
                    strlen(str1) + strlen(str2) + SIZE_FOR_NULL);
 
-    strcpy(connectedString, str1); /* Appending str1 to the connected string */
-    connectedString = strcat(connectedString, str2); /* Appending str2 */
+    (void) strcpy(connectedString, str1); /* Appending str1 to the connected string */
+    (void) strcat(connectedString, str2); /* Appending str2 */
 
     return connectedString;
 }

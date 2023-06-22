@@ -35,10 +35,23 @@ char *strToLowerCase(const char *str);
 /* Return TRUE if str1 == str2, otherwise FALSE. */
 boolean sameStrings(const char *str1, const char *str2);
 
-/* Connects two given strings to a new string.
- * param const char *str1 is the first string to connect
- * param const char *str2 is the second string to connect
- * Returns the new created string str1 + str2. */
+/*
+ * Adds a given string to the first string and frees the string to add.
+ * Basically does: str1 = str1 + str2, free(str2).
+ * Handles all the cases where a pointer is NULL.
+ *
+ * @param   *str1 The first string.
+ * @param   *str2 The string to add.
+ */
+void addTwoStrings(char **str1, char **str2);
+
+/*
+ * Connects two given strings to a new string.
+ *
+ * @param   *str1 The first string to connect.
+ * @param   *str2 The second string to connect.
+ * @return  The new created string str1 + str2.
+ */
 char *connectTwoStrings(const char *str1, const char *str2);
 
 /* ---------------------------------------- */
