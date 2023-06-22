@@ -5,10 +5,10 @@ set(CMAKE_C_STANDARD 90)
 
 add_executable(mmn_14 main.c general_help_methods.c general_help_methods.h new-data-types/boolean.h
         new-data-types/Error.h errors/error_check.c errors/error_handle.c
-        transitions/pre-processor.c  transitions/pre-processor.h fileHandling/readFromFile.c
-        fileHandling/readFromFile.h
-        fileHandling/writeToFile.c fileHandling/writeToFile.h encoding/encoding-finals/opcodes.h
+        transitions/pre-processor.c  transitions/pre-processor.h FileHandling/readFromFile.c
+        FileHandling/readFromFile.h
+        FileHandling/writeToFile.c FileHandling/writeToFile.h encoding/encoding-finals/opcodes.h
         encoding/encoding-finals/addressing-methods.h transitions/first-transition.c
         transitions/first-transition.h transitions/second-transition.c
         transitions/second-transition.h encoding/encoding-finals/encoding-type.h encoding/encoding-finals/encoding-type.h
-        encoding/encoding-finals/encoding-type.h assembler.c assembler.h errors/warnings.c errors/warnings.h general-enums/indexes.h diagnoses/diagnose_line.c diagnoses/diagnose_line.h new-data-types/param_num.h encoding/encoding-finals/sentenceType.h new-data-types/process_result.h errors/system_errors.c errors/system_errors.h errors/errors.c errors/errors.h fileHandling/fileHelpMethods.c fileHandling/fileHelpMethods.h errors/error_types/SystemError.h errors/error_types/SyntaxError.h errors/error_types/LogicalError.h NameTable/NameTable.c encoding/encode-line.c encoding/encode-line.h encoding/encoding-help-methods.c encoding/encoding-help-methods.h errors/error_types/ImgSystemError.h diagnoses/diagnose_help_methods.c diagnoses/diagnose_help_methods.h new-data-types/word_number.h NameTable/NameTable.h)
+        encoding/encoding-finals/encoding-type.h assembler.c assembler.h errors/warnings.c errors/warnings.h general-enums/indexes.h diagnoses/diagnose_line.c diagnoses/diagnose_line.h new-data-types/param_num.h encoding/encoding-finals/sentenceType.h new-data-types/process_result.h errors/system_errors.c errors/system_errors.h errors/errors.c errors/errors.h FileHandling/fileHelpMethods.c FileHandling/fileHelpMethods.h errors/error_types/SystemError.h errors/error_types/SyntaxError.h errors/error_types/LogicalError.h NameTable/NameTable.c encoding/encode-line.c encoding/encode-line.h encoding/encoding-help-methods.c encoding/encoding-help-methods.h errors/error_types/ImgSystemError.h diagnoses/diagnose_help_methods.c diagnoses/diagnose_help_methods.h new-data-types/word_number.h NameTable/NameTable.h)

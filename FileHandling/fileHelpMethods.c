@@ -1,8 +1,9 @@
 /*
  * @author Ofir Paz
  * @Version (27/04/2023)
+ *
  * This file has help methods to assist with handling files.
- * */
+ */
 
 /* ---Include header files--- */
 #include <stdio.h>
@@ -15,12 +16,15 @@
 #define ZERO_CODE 0
 /* ------------ */
 
-/* Opens a file.
+/*
+ * Opens a file.
  * Terminates the program on error!
- * param const char *file_name is the name of the file to open
- * param const char *fileType is the type of the file to open
- * param const char *modeType is the mode to open the file with
- * Returns a pointer to the opened file. */
+ *
+ * @param   *file_name The name of the file to open.
+ * @param   *fileType The type of the file to open.
+ * @param   *modeType The mode to open the file with.
+ * @return  Pointer to the opened file.
+ */
 FILE *openFile(const char *file_name, const char *fileType, const char *modeType)
 {
     static FILE *file = NULL; /* Will be the file to open */
@@ -36,11 +40,14 @@ FILE *openFile(const char *file_name, const char *fileType, const char *modeType
     return file;
 }
 
-/* Closes a file.
+/*
+ * Closes a file.
  * Terminates the program on error!
- * param FILE *file is the file to close
- * Returns nothing. */
+ *
+ * @param   *file The file to close
+ */
 void closeFile(FILE *file)
 {
-    handle_file_close_errors(fclose(file));
+    if (file != NULL) /* Close the file only if it's open */
+        handle_file_close_errors(fclose(file));
 }
