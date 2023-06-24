@@ -66,11 +66,11 @@ void *getDataByName(const NameTable *table, const char *name);
  *
  * @param   *name_table Pointer to the NameTable.
  * @param   *name The name of node to change the data for.
- * @param   *str The string to add the data.
+ * @param   *str The string to add to the data.
  * @return  0 if successful, -1 if the name is not in the table, -2 if the
  *          table's data type is not string.
  */
-int addStringToData(NameTable *name_table, const char *name, char *str);
+int addStringToData(NameTable *name_table, const char *name, const char *str);
 
 /*
  * Changes the data associated with the given name in the NameTable.

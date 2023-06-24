@@ -22,6 +22,7 @@
 #define WAS_NULL_RETURN_CODE (-1)
 #define FREED_RETURN_CODE 0
 #define SIZE_FOR_NULL 1
+#define ZERO_LENGTH 0
 #define SAME_STRINGS 0
 /* ------------ */
 
@@ -82,29 +83,27 @@ boolean sameStrings(const char *str1, const char *str2)
 }
 
 /*
- * Adds a given string to the first string and frees the string to add.
- * Basically does: str1 = str1 + str2, free(str2).
- * Handles all the cases where a pointer is NULL.
+ * Adds a given string to the first string.
+ * Assumes that str1 and str2 are null-terminated, otherwise undefined behavior !
+ * Basically does: str1 = str1 + str2.
  *
- * @param   *str1 The first string.
+ * @param   **str1 The first string.
  * @param   *str2 The string to add.
  */
-void addTwoStrings(char **str1, char **str2)
+void addTwoStrings(char **str1, const char *str2)
 {
-    /* If any of does pointers are NULL, we have nothing to do. */
-    if (str1 == NULL || str2 == NULL || *str2 == NULL);
-
-    /* Same as x + 0 = x. */
-    else if (*str1 == NULL) *str1 = *str2;
+    /* If those pointers are NULL, we have nothing to do. */
+    if (str1 == NULL || str2 == NULL);
 
     else /* None of the pointers are NULL. */
     {
+        size_t len1 = (*str1 == NULL)? ZERO_LENGTH : strlen(*str1);
+        size_t len2 = strlen(str2);
         /* Allocates more space in the memory for str1 */
-        *str1 = realloc(*str1, strlen(*str1) + strlen(*str2) + SIZE_FOR_NULL);
+        *str1 = realloc(*str1, len1 + len2 + SIZE_FOR_NULL);
         handle_allocation_error(*str1);
 
-        (void) strcat(*str1, *str2); /* Adds to strings */
-        free_ptr(POINTER(*str2)); /* Frees the string to add */
+        (void) strcat(*str1, str2); /* Adds the strings */
     }
 }
 

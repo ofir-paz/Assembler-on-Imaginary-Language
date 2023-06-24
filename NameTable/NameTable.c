@@ -186,11 +186,11 @@ void *getDataByName(const NameTable *table, const char *name)
  *
  * @param   *name_table Pointer to the NameTable.
  * @param   *name The name of node to change the data for.
- * @param   *str The string to add the data.
+ * @param   *str The string to add to the data.
  * @return  0 if successful, -1 if the name is not in the table, -2 if the
  *          table's data type is not string.
  */
-int addStringToData(NameTable *name_table, const char *name, char *str)
+int addStringToData(NameTable *name_table, const char *name, const char *str)
 {
     int returnCode = SUCCESS_CODE; /* Value to return. */
     Node *node = getNodeByName(name_table, name); /* Get the node by name. */
@@ -200,7 +200,7 @@ int addStringToData(NameTable *name_table, const char *name, char *str)
     else if (name_table -> dataType != STRING_TYPE) /* Check if the data type of table is string */
         returnCode = NOT_MATCHING_DATA_CODE;
     else /* Add the string to the data */
-        addTwoStrings((char **) &(node -> data), &str);
+        addTwoStrings((char **) &(node -> data), str);
 
     return returnCode;
 }

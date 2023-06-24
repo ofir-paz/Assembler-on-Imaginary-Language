@@ -36,14 +36,14 @@ char *strToLowerCase(const char *str);
 boolean sameStrings(const char *str1, const char *str2);
 
 /*
- * Adds a given string to the first string and frees the string to add.
- * Basically does: str1 = str1 + str2, free(str2).
- * Handles all the cases where a pointer is NULL.
+ * Adds a given string to the first string.
+ * Assumes that str1 and str2 are null-terminated, otherwise undefined behavior !
+ * Basically does: str1 = str1 + str2.
  *
- * @param   *str1 The first string.
+ * @param   **str1 The first string.
  * @param   *str2 The string to add.
  */
-void addTwoStrings(char **str1, char **str2);
+void addTwoStrings(char **str1, const char *str2);
 
 /*
  * Connects two given strings to a new string.
