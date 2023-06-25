@@ -18,7 +18,7 @@
  * @param   **line is a pointer to string that will hold the read line.
  * @return  The length of the line if it has been read successfully or EOF (-1) if not.
  */
-int readNextLineFromFile(const char *file_name, const char *fileType, char **line);
+ssize_t readNextLineFromFile(const char *file_name, const char *fileType, char **line);
 
 /* ---------------------------------------- */
 

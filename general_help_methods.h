@@ -7,8 +7,10 @@
 #ifndef MMN_22_GENERAL_HELP_METHODS_H
 #define MMN_22_GENERAL_HELP_METHODS_H
 
+#include "new-data-types/boolean.h"
+
 /* ---Macros--- */
-#define POINTER(ptr) (void **)(ptr)
+#define POINTER(ptr) (void **)(&ptr)
 /* ------------ */
 
 /* ---------------Prototypes--------------- */
@@ -18,7 +20,7 @@
  * param void *ptr is the pointer to allocate space for
  * param size_t size is the size of the space to allocate
  * Returns nothing. */
-void allocate_space(void *ptr, size_t size);
+void *allocate_space(size_t size);
 
 /*
  * Frees a given pointer.
@@ -28,12 +30,29 @@ void allocate_space(void *ptr, size_t size);
  */
 int free_ptr(void **ptr);
 
+/*
+ * Creates a dynamically allocated string from a given string.
+ *
+ * @param   *str The string to recreate dynamically.
+ * @return  The newly dynamically created string with the contents of str.
+ */
+char *getDynamicString(char *str);
+
 /* Turns every char in the given param char *str to lower case.
  * Returns the created lower case string */
 char *strToLowerCase(const char *str);
 
 /* Return TRUE if str1 == str2, otherwise FALSE. */
 boolean sameStrings(const char *str1, const char *str2);
+
+/*
+ * Connects two given strings to a new string.
+ *
+ * @param   *str1 The first string to connect.
+ * @param   *str2 The second string to connect.
+ * @return  The new created string str1 + str2, or NULL if str1 or str2 is NULL.
+ */
+char *connectTwoStrings(const char *str1, const char *str2);
 
 /*
  * Adds a given string to the first string.
@@ -44,15 +63,6 @@ boolean sameStrings(const char *str1, const char *str2);
  * @param   *str2 The string to add.
  */
 void addTwoStrings(char **str1, const char *str2);
-
-/*
- * Connects two given strings to a new string.
- *
- * @param   *str1 The first string to connect.
- * @param   *str2 The second string to connect.
- * @return  The new created string str1 + str2.
- */
-char *connectTwoStrings(const char *str1, const char *str2);
 
 /* ---------------------------------------- */
 

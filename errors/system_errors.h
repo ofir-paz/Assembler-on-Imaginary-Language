@@ -10,6 +10,10 @@
 #ifndef MMN_14_SYSTEM_ERRORS_H
 #define MMN_14_SYSTEM_ERRORS_H
 
+#include <stdio.h>
+
+/* ---------------Prototypes--------------- */
+
 /* Handles no allocation error.
  * param void *ptr is the pointer to check if it has allocated space
  * Returns nothing. */
@@ -24,5 +28,7 @@ void handle_file_open_errors(const FILE *file);
  * param int code is the return code of fclose() func.
  * Returns nothing. */
 void handle_file_close_errors(int code);
+
+/* ---------------------------------------- */
 
 #endif /* MMN_14_SYSTEM_ERRORS_H */

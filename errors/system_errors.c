@@ -56,6 +56,6 @@ void handle_file_open_errors(const FILE *file)
  * Returns nothing. */
 void handle_file_close_errors(int code)
 {
-    if (!code) /* != 0, 0 is success return code of fclose() */
+    if (code == EOF) /* EOF (-1) is error return code of fclose() */
         system_error(FILE_CLOSE_ERR);
 }

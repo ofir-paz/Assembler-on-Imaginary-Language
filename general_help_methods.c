@@ -15,7 +15,7 @@
 /* -------------- */
 
 /* ---Macros--- */
-#define POINTER(ptr) (void **)(ptr)
+#define POINTER(ptr) (void **)(&ptr)
 /* ------------ */
 
 /* ---Finals--- */
@@ -31,10 +31,11 @@
  * param void *ptr is the pointer to allocate space for
  * param size_t size is the size of the space to allocate
  * Returns nothing. */
-void allocate_space(void **ptr, size_t size)
+void *allocate_space(size_t size)
 {
-    *ptr = (typeof(*ptr)) malloc(size); /* Allocating the space */
+    void *ptr = malloc(size); /* Allocating the space */
     handle_allocation_error(ptr); /* Handling errors if there are */
+    return ptr;
 }
 
 /*
@@ -58,6 +59,19 @@ int free_ptr(void **ptr)
     return returnCode;
 }
 
+/*
+ * Creates a dynamically allocated string from a given string.
+ *
+ * @param   *str The string to recreate dynamically.
+ * @return  The newly dynamically created string with the contents of str.
+ */
+char *getDynamicString(char *str)
+{
+    char *dynamicString = (char *) allocate_space(strlen(str));
+    dynamicString = strcpy(dynamicString, str);
+    return dynamicString;
+}
+
 /* Turns every char in the given param char *str to lower case.
  * Returns the created lower case string */
 char *strToLowerCase(const char *str)
@@ -65,8 +79,7 @@ char *strToLowerCase(const char *str)
     int i; /* Loop variable */
     
     /* Assigning space in the memory for the new string */
-    char *lowerCase_str;
-    allocate_space(POINTER(lowerCase_str), strlen(str) + SIZE_FOR_NULL);
+    char *lowerCase_str = (char *) allocate_space(strlen(str) + SIZE_FOR_NULL);
 
     lowerCase_str[strlen(str)] = NULL_TERMINATOR; /* Adding null terminator */
 
@@ -83,6 +96,30 @@ boolean sameStrings(const char *str1, const char *str2)
 }
 
 /*
+ * Connects two given strings to a new string.
+ *
+ * @param   *str1 The first string to connect.
+ * @param   *str2 The second string to connect.
+ * @return  The new created string str1 + str2, or NULL if str1 or str2 is NULL.
+ */
+char *connectTwoStrings(const char *str1, const char *str2)
+{
+    /* String to return */
+    char *connectedString = NULL;
+
+    if (str1 != NULL && str2 != NULL)
+    {
+        connectedString = (char *)
+                allocate_space(strlen(str1) + strlen(str2) + SIZE_FOR_NULL);
+
+        (void) strcpy(connectedString, str1); /* Appending str1 to the connected string */
+        (void) strcat(connectedString, str2); /* Appending str2 */
+    }
+
+    return connectedString;
+}
+
+/*
  * Adds a given string to the first string.
  * Assumes that str1 and str2 are null-terminated, otherwise undefined behavior !
  * Basically does: str1 = str1 + str2.
@@ -93,35 +130,18 @@ boolean sameStrings(const char *str1, const char *str2)
 void addTwoStrings(char **str1, const char *str2)
 {
     /* If those pointers are NULL, we have nothing to do. */
-    if (str1 == NULL || str2 == NULL);
-
-    else /* None of the pointers are NULL. */
+    if (str1 != NULL && str2 != NULL)
     {
-        size_t len1 = (*str1 == NULL)? ZERO_LENGTH : strlen(*str1);
-        size_t len2 = strlen(str2);
-        /* Allocates more space in the memory for str1 */
-        *str1 = realloc(*str1, len1 + len2 + SIZE_FOR_NULL);
-        handle_allocation_error(*str1);
-
-        (void) strcat(*str1, str2); /* Adds the strings */
+        if (*str1 == NULL)
+        {
+            *str1 = (char *) allocate_space(strlen(str2));
+            *str1 = strcpy(*str1, str2);
+        }
+        else
+        {
+            char *sumOfStrings = connectTwoStrings(*str1, str2);
+            free_ptr(POINTER(*str1));
+            *str1 = sumOfStrings;
+        }
     }
-}
-
-/*
- * Connects two given strings to a new string.
- *
- * @param   *str1 The first string to connect.
- * @param   *str2 The second string to connect.
- * @return  The new created string str1 + str2.
- */
-char *connectTwoStrings(const char *str1, const char *str2)
-{
-    char *connectedString; /* String the return */
-    allocate_space(POINTER(connectedString),
-                   strlen(str1) + strlen(str2) + SIZE_FOR_NULL);
-
-    (void) strcpy(connectedString, str1); /* Appending str1 to the connected string */
-    (void) strcat(connectedString, str2); /* Appending str2 */
-
-    return connectedString;
 }

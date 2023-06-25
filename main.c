@@ -14,11 +14,12 @@
 int main(int argc, char *argv[]) {
     int i = ONE_INDEX; /* Loop variable */
 
-    if (argument_error(argc) == TRUE) /* Check for errors with the arguments */
-        handle_argument_error(); /* Handle it */
+    //if (argument_error(argc) == TRUE) /* Check for errors with the arguments */
+    //    handle_argument_error(); /* Handle it */
 
-    while (i < argc)
+    while (i < argc){
         assemble(argv[i]);
-
+        i++;
+    }
     return 0;
 }

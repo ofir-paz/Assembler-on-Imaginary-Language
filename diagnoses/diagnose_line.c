@@ -9,9 +9,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include "../new-data-types/word_number.h"
+#include "../new-data-types/param_num.h"
 #include "../general-enums/indexes.h"
 #include "../general-enums/neededKeys.h"
-#include "cmd_params.h"
 #include "../errors/system_errors.h"
 #include "diagnose_help_methods.h"
 #include "../general_help_methods.h"
@@ -44,7 +44,7 @@ void findWord(const char *line, char **word, word_number wordNumber)
     size_t wordSize = getWordSize(line, wordNumber); /* Finding the size of the word */
     int start = findStartIndexOfWord(line, wordNumber); /* Start index of the word */
 
-    allocate_space(*word, wordSize); /* Allocating space for the string */
+    *word = (char *) allocate_space(wordSize); /* Allocating space for the string */
     (*word)[wordSize] = NULL_TERMINATOR; /* Add null terminator to the end of the string */
 
     /* Copying the command from line to string command */
@@ -56,7 +56,7 @@ void findWord(const char *line, char **word, word_number wordNumber)
  * This functions presumes that the command and the commas (up to the parameter to find)
  * are valid since it is supposed to be called after they are validated.
  * Returns the index of the wanted parameter or index of last char ('\0') in line if there isn't. */
-int findParamIndex(const char *line, ParamNum paramNum)
+int findParamIndex(const char *line, param_num paramNum)
 {
     /* Start index of the command in line. */
     int startOfCmd = nextCharIndex(line, MINUS_ONE_INDEX);
@@ -79,7 +79,7 @@ int findParamIndex(const char *line, ParamNum paramNum)
 /* Finds the length of the float parameter numbered paramNum in
  * param const char *line.
  * Returns the length of the specified float parameter. */
-int getFloatParamLen(const char *line, ParamNum paramNum)
+int getFloatParamLen(const char *line, param_num paramNum)
 {
     int start = findParamIndex(line, paramNum); /* Start index of the float */
     int end = start + 1; /* End index of the float */
@@ -91,26 +91,26 @@ int getFloatParamLen(const char *line, ParamNum paramNum)
 /* Finds the length of the parameter number paramNum with type paramtype pType
  * in const char *line.
  * Returns the length of the specific parameter. */
-int findParamLen(const char *line, ParamNum paramNum, paramtype pType)
+int findParamLen(const char *line, param_num paramNum)// paramtype pType)
 {
     int len; /* Value to return */
     /* Addressing every option for the parameter type */
-    switch (pType) {
-        case FLOAT: /* Option of float param */
-            len = getFloatParamLen(line, paramNum);
-            break;
-        case CHAR: /* Option of char param */
-            len = getCharParamLen();
-            break;
-        default: /* Extreme case */
-            len = DEFAULT_ZERO_LEN;
-    }
+//    switch () {
+//        case FLOAT: /* Option of float param */
+//            len = getFloatParamLen(line, paramNum);
+//            break;
+//        case CHAR: /* Option of char param */
+//            len = getCharParamLen();
+//            break;
+//        default: /* Extreme case */
+//            len = DEFAULT_ZERO_LEN;
+//    }
     return len;
 }
 
 /* Gets the float parameter numbered paramNum from param const char *line.
  * Returns the specified float value. */
-float getFloatParamFromLine(const char *line, ParamNum paramNum)
+float getFloatParamFromLine(const char *line, param_num paramNum)
 {
     int index = findParamIndex(line, paramNum);
     char *endPtr;
@@ -119,7 +119,7 @@ float getFloatParamFromLine(const char *line, ParamNum paramNum)
 
 /* Gets the char parameter numbered paramNum from param const char *line.
  * Returns the specified char. */
-char getCharParamFromLine(const char *line, ParamNum paramNum)
+char getCharParamFromLine(const char *line, param_num paramNum)
 {
     int index = findParamIndex(line, paramNum);
     return line[index];

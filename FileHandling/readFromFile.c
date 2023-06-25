@@ -23,16 +23,16 @@
  * @param   **line is a pointer to string that will hold the read line.
  * @return  The length of the line if it has been read successfully or EOF (-1) if not.
  */
-int readNextLineFromFile(const char *file_name, const char *fileType, char **line)
+ssize_t readNextLineFromFile(const char *file_name, const char *fileType, char **line)
 {
-    int returnCode; /* Value to return, we assume success */
+    ssize_t returnCode; /* Value to return, we assume success */
     FILE *fileToRead = openFile(file_name, fileType, READ_MODE); /* Open file */
     size_t len = ZERO_LEN; /* Will be used with the getline() function */
     *line = NULL;
 
     /* Read the line. If there is no file to read, close the file. */
-    if ((returnCode = (int) getline(line, &len, fileToRead)) == EOF)
-        closeFile(fileToRead);
+    if ((returnCode = getline(line, &len, fileToRead)) == EOF)
+        closeFile(&fileToRead);
 
     return returnCode;
 }

@@ -30,7 +30,7 @@ FILE *openFile(const char *file_name, const char *fileType, const char *modeType
     static FILE *file = NULL; /* Will be the file to open */
     char *fileToOpen = connectTwoStrings(file_name, fileType); /* Full file name */
 
-    if (file == NULL) /* If file was not opened */
+    if (file == NULL || sameStrings(modeType, "w") == TRUE) /* If file was not opened */
     {
         file = fopen(fileToOpen, modeType); /* Open the file */
         handle_file_open_errors(file); /* Will handle errors with opening file */
@@ -44,10 +44,11 @@ FILE *openFile(const char *file_name, const char *fileType, const char *modeType
  * Closes a file.
  * Terminates the program on error!
  *
- * @param   *file The file to close
+ * @param   **file Pointer to the file to close
  */
-void closeFile(FILE *file)
+void closeFile(FILE **file)
 {
-    if (file != NULL) /* Close the file only if it's open */
-        handle_file_close_errors(fclose(file));
+    if (file != NULL && *file != NULL) /* Close the file only if it's open */
+        handle_file_close_errors(fclose(*file));
+    *file = NULL;
 }

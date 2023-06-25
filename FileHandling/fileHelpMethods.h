@@ -27,9 +27,9 @@ FILE *openFile(const char *file_name, const char *fileType, const char *modeType
  * Closes a file.
  * Terminates the program on error!
  *
- * @param   *file The file to close
+ * @param   **file Pointer to the file to close
  */
-void closeFile(FILE *file);
+void closeFile(FILE **file);
 
 /* ---------------------------------------- */
 

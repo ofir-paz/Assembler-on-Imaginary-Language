@@ -50,7 +50,7 @@ typedef struct {
  */
 NameTable *createNameTable(dataType type)
 {
-    NameTable *table = NULL;
+    NameTable *table = (NameTable *) allocate_space(sizeof(NameTable));
     table -> dataType = type;
     table -> head = NULL;
     return table;
@@ -71,7 +71,7 @@ Node *getNodeByName(const NameTable *name_table, const char *name)
     while (curr != NULL)
     {
         /* Exit the loop if we found the matching node */
-        if (sameStrings(curr -> name, name) == TRUE) continue;
+        if (sameStrings(curr -> name, name) == TRUE) break;
         curr = curr->next; /* Go to next node */
     }
 
@@ -110,8 +110,8 @@ Node *getToLastNode(const NameTable *name_table)
  */
 Node *createNode(char *name, void *data, Node *next)
 {
-    Node *new_node = NULL; /* New node, Node to return. */
-    allocate_space(new_node, sizeof(Node));
+    /* New node, Node to return. */
+    Node *new_node = (Node *) allocate_space(sizeof(Node));
 
     /* Assigns attributes of the new node */
     new_node -> name = name;

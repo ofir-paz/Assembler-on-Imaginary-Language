@@ -9,7 +9,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include "../new-data-types/Error.h"
-#include "complex.h"
 #include "error_check.h"
 /* -------------------------- */
 
@@ -74,22 +73,11 @@ void noAllocationERR()
  * Returns nothing. */
 void caseSensitiveERR(char **lowerCaseFunc)
 {
-    char *fix, *tmp = "Try using the command: ";
 
-    /* Assigning space in the memory for the fix string, including null */
-    fix = (char *) malloc(strlen(tmp) + strlen(*lowerCaseFunc) + SPACE_FOR_NULL);
-
-    if (isAllocated(fix) == FALSE) /* Checking if space has not been assigned. */
-        noAllocationERR(); /* If not, noAllocationERR() will terminate the program */
-
-    strcpy(fix, tmp); /* Adding tmp to fix */
-    strcat(fix, *lowerCaseFunc); /* Adding lowerCaseFunc to fix */
-
-    printERR(WRONG_CASE_FUNC, fix);
+    printERR(WRONG_CASE_FUNC, NULL);
 
     /* Freeing the unneeded strings */
     free(*lowerCaseFunc);
-    free(fix);
 }
 
 /* Handles the error where the command from the user is an undefined function.
@@ -163,7 +151,7 @@ void handleExtraneousERR(Error extraERR, char **fix)
 
 void handle_lineTooLong_ERR(int lineIndex)
 {
-    printERR(LINE_TOO_LONG, lineIndex);
+    printERR(LINE_TOO_LONG, NULL);
 }
 
 

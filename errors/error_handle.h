@@ -7,10 +7,6 @@
 #ifndef MMN_22_ERROR_HANDLE_H
 #define MMN_22_ERROR_HANDLE_H
 
-#include "Error.h"
-
-typedef struct complex complex; /* Prototype for complex data type */
-
 /* ----------Prototypes---------- */
 
 /* Handles the error where there has been a failed allocation in the memory.

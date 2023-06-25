@@ -8,7 +8,7 @@
 #ifndef MMN_14_PRE_PROCESSOR_H
 #define MMN_14_PRE_PROCESSOR_H
 
-#include "NameTable/NameTable.h"
+#include "../NameTable/NameTable.h"
 
 /* ---------------Prototypes--------------- */
 

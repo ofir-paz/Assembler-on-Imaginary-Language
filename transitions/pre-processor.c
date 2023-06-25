@@ -7,6 +7,7 @@
 
 /* ---Include header files--- */
 #include <stdio.h>
+#include <string.h>
 #include "../new-data-types/boolean.h"
 #include "../NameTable/NameTable.h"
 #include "../general_help_methods.h"
@@ -44,12 +45,13 @@ NameTable *pre_process(const char *file_name)
 {
     NameTable *amFile = createNameTable(STRING_TYPE); /* Will hold the file to print */
     NameTable *macro_table = createNameTable(STRING_TYPE); /* Will hold the macros */
+    addNameToTable(amFile, getDynamicString(AFTER_MACRO));
 
     traverse_before_macro_file(file_name, amFile, macro_table);
 
     /* Create the .am file */
     writeToFile(file_name, AFTER_MACRO,
-                getDataByName(amFile, AFTER_MACRO));
+                (char *) getDataByName(amFile, AFTER_MACRO));
     deleteTable(amFile); /* Free unnecessary variable */
 
     return macro_table;

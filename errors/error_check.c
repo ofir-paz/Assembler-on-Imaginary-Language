@@ -9,31 +9,28 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include "../new-data-types/boolean.h"
+#include "../new-data-types/Error.h"
+#include "../new-data-types/param_num.h"
+#include "../general-enums/indexes.h"
 #include "../general-enums/neededKeys.h"
-#include "../new-data-types//boolean.h"
 #include "../general_help_methods.h"
 #include "../diagnoses/diagnose_line.h"
+#include "../diagnoses/diagnose_help_methods.h"
 /* -------------------------- */
 
 /* ---Finals--- */
 #define ZERO_NUMBER 0
 #define ZERO_INDEX 0
 #define LEGAL_DOTS_IN_FLOAT 1
-#define EMPTY_LINE "\n\0"
 /* ------------ */
-
-/* Returns TRUE if param const char *line is an empty line {enter,null}, otherwise FALSE. */
-boolean isEmptyLine(const char *line)
-{
-    return sameStrings(line, EMPTY_LINE);
-}
 
 /* Checks if the function is a defined handle complex function.
  * Returns TRUE if it is, otherwise FALSE */
-boolean isDefinedFunction(const char *command)
-{
-    return (getFunction(command) != NULL)? TRUE : FALSE;
-}
+//boolean isDefinedFunction(const char *command)
+//{
+//    return (getFunction(command) != NULL)? TRUE : FALSE;
+//}
 
 /* Checks for illegal comma after the function in param const char *command.
  * Returns TRUE if there is a comma after the command, otherwise FALSE. */
@@ -62,21 +59,21 @@ boolean isNextCharComma(const char *line, int index)
 Error checkCommandError(const char *command)
 {
     Error error; /* Value to return, we don't know the error yet. */
-    char *lowerCase = strToLowerCase(command);
-
-    if (isDefinedFunction(command) == TRUE) /* Checks if there is an error */
-        error = NO_ERROR;
-
-    /* Try to catch a specific error in case there is */
-    else if (isCommaAfterCmd(command) == TRUE) /* See if the error is illegal comma after the command */
-        error = COMMA_AFTER_CMD;
-    /* See if the user didn't input the command in lower case letter */
-    else if (isDefinedFunction(lowerCase) == TRUE)
-        error = WRONG_CASE_FUNC;
-    else /* No specific function error, we call it undefined function. */
-        error = UNDEFINED_FUNC;
-
-    free(lowerCase);
+//    char *lowerCase = strToLowerCase(command);
+//
+//    if (isDefinedFunction(command) == TRUE) /* Checks if there is an error */
+//        error = NO_ERROR;
+//
+//    /* Try to catch a specific error in case there is */
+//    else if (isCommaAfterCmd(command) == TRUE) /* See if the error is illegal comma after the command */
+//        error = COMMA_AFTER_CMD;
+//    /* See if the user didn't input the command in lower case letter */
+//    else if (isDefinedFunction(lowerCase) == TRUE)
+//        error = WRONG_CASE_FUNC;
+//    else /* No specific function error, we call it undefined function. */
+//        error = UNDEFINED_FUNC;
+//
+//    free(lowerCase);
     return  error; /* Return the found error */
 }
 
@@ -84,12 +81,12 @@ Error checkCommandError(const char *command)
  * the parameter in line numbered paramNum with type pType and the index
  * of the next param is valid (comma-wise)
  * Returns NO_ERROR if it's valid, otherwise the specific error that occurs. */
-Error checkCommaError(const char *line, ParamNum paramNum, paramtype pType)
+Error checkCommaError(const char *line, param_num paramNum)//, paramtype pType)
 {
     Error error = NO_ERROR; /* Value to return, we assume there is no error. */
 
     /* Index to check commas from */
-    int index = findParamIndex(line, paramNum) + findParamLen(line, paramNum, pType);
+    int index;// = findParamIndex(line, paramNum) + findParamLen(line, paramNum, pType);
 
     /* Checks if the char between the two params is a comma */
     if (isCurrCharComma(line, index) == TRUE || isNextCharComma(line, index) == TRUE)
@@ -134,7 +131,7 @@ boolean isOnlySign(const char *line, int start, int end)
     boolean isOnlySign = FALSE; /* Value to return, we assume the number is not only a sign */
 
     /* Checks if the error is that the user entered only the sign of the float */
-    if (isPlusOrMinus(*(line + start)) && nextInt(start) == end)
+    if (isPlusOrMinus(*(line + start)) && (start + ONE_INDEX) == end)
         isOnlySign = TRUE; /* Assign value to return to TRUE if so */
 
     return isOnlySign;
@@ -161,7 +158,7 @@ boolean isFloat(const char *str, int start, int end)
 
 /* Checks if float param number paramNum in const char *line is valid.
  * Returns NO_ERROR if it is, otherwise the specific error caught. */
-Error checkParamFloatError(const char *line, ParamNum paramNum)
+Error checkParamFloatError(const char *line, param_num paramNum)
 {
     Error error = NO_ERROR; /* Assuming there is no error. */
     int start = findParamIndex(line, paramNum); /* Start index of parameter in line. */
@@ -202,7 +199,7 @@ Error checkParamFloatError(const char *line, ParamNum paramNum)
 boolean isNextEmpty(const char *line, int index)
 {
     boolean isNextEmpty = FALSE; /* Value to return, we assume the char after is not empty. */
-    int nextI = nextInt(index); /* Index + 1, will be used to check the char after the one in index */
+    int nextI = index + ONE_INDEX; /* Index + 1, will be used to check the char after the one in index */
 
     /* Checks if the next char even exist */
     if (isIndexInStr(line, nextI) == TRUE){
@@ -241,15 +238,9 @@ boolean isCapitalLetter(char letter)
     return (toupper(letter) == letter)? TRUE : FALSE;
 }
 
-/* Returns true if param char complex represents a defined complex, otherwise FALSE. */
-boolean isDefinedComplex(char complex)
-{
-    return (complex >= CHAR_A && complex <= CHAR_F)? TRUE : FALSE;
-}
-
 /* Checks for errors in the char param numbered paramNum of const char *line.
  * Returns NO_ERROR if there is no error, otherwise the specific error caught. */
-Error checkParamCharError(const char *line, ParamNum paramNum)
+Error checkParamCharError(const char *line, param_num paramNum)
 {
     Error error = NO_ERROR; /* Assuming there is no error. */
 
@@ -268,8 +259,6 @@ Error checkParamCharError(const char *line, ParamNum paramNum)
             error = NOT_LETTER;
         else if (isCapitalLetter(param) == FALSE) /* Checks if the param is not a capital letter */
             error = NOT_CAPITAL;
-        else if (isDefinedComplex(param) == FALSE) /* Checks if the param is a defined complex */
-            error = UNDEFINED_C_VAR;
         else
             error = NO_ERROR;
     }
@@ -281,13 +270,13 @@ Error checkParamCharError(const char *line, ParamNum paramNum)
 
 /* Checks for illegal extraneous text after the last parameter param lastParam in param const char *line.
  * Returns NO_ERROR if there is no extraneous text, otherwise the specific error caught. */
-Error checkExtraneousTextError(const char *line, ParamNum lastParam, paramtype pType)
+Error checkExtraneousTextError(const char *line, param_num lastParam) // paramtype pType)
 {
     Error error = NO_ERROR; /* Value to return, we assume there is no error. */
 
     /* Last index of the last param */
-    int lastIndexOfLastParam = findParamIndex(line, lastParam) +
-            findParamLen(line, lastParam, pType) - 1;
+    int lastIndexOfLastParam; //= findParamIndex(line, lastParam) +
+            //findParamLen(line, lastParam, pType) - 1;
 
     int lastChIndex = nextCharIndex(line, lastIndexOfLastParam);
     char lastCh = line[lastChIndex];
