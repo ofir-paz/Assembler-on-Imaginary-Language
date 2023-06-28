@@ -10,16 +10,14 @@
 #include <string.h>
 #include "../new-data-types/word_number.h"
 #include "../new-data-types/param_num.h"
+#include "../general-enums/programEnums.h"
 #include "../general-enums/indexes.h"
 #include "../general-enums/neededKeys.h"
-#include "../errors/system_errors.h"
 #include "diagnose_help_methods.h"
 #include "../general_help_methods.h"
 /* -------------------------- */
 
 /* -----Finals----- */
-#define SPACE_FOR_NULL 1
-#define DEFAULT_ZERO_LEN 0
 /* ---------------- */
 
 /* Gets the size of a specified word in a line string.
@@ -44,18 +42,21 @@ void findWord(const char *line, char **word, word_number wordNumber)
     size_t wordSize = getWordSize(line, wordNumber); /* Finding the size of the word */
     int start = findStartIndexOfWord(line, wordNumber); /* Start index of the word */
 
-    *word = (char *) allocate_space(wordSize); /* Allocating space for the string */
+    /* Allocating space for the string */
+    *word = (char *) allocate_space(wordSize + SIZE_FOR_NULL);
     (*word)[wordSize] = NULL_TERMINATOR; /* Add null terminator to the end of the string */
 
     /* Copying the command from line to string command */
-    strncpy(*word, line + start, wordSize);
+    (void) strncpy(*word, line + start, wordSize);
 }
 
-/* Finds index of parameter in const char *line.
+/*
+ * Finds index of parameter in const char *line.
  * param paramNum specifies the number of parameter to seek.
  * This functions presumes that the command and the commas (up to the parameter to find)
  * are valid since it is supposed to be called after they are validated.
- * Returns the index of the wanted parameter or index of last char ('\0') in line if there isn't. */
+ * Returns the index of the wanted parameter or index of last char ('\0') in line if there isn't.
+ */
 int findParamIndex(const char *line, param_num paramNum)
 {
     /* Start index of the command in line. */
@@ -82,7 +83,7 @@ int findParamIndex(const char *line, param_num paramNum)
 int getFloatParamLen(const char *line, param_num paramNum)
 {
     int start = findParamIndex(line, paramNum); /* Start index of the float */
-    int end = start + 1; /* End index of the float */
+    int end = start + ONE_INDEX; /* End index of the float */
     while (isPartOfNumber(line, end) == TRUE) /* While end is still in the number */
         end++; /* Move end forward */
     return end - start; /* Return the length */

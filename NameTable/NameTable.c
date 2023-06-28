@@ -250,19 +250,19 @@ void deleteNode(Node *node)
 /*
  * Deletes the entire NameTable and frees the memory.
  *
- * @param   table Pointer to the NameTable to delete.
+ * @param   **table Pointer to the NameTable to delete.
  */
-void deleteTable(NameTable *table)
+void deleteTable(NameTable **table)
 {
-    if (table != NULL) /* Check if it is already deleted. */
+    if (table != NULL && *table != NULL) /* Check if it is already deleted. */
     {
-        Node *curr = table -> head;
+        Node *curr = (*table) -> head;
         while (curr != NULL) /* Delete it node-by-node. */
         {
             Node *next = curr->next;
             deleteNode(curr);
             curr = next;
         }
-        table->head = NULL;
+        (void) free_ptr(POINTER(*table));
     }
 }

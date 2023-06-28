@@ -88,9 +88,9 @@ int setNumberInData(NameTable *name_table, const char *name, int num);
 /*
  * Deletes the entire NameTable and frees the memory.
  *
- * @param   table Pointer to the NameTable to delete.
+ * @param   **table Pointer to the NameTable to delete.
  */
-void deleteTable(NameTable *table);
+void deleteTable(NameTable **table);
 
 /* ---------------------------------------- */
 

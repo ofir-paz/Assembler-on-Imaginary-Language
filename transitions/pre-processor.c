@@ -25,6 +25,7 @@
 
 /* ----------Prototypes---------- */
 void traverse_before_macro_file(const char *file_name, NameTable *amFile, NameTable *macro_table);
+void handleLine(const char *line, char **macro_name, NameTable *amFile, NameTable *macro_table);
 boolean isInMacroDef(const char *line, boolean wasInMacroDef);
 void getMacroName(const char *line, char **macro_name, boolean wasInMacroDef, boolean inMacroDef);
 void addToTablesIfNeeded(const char *line, char *macro_name, boolean wasInMacroDef,
@@ -45,14 +46,14 @@ NameTable *pre_process(const char *file_name)
 {
     NameTable *amFile = createNameTable(STRING_TYPE); /* Will hold the file to print */
     NameTable *macro_table = createNameTable(STRING_TYPE); /* Will hold the macros */
-    addNameToTable(amFile, getDynamicString(AFTER_MACRO));
+    (void) addNameToTable(amFile, getDynamicString(AFTER_MACRO));
 
     traverse_before_macro_file(file_name, amFile, macro_table);
 
     /* Create the .am file */
     writeToFile(file_name, AFTER_MACRO,
                 (char *) getDataByName(amFile, AFTER_MACRO));
-    deleteTable(amFile); /* Free unnecessary variable */
+    deleteTable(&amFile); /* Free unnecessary variable */
 
     return macro_table;
 }
@@ -69,23 +70,38 @@ void traverse_before_macro_file(const char *file_name, NameTable *amFile, NameTa
     char *line = NULL; /* This will hold the current line */
     char *macro_name = NULL; /* This will hold the current macro name we are working with. */
 
-    /* Flags to indicate the state of macro definition */
-    boolean inMacroDef, wasInMacroDef = FALSE;
-
     /* Read the file line-by-line and handle it. */
     while (readNextLineFromFile(file_name, BEFORE_MACRO, &line) != EOF)
     {
-        if (isSkipLine(line) == TRUE) continue; /* Go to next line if we can skip this one */
-        inMacroDef = isInMacroDef(line, wasInMacroDef); /* See if we're now inside mcro def */
-        getMacroName(line, &macro_name, wasInMacroDef, inMacroDef); /* Get curr macro name */
+        if (isSkipLine(line) == FALSE) /* Go to next line if we can skip this one */
+            handleLine(line, &macro_name, amFile, macro_table);
 
-        /* Will make the necessary actions. add to amFile, or macro_table */
-        addToTablesIfNeeded(line, macro_name, wasInMacroDef, inMacroDef, amFile, macro_table);
-
-        wasInMacroDef = inMacroDef; /* Next iteration */
+        (void) free_ptr(POINTER(line)); /* Next line */
     }
 
-    free_ptr(POINTER(line));
+    (void) free_ptr(POINTER(line));
+}
+
+/*
+ * Handles the given line string in the pre-process.
+ *
+ * @param   *line Current line string.
+ * @param   **macro_name Pointer to the current macro name.
+ * @param   *amFile Data structure to hold the file to print.
+ * @param   *macro_table Data structure to hold the macro names and contents.
+ */
+void handleLine(const char *line, char **macro_name, NameTable *amFile, NameTable *macro_table)
+{
+    /* Flags to indicate the state of macro definition. */
+    static boolean wasInMacroDef = FALSE; /* See if last line was in a mcro def. */
+    boolean inMacroDef = isInMacroDef(line, wasInMacroDef); /* See if we're now inside mcro def */
+
+    getMacroName(line, macro_name, wasInMacroDef, inMacroDef); /* Get curr macro name */
+
+    /* Will make the necessary actions. add to amFile, or macro_table */
+    addToTablesIfNeeded(line, *macro_name, wasInMacroDef, inMacroDef, amFile, macro_table);
+
+    wasInMacroDef = inMacroDef;
 }
 
 /*
@@ -99,7 +115,7 @@ void traverse_before_macro_file(const char *file_name, NameTable *amFile, NameTa
 boolean isInMacroDef(const char *line, boolean wasInMacroDef)
 {
     boolean inMacroDef; /* Value to return */
-    char *firstWord; /* Will hold the first word in the line */
+    char *firstWord = NULL; /* Will hold the first word in the line */
     findWord(line, &firstWord, FIRST_WORD); /* Find the first word */
 
     /* Check if we are in a macro definition. */
@@ -110,6 +126,7 @@ boolean isInMacroDef(const char *line, boolean wasInMacroDef)
         /* Did we exit a macro definition? */
         inMacroDef = (sameStrings(firstWord, END_MACRO) == TRUE)? FALSE : TRUE;
 
+    (void) free_ptr(POINTER(firstWord)); /* Free unnecessary variable. */
     return inMacroDef;
 }
 
@@ -144,8 +161,8 @@ void getMacroName(const char *line, char **macro_name, boolean wasInMacroDef, bo
 void addToTablesIfNeeded(const char *line, char *macro_name, boolean wasInMacroDef,
                          boolean inMacroDef, NameTable *amFile, NameTable *macro_table)
 {
-    char *firstWord; /* Will hold first word in line */
-    findWord(line, &firstWord, FIRST_WORD); /* Find the first word */
+    char *firstWord = NULL; /* Will hold first word in line. */
+    findWord(line, &firstWord, FIRST_WORD); /* Find the first word. */
 
     /* Entered new macro definition, add the macro to the macro table. */
     if (isInNewMacroDef(wasInMacroDef, inMacroDef) == TRUE)
@@ -160,14 +177,14 @@ void addToTablesIfNeeded(const char *line, char *macro_name, boolean wasInMacroD
 
     /* Check if there is a macro */
     else if (isNameInTable(macro_table, firstWord) == TRUE)
-        addStringToData(amFile, AFTER_MACRO,
+        (void) addStringToData(amFile, AFTER_MACRO,
                         getDataByName(macro_table, firstWord));
 
     /* Nothing special, Add the current line to .am file. */
     else
-        addStringToData(amFile, AFTER_MACRO, line);
+        (void) addStringToData(amFile, AFTER_MACRO, line);
 
-    free_ptr(POINTER(firstWord)); /* Free unnecessary pointer */
+    (void) free_ptr(POINTER(firstWord)); /* Free unnecessary pointer */
 }
 
 /*

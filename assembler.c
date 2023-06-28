@@ -21,5 +21,6 @@ void assemble(const char *file_name)
     //if (handle_filename_error(file_name) == NO_ERROR)
     //{
         macro_table = pre_process(file_name);
+    deleteTable(&macro_table);
     //}
 }

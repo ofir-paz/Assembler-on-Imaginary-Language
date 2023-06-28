@@ -59,7 +59,7 @@ char *connectTwoStrings(const char *str1, const char *str2);
  * Assumes that str1 and str2 are null-terminated, otherwise undefined behavior !
  * Basically does: str1 = str1 + str2.
  *
- * @param   **str1 The first string.
+ * @param   **str1 Pointer to the first string.
  * @param   *str2 The string to add.
  */
 void addTwoStrings(char **str1, const char *str2);

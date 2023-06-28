@@ -68,13 +68,20 @@ int nextEmptyIndex(const char *str, int i)
     return i; /* Return the found index */
 }
 
-/* Finds the next index in param const char *str which points to a different word.
- * If param int i is not an index of str returns i,
- * otherwise returns the index of the next word in str (index of null if there isn't) */
+/*
+ * Finds the next index in the given string which points to a different word.
+ * If the given index is any negative value, returns the first word index.
+ * If it's after the last char in the given string, returns the given index.
+ *
+ * @param   *str The line string.
+ * @param   i The given index.
+ * @return  The next word index from i in str, or i if i > len(str).
+ */
 int nextWordIndex(const char *str, int i)
 {
     /* Using the nextCharIndex and nextEmptyIndex funcs to find the next word. */
-    return nextCharIndex(str, nextEmptyIndex(str, i));
+    return (i < ZERO_INDEX)? nextCharIndex(str, MINUS_ONE_INDEX) :
+        nextCharIndex(str, nextEmptyIndex(str, i));
 }
 
 /* Finds the next index in param const char *str where it is a comma.

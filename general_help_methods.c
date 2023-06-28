@@ -9,6 +9,7 @@
 #include <string.h>
 #include <ctype.h>
 #include "new-data-types/boolean.h"
+#include "general-enums/programEnums.h"
 #include "general-enums/indexes.h"
 #include "general-enums/neededKeys.h"
 #include "errors/system_errors.h"
@@ -21,8 +22,6 @@
 /* ---Finals--- */
 #define WAS_NULL_RETURN_CODE (-1)
 #define FREED_RETURN_CODE 0
-#define SIZE_FOR_NULL 1
-#define ZERO_LENGTH 0
 #define SAME_STRINGS 0
 /* ------------ */
 
@@ -67,8 +66,8 @@ int free_ptr(void **ptr)
  */
 char *getDynamicString(char *str)
 {
-    char *dynamicString = (char *) allocate_space(strlen(str));
-    dynamicString = strcpy(dynamicString, str);
+    char *dynamicString = (char *) allocate_space(strlen(str) + SIZE_FOR_NULL);
+    (void) strcpy(dynamicString, str);
     return dynamicString;
 }
 
@@ -124,7 +123,7 @@ char *connectTwoStrings(const char *str1, const char *str2)
  * Assumes that str1 and str2 are null-terminated, otherwise undefined behavior !
  * Basically does: str1 = str1 + str2.
  *
- * @param   **str1 The first string.
+ * @param   **str1 Pointer to the first string.
  * @param   *str2 The string to add.
  */
 void addTwoStrings(char **str1, const char *str2)
@@ -132,16 +131,16 @@ void addTwoStrings(char **str1, const char *str2)
     /* If those pointers are NULL, we have nothing to do. */
     if (str1 != NULL && str2 != NULL)
     {
-        if (*str1 == NULL)
+        if (*str1 == NULL) /* Create new space if the string is NULL */
         {
-            *str1 = (char *) allocate_space(strlen(str2));
-            *str1 = strcpy(*str1, str2);
+            *str1 = (char *) allocate_space(strlen(str2) + SIZE_FOR_NULL);
+            *str1 = strcpy(*str1, str2); /* *str1 = str2 (str1 was empty before) */
         }
-        else
+        else /* Add more space if the string already has some. */
         {
-            char *sumOfStrings = connectTwoStrings(*str1, str2);
-            free_ptr(POINTER(*str1));
-            *str1 = sumOfStrings;
+            *str1 = (char *) realloc(*str1,
+                                     strlen(*str1) + strlen(str2) + SIZE_FOR_NULL);
+            (void) strcat(*str1, str2); /* *str1 += str2 */
         }
     }
 }

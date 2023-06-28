@@ -25,9 +25,15 @@ int nextCharIndex(const char *str, int i);
  * otherwise returns the index of the next empty space in str (index of null if there isn't) */
 int nextEmptyIndex(const char *str, int i);
 
-/* Finds the next index in param const char *str which points to a different word.
- * If param int i is not an index of str returns i,
- * otherwise returns the index of the next word in str (index of null if there isn't) */
+/*
+ * Finds the next index in the given string which points to a different word.
+ * If the given index is any negative value, returns the first word index.
+ * If it's after the last char in the given string, returns the given index.
+ *
+ * @param   *str The line string.
+ * @param   i The given index.
+ * @return  The next word index from i in str, or i if i > len(str).
+ */
 int nextWordIndex(const char *str, int i);
 
 /* Finds the next index in param const char *str where it is a comma.
