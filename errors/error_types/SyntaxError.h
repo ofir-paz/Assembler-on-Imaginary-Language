@@ -13,7 +13,7 @@
 typedef enum
 {
     /* Indicates no error. !! add new errors after this one !! */
-        NO_ERROR,
+        SYNTAX_ERR_START = start_of_error(1),
     /* Label related syntax errors */
         LABEL_NOT_START_WITH_LETTER_ERR, INVALID_CHARS_IN_LABEL_ERR, LABEL_TOO_LONG_ERR,
         SPACE_BETWEEN_LABEL_AND_COLONS_ERR, NO_COLONS_ERR, NO_SPACE_AFTER_COLONS_ERR,

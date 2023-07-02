@@ -13,7 +13,7 @@
 typedef enum
 {
     /* Indicates no error. !! add new errors after this one !! */
-        NO_ERROR,
+        LOGICAL_ERR_START = start_of_error(2),
     /* Macro related logical errors */
         MCRO_BEFORE_DEF_ERR,
     /* Label related logical errors */

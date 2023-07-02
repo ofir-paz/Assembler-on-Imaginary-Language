@@ -9,8 +9,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include "error_types/error_types.h"
 #include "../new-data-types/boolean.h"
-#include "../new-data-types/Error.h"
 #include "../new-data-types/param_num.h"
 #include "../general-enums/indexes.h"
 #include "../general-enums/neededKeys.h"
@@ -25,12 +25,16 @@
 #define LEGAL_DOTS_IN_FLOAT 1
 /* ------------ */
 
-/* Checks if the function is a defined handle complex function.
- * Returns TRUE if it is, otherwise FALSE */
-//boolean isDefinedFunction(const char *command)
-//{
-//    return (getFunction(command) != NULL)? TRUE : FALSE;
-//}
+/*
+ * Checks if a given error code represents an error.
+ *
+ * @param   errorCode The error code to check.
+ * @return  TRUE if the error code represents an error, otherwise FALSE.
+ */
+boolean isError(int errorCode)
+{
+    return (errorCode % MAX_ERRORS_IN_ENUM)? TRUE : FALSE;
+}
 
 /* Checks for illegal comma after the function in param const char *command.
  * Returns TRUE if there is a comma after the command, otherwise FALSE. */
