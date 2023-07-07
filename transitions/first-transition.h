@@ -22,8 +22,8 @@
  * @return
  */
 process_result first_transition(const char *file_name,
-                                NameTable *entryLabels, NameTable *externLabels,
-                                MemoryImage *codeMemImage, MemoryImage *dataMemImage);
+                      NameTable *regLabels, NameTable *entLabels, NameTable *extLabels,
+                      MemoryImage *memoryImage);
 /* ---------------------------------------- */
 
 #endif /* MMN_14_FIRST_TRANSITION_H */

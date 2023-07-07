@@ -8,7 +8,7 @@
 #include <stddef.h>
 #include "new-data-types/process_result.h"
 #include "NameTable/NameTable.h"
-#include "encoding/MemoryImage.h"
+#include "encoding/encoding.h"
 #include "transitions/pre-processor.h"
 #include "transitions/first-transition.h"
 #include "transitions/second-transition.h"
@@ -19,14 +19,15 @@
 
 void assemble(const char *file_name)
 {
-    process_result processResult = FAILED;
-    NameTable *entryLabels = NULL, *externLabels = NULL;
-    MemoryImage *codeMemImage = NULL, *dataMemImage = NULL;
+    process_result processResult = FAILURE;
+    NameTable *regLabels = NULL, *entLabels = NULL, *extLabels = NULL;
+    MemoryImage *memoryImage = NULL;
 
     //if (handle_filename_error(file_name) == NO_ERROR)
     //{
     (void) pre_process(file_name);
-    processResult = first_transition(file_name, entryLabels, externLabels,
-                                     codeMemImage, dataMemImage);
+    processResult = first_transition(file_name, regLabels, entLabels, extLabels, memoryImage);
     //}
+
+    (void) clearMemoryImage(memoryImage);
 }

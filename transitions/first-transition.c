@@ -8,12 +8,15 @@
 /* ---Include header files--- */
 #include <stdio.h>
 #include <string.h>
-#include "../new-data-types/process_result.h"
 #include "../NameTable/NameTable.h"
-#include "../encoding/MemoryImage.h"
-#include "../errors/error_check.h"
-#include "../general_help_methods.h"
+#include "../new-data-types/process_result.h"
+#include "../errors/error_types/error_types.h"
+#include "../general-enums/programEnums.h"
+#include "TransitionNumber.h"
 #include "../FileHandling/readFromFile.h"
+#include "../errors/errors.h"
+#include "../general_help_methods.h"
+#include "../encoding/encoding.h"
 /* -------------------------- */
 
 /* ---Macros--- */
@@ -24,6 +27,18 @@
 /* ------------ */
 
 /* ---------------Prototypes--------------- */
+process_result firstFileTraverse(const char *file_name,
+                                 NameTable *regLabels, NameTable *entLabels, NameTable *extLabels,
+                                 MemoryImage *memoryImage);
+Error handleLine(const char *line,
+                 NameTable *regLabels, NameTable *entLabels, NameTable *extLabels,
+                 MemoryImage *memoryImage, int *IC, int *DC, boolean *wasError);
+void firstAssemblerAlgo(const char *line,
+                        NameTable *regLabels, NameTable *entLabels, NameTable *extLabels,
+                        MemoryImage *memoryImage, int *IC, int *DC);
+void addToTablesIfNeeded(const char *line,
+                         NameTable *regLabels, NameTable *entLabels, NameTable *extLabels,
+                         int *IC, int *DC);
 /* ---------------------------------------- */
 
 /*
@@ -34,13 +49,13 @@
  * @return
  */
 process_result first_transition(const char *file_name,
-                                NameTable *entryLabels, NameTable *externLabels,
-                                MemoryImage *codeMemImage, MemoryImage *dataMemImage)
+                                NameTable *regLabels, NameTable *entLabels, NameTable *extLabels,
+                                MemoryImage *memoryImage)
 {
-    entryLabels = createNameTable(INT_TYPE); /* Will hold the .entry labels. */
-    externLabels = createNameTable(INT_TYPE); /* Will hold the .extern labels. */
+    entLabels = createNameTable(INT_TYPE); /* Will hold the .entry labels. */
+    extLabels = createNameTable(INT_TYPE); /* Will hold the .extern labels. */
 
-    return firstFileTraverse(file_name, entryLabels, externLabels, codeMemImage, dataMemImage);
+    return firstFileTraverse(file_name, regLabels, entLabels, extLabels, memoryImage);
 }
 
 /*
@@ -51,23 +66,23 @@ process_result first_transition(const char *file_name,
  * @param   *macro_table The data structure to hold the macros and their contents.
  */
 process_result firstFileTraverse(const char *file_name,
-                                 NameTable *entryLabels, NameTable *externLabels,
-                                 MemoryImage *codeMemImage, MemoryImage *dataMemImage)
+                                 NameTable *regLabels, NameTable *entLabels, NameTable *extLabels,
+                                 MemoryImage *memoryImage)
 {
     boolean wasError = FALSE;
+    int IC, DC;
     char *line = NULL; /* This will hold the current line */
 
     /* Read the file line-by-line and handle it. */
     while (readNextLineFromFile(file_name, AFTER_MACRO, &line) != EOF)
     {
-        if (isError(handleLine(line, entryLabels, externLabels,
-                                      codeMemImage, dataMemImage, wasError)) == TRUE)
-            wasError = TRUE;
+        (void) handleLine(line, regLabels, entLabels, extLabels, memoryImage, &IC, &DC, &wasError);
 
         (void) free_ptr(POINTER(line)); /* Next line */
     }
 
     (void) free_ptr(POINTER(line));
+    return (wasError == FALSE)? SUCCESS : FAILURE;
 }
 
 /*
@@ -78,8 +93,45 @@ process_result firstFileTraverse(const char *file_name,
  * @param   *amFile Data structure to hold the file to print.
  * @param   *macro_table Data structure to hold the macro names and contents.
  */
-int handleLine(const char *line, NameTable *entryLabels, NameTable *externLabels,
-                MemoryImage *codeMemImage, MemoryImage *dataMemImage, boolean wasError)
+Error handleLine(const char *line,
+                 NameTable *regLabels, NameTable *entLabels, NameTable *extLabels,
+                 MemoryImage *memoryImage, int *IC, int *DC, boolean *wasError)
+{
+    /* Value to return. Represents the error in the line (if there is). */
+    Error line_error = handleLineErrors(FIRST_TRANSITION,
+                                        line, regLabels, entLabels, extLabels);
+
+    if (*wasError == FALSE && line_error != NO_ERROR)
+        *wasError = TRUE;
+
+    if (*wasError == FALSE)
+        firstAssemblerAlgo(line, regLabels, entLabels, extLabels, memoryImage, IC, DC);
+
+    return line_error;
+}
+
+void firstAssemblerAlgo(const char *line,
+                        NameTable *regLabels, NameTable *entLabels, NameTable *extLabels,
+                        MemoryImage *memoryImage, int *IC, int *DC)
+{
+    addToTablesIfNeeded(line, regLabels, entLabels, extLabels, IC, DC);
+    encodeLine(line, memoryImage, FIRST_TRANSITION);
+}
+
+/*
+ * Adds content to the data structure if needed.
+ * Will know if any addition is needed based on the given flags and line string.
+ *
+ * @param   *line The line string which the program is currently processing.
+ * @param   *macro_name The macro name which is the program is currently working with.
+ * @param   wasInMacroDef Flag to indicate if the last line was in a macro definition.
+ * @param   inMacroDef Flag to indicate if the current line is in a macro definition.
+ * @param   *amFile The data structure to hold the contents of the .am file.
+ * @param   *macro_table The data structure to hold the macros and their contents.
+ */
+void addToTablesIfNeeded(const char *line,
+                         NameTable *regLabels, NameTable *entLabels, NameTable *extLabels,
+                         int *IC, int *DC)
 {
 
 }

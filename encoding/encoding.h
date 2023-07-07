@@ -8,13 +8,11 @@
 #ifndef MMN_14_ENCODING_H
 #define MMN_14_ENCODING_H
 
-/* ---Finals--- */
-#define REAL_BYTES_FOR_WORD 2
-/* ------------ */
-
-typedef char (*MemoryImage)[REAL_BYTES_FOR_WORD];
+/* Prototype for data structure to hold the memory image. */
+typedef struct MemoryImage MemoryImage;
 
 /* ---------------Prototypes--------------- */
+void encodeLine(const char *line, MemoryImage *memoryImage, int transition, ...);
 /* ---------------------------------------- */
 
 #endif /* MMN_14_ENCODING_H */

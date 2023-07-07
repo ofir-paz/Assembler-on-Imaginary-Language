@@ -23,5 +23,5 @@ add_executable(mmn_14 main.c general_help_methods.c general_help_methods.h new-d
         encoding/encoding-help-methods.c encoding/encoding-help-methods.h
         errors/error_types/ImgSystemError.h diagnoses/diagnose_help_methods.c
         diagnoses/diagnose_help_methods.h new-data-types/word_number.h NameTable/NameTable.h
-        general-enums/programEnums.h  encoding/MemoryImage.h
-        errors/error_types/error_constant.h errors/error_types/error_types.h)
+        general-enums/programEnums.h
+        errors/error_types/error_constant.h errors/error_types/error_types.h transitions/TransitionNumber.h errors/PreProcessorErrors/PreProcessorErrors.c errors/PreProcessorErrors/PreProcessorErrors.h)

@@ -8,6 +8,6 @@
 #define MMN_14_PROCESS_RESULT
 
 /* process_result data type */
-typedef enum {FAILED, SUCCESS} process_result;
+typedef enum {FAILURE, SUCCESS} process_result;
 
 #endif /* MMN_14_PROCESS_RESULT */

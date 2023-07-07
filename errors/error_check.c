@@ -25,17 +25,6 @@
 #define LEGAL_DOTS_IN_FLOAT 1
 /* ------------ */
 
-/*
- * Checks if a given error code represents an error.
- *
- * @param   errorCode The error code to check.
- * @return  TRUE if the error code represents an error, otherwise FALSE.
- */
-boolean isError(int errorCode)
-{
-    return (errorCode % MAX_ERRORS_IN_ENUM)? TRUE : FALSE;
-}
-
 /* Checks for illegal comma after the function in param const char *command.
  * Returns TRUE if there is a comma after the command, otherwise FALSE. */
 boolean isCommaAfterCmd(const char *command)

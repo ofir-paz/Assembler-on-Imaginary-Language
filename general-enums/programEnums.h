@@ -9,6 +9,6 @@
 #define MMN_14_PROGRAMENUMS_H
 
 /* General enums */
-enum {SIZE_FOR_NULL = 1};
+enum {SIZE_FOR_NULL = 1, ZERO_COUNT = 0};
 
 #endif /* MMN_14_PROGRAMENUMS_H */

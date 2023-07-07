@@ -9,16 +9,9 @@
 
 #include "../new-data-types/boolean.h"
 #include "../new-data-types/param_num.h"
+#include "error_types/error_types.h"
 
 /* ------------------Prototypes------------------- */
-
-/*
- * Checks if a given error code represents an error.
- *
- * @param   errorCode The error code to check.
- * @return  TRUE if the error code represents an error, otherwise FALSE.
- */
-boolean isError(int errorCode);
 
 /* Checks if the given pointer *ptr has allocated space in the memory.
  * Returns TRUE if it has, otherwise FALSE. */

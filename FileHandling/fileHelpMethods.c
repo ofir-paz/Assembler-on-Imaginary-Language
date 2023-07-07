@@ -36,7 +36,7 @@ FILE *openFile(const char *file_name, const char *fileType, const char *modeType
         handle_file_open_errors(file); /* Will handle errors with opening file */
     }
 
-    free(fileToOpen); /* Freeing unnecessary string */
+    (void) free_ptr(POINTER(fileToOpen)); /* Freeing unnecessary string */
     return file;
 }
 

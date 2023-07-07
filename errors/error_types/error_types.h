@@ -10,10 +10,12 @@
 
 /* ---Include all error types--- */
 #include "error_constant.h"
-#include "SystemError.h"
 #include "ImgSystemError.h"
-#include "SystemError.h"
+#include "SyntaxError.h"
 #include "LogicalError.h"
 /* ----------------------------- */
+
+/* Combine all different error types to be represented as int */
+typedef int Error;
 
 #endif /* MMN_14_ERROR_TYPES_H */

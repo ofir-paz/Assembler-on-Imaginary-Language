@@ -13,7 +13,7 @@
 typedef enum
 {
     /* Indicates no error, add new errors after this one ! */
-        NO_ERROR,
+        SYSTEM_ERR_START,
     /* Dynamic space allocation errors */
         NO_ALLOCATION_ERR,
     /* File handling related errors */
