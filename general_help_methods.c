@@ -144,3 +144,43 @@ void addTwoStrings(char **str1, const char *str2)
         }
     }
 }
+
+/*
+ * Duplicates a given string.
+ *
+ * @param   str The input string to be duplicated.
+ * @return      A pointer to the newly duplicated string if 'str' is not NULL.
+ *              Returns NULL if 'str' is NULL.
+ */
+char *my_strdup(const char *str)
+{
+    char *dup_str = NULL; /* String to return. */
+
+    if (str != NULL) /* Checking for invalid param. */
+    {
+        /* Duplicating the given string to a new one. */
+        dup_str = (char *) allocate_space(strlen(str) + SIZE_FOR_NULL);
+        dup_str = strncpy(dup_str, str, strlen(str) + SIZE_FOR_NULL);
+    }
+
+    return dup_str;
+}
+
+/*
+ * Returns the index of a given string in an array of strings.
+ *
+ * @param   arr   The array of strings to search.
+ * @param   size  The size of the array.
+ * @param   str   The string to search for in the array.
+ * @return  The index of an occurrence of the string in the array,
+ *          or -1 if the string is not found.
+ */
+int getIndexOfStrInArray(const char *arr[], int size, const char *str)
+{
+    int i = size - 1; /* Loop variable and index to return. */
+
+    /* A loop that will stop until we find an element in arr that is equal to str, or i = -1. */
+    while (sameStrings(arr[i--], str) == FALSE && i >= ZERO_INDEX);
+
+    return i;
+}

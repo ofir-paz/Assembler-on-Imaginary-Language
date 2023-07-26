@@ -15,9 +15,9 @@ typedef enum
     /* Indicates no error. !! add new errors after this one !! */
         LOGICAL_ERR_START = start_of_error(3),
     /* Macro related logical errors */
-        MCRO_BEFORE_DEF_ERR,
+
     /* Label related logical errors */
-        LABEL_NAME_IS_OP, MULT_LABEL_DEF_ERR, EMPTY_LABEL,
+        MULT_LABEL_DEF_ERR, NESTED_LABEL_DEF_ERR,
     /* Extern label related logical errors */
 
     /* Entry label related logical errors */

@@ -64,6 +64,26 @@ char *connectTwoStrings(const char *str1, const char *str2);
  */
 void addTwoStrings(char **str1, const char *str2);
 
+/*
+ * Duplicates a given string.
+ *
+ * @param   str The input string to be duplicated.
+ * @return  A pointer to the newly duplicated string if 'str' is not NULL.
+ *          Returns NULL if 'str' is NULL.
+ */
+char *my_strdup(const char *str);
+
+/*
+ * Returns the index of a given string in an array of strings.
+ *
+ * @param   arr   The array of strings to search.
+ * @param   size  The size of the array.
+ * @param   str   The string to search for in the array.
+ * @return  The index of an occurrence of the string in the array,
+ *          or -1 if the string is not found.
+ */
+int getIndexOfStrInArray(const char *arr[], int size, const char *str);
+
 /* ---------------------------------------- */
 
 #endif /* MMN_22_GENERAL_HELP_METHODS_H */

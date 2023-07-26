@@ -14,9 +14,12 @@ typedef enum
 {
     /* Indicates no error. !! add new errors after this one !! */
         SYNTAX_ERR_START = start_of_error(1),
+    /* Macro related syntax errors */
+        INVALID_MACRO_NAME_ERR, EXTRANEOUS_TEXT_IN_MACRO_LINE_ERR,
     /* Label related syntax errors */
         LABEL_NOT_START_WITH_LETTER_ERR, INVALID_CHARS_IN_LABEL_ERR, LABEL_TOO_LONG_ERR,
-        SPACE_BETWEEN_LABEL_AND_COLONS_ERR, NO_COLONS_ERR, NO_SPACE_AFTER_COLONS_ERR,
+        SPACE_BETWEEN_LABEL_AND_COLONS_ERR, INVALID_LABEL_NAME_ERR,
+        NO_COLONS_ERR, NO_SPACE_AFTER_COLONS_ERR, EMPTY_LABEL_ERR,
     /* Operation syntax errors */
         OP_NAME_TOO_SHORT_ERR, OP_NAME_TOO_LONG_ERR, OP_NAME_INVALID_CHARS_ERR,
         WRONG_CASE_OP_ERR, UNDEFINED_OP_ERR,

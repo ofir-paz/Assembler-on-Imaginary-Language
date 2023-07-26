@@ -10,7 +10,8 @@
 
 /* ---------------Prototypes--------------- */
 
-Error handlePreProcessErrors(const char *line, NameTable *macroTable, boolean wasInMacroDef);
+Error handlePreProcessErrors(const char *line, int lineNumber, const char *macro_name,
+                             boolean isMacroLine);
 
 /* ---------------------------------------- */
 

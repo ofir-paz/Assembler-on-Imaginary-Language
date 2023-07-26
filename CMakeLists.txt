@@ -14,7 +14,7 @@ add_executable(mmn_14 main.c general_help_methods.c general_help_methods.h new-d
         encoding/encoding-finals/encoding-type.h
         encoding/encoding-finals/encoding-type.h assembler.c assembler.h errors/warnings.c
         errors/warnings.h general-enums/indexes.h diagnoses/diagnose_line.c
-        diagnoses/diagnose_line.h new-data-types/param_num.h encoding/encoding-finals/sentenceType.h
+        diagnoses/diagnose_line.h new-data-types/param_num.h encoding/encoding-finals/guidance.h
         new-data-types/process_result.h errors/system_errors.c errors/system_errors.h
         errors/errors.c errors/errors.h FileHandling/fileHelpMethods.c
         FileHandling/fileHelpMethods.h errors/error_types/SystemError.h
@@ -24,4 +24,4 @@ add_executable(mmn_14 main.c general_help_methods.c general_help_methods.h new-d
         errors/error_types/ImgSystemError.h diagnoses/diagnose_help_methods.c
         diagnoses/diagnose_help_methods.h new-data-types/word_number.h NameTable/NameTable.h
         general-enums/programEnums.h
-        errors/error_types/error_constant.h errors/error_types/error_types.h transitions/TransitionNumber.h errors/PreProcessorErrors/PreProcessorErrors.c errors/PreProcessorErrors/PreProcessorErrors.h)
+        errors/error_types/error_constant.h errors/error_types/error_types.h transitions/TransitionNumber.h errors/PreProcessorErrors/PreProcessorErrors.c errors/PreProcessorErrors/PreProcessorErrors.h diagnoses/assembler_lang_related_diagnoses.c diagnoses/assembler_lang_related_diagnoses.h encoding/encoding-finals/encoding-finals.h errors/PreProcessorErrors/PreProcessorErrors_help_methods.c errors/PreProcessorErrors/PreProcessorErrors_help_methods.h)

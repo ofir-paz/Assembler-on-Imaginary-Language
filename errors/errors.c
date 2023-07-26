@@ -20,18 +20,38 @@
 #define INPUT_ERROR_CODE (-1)
 /* ------------ */
 
-Error handleLineErrors(TransitionNumber_t transitionNumber, ...)
+void printERR(Error error, int lineNumber)
+{
+    const char *imgSystemErrorMSG[] =
+            {
+                "NO_ERROR",
+                ""
+            };
+    const char *syntaxErrorMSG[] =
+            {
+                    "NO_ERROR",
+                    ""
+            };
+    const char *logicalErrorMSG[] =
+            {
+                    "NO_ERROR",
+                    ""
+            };
+
+}
+
+Error handleLineErrors(TransitionNumber_t transitionNumber, const char *line, int lineNumber, ...)
 {
     Error error = INPUT_ERROR_CODE;
     va_list ptr;
-    va_start(ptr, transitionNumber);
+    va_start(ptr, lineNumber);
 
     switch (transitionNumber)
     {
         case PRE_PROCESS:
-            error = handlePreProcessErrors(va_arg(ptr, const char *),
-                                           va_arg(ptr, NameTable *),
-                                           va_arg(ptr, boolean));
+            error = handlePreProcessErrors(line, lineNumber,
+                                           va_arg(ptr, const char *), /* macro_name= */
+                                           va_arg(ptr, boolean)); /* isMacroLine= */
             break;
         case FIRST_TRANSITION:
             break;

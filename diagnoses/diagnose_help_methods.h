@@ -15,6 +15,9 @@
  * Returns TRUE if i is an index of the given string, otherwise FALSE. */
 boolean isIndexInStr(const char *str, int i);
 
+/* Returns TRUE if param char ch is empty (space; tab; enter), otherwise FALSE */
+boolean isEmpty(char ch);
+
 /* Finds the next index in param const char *str where it is not an empty space (tab/space/enter).
  * If param int i is not an index of str returns i,
  * otherwise returns the index of the next non-empty space in str (index of null if there isn't). */

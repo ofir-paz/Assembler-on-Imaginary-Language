@@ -8,8 +8,6 @@
 #ifndef MMN_14_PRE_PROCESSOR_H
 #define MMN_14_PRE_PROCESSOR_H
 
-#include "../NameTable/NameTable.h"
-
 /* ---------------Prototypes--------------- */
 
 /*
@@ -19,7 +17,7 @@
  * @param   *file_name The name of the file to process.
  * @return  The data structure holding the macros of the .as file.
  */
-NameTable *pre_process(const char *file_name);
+process_result pre_process(const char *file_name);
 
 /* ---------------------------------------- */
 

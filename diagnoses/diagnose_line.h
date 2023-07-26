@@ -6,17 +6,20 @@
 #ifndef MMN_22_DIAGNOSE_INPUT_H
 #define MMN_22_DIAGNOSE_INPUT_H
 
-#include "../new-data-types/Error.h"
+#include "../errors/error_types/error_types.h"
 #include "../new-data-types/word_number.h"
-#include "../new-data-types/param_num.h"
 
 /* ----------Prototypes---------- */
 
-/* Finds a specified word in a given line string.
- * param const char *line is the line string that holds the word
- * param char **word is a pointer to the string that will hold the found word
- * param word_number wordNumber is the number of the word to seek, must be positive !
- * Returns nothing. */
+/*
+ * Finds the specified word in the given line and stores it in the provided pointer.
+ *
+ * @param   line        The input line containing words separated by spaces.
+ * @param   word        A pointer to a char pointer that will store the found word.
+ * @param   wordNumber  The position of the word to be extracted (0-indexed).
+ *                      If wordNumber is negative or greater than the number of words in the line,
+ *                      *word will be set to NULL.
+ */
 void findWord(const char *line, char **word, word_number wordNumber);
 
 /* Given the param const char *command and the param Error error,

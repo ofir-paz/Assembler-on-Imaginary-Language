@@ -261,39 +261,30 @@ Error checkParamCharError(const char *line, param_num paramNum)
     return error;
 }
 
-/* Checks for illegal extraneous text after the last parameter param lastParam in param const char *line.
- * Returns NO_ERROR if there is no extraneous text, otherwise the specific error caught. */
-Error checkExtraneousTextError(const char *line, param_num lastParam) // paramtype pType)
+/*
+ * Checks for extraneous text error in the given line starting from the specified index.
+ *
+ * @param   line              The input line to check for errors.
+ * @param   indexOfLastToken  The index of the last token in the line before the error check.
+ * @return                    Specific extraneous text error.
+ */
+Error checkExtraneousTextError(const char *line, int indexOfLastToken)
 {
     Error error = NO_ERROR; /* Value to return, we assume there is no error. */
 
-    /* Last index of the last param */
-    int lastIndexOfLastParam; //= findParamIndex(line, lastParam) +
-            //findParamLen(line, lastParam, pType) - 1;
+    int nextTokenIndex = nextWordIndex(line, indexOfLastToken);
 
-    int lastChIndex = nextCharIndex(line, lastIndexOfLastParam);
-    char lastCh = line[lastChIndex];
+        /* Checks for extraneous comma error */
+    if (isCurrCharComma(line, nextTokenIndex) == TRUE)
+        error = EXTRANEOUS_COMMA_ERR;
 
-    if (lastCh == COMMA) /* Checks for extraneous comma error */
-        error = EXTRANEOUS_COMMA;
-    else if (lastCh != NULL_TERMINATOR && lastCh != ENTER_KEY) /* Checks for extraneous text error */
-        error = EXTRANEOUS_TXT;
+        /* Checks for extraneous text error */
+    else if ((isEmpty(line[nextTokenIndex])) == FALSE)
+        error = EXTRANEOUS_TXT_ERR;
+
     else /* No extraneous text! */
         error = NO_ERROR;
-    return error;
-}
 
-/* Checks for errors in the stop command.
- * Returns NO_ERROR if there are no errors, otherwise the specific error caught. */
-Error checkStopError(const char *line)
-{
-    Error error = NO_ERROR; /* Value to return, we assume there is no error. */
-    char lastCh = line[nextWordIndex(line, ZERO_INDEX)]; /* First char after "stop". */
-
-    if (lastCh != NULL_TERMINATOR && lastCh != ENTER_KEY) /* Checks for extraneous text error */
-        error = EXTRANEOUS_TXT;
-    else /* No stop errors! */
-        error = NO_ERROR;
     return error;
 }
 

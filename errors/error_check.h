@@ -35,13 +35,14 @@ Error checkParamFloatError(const char *line, param_num paramNum);
  * Returns NO_ERROR if there is no error, otherwise the specific error caught. */
 Error checkParamCharError(const char *line, param_num paramNum);
 
-/* Checks for illegal extraneous text after the last parameter param lastParam in param const char *line.
- * Returns NO_ERROR if there is no extraneous text, otherwise the specific error caught. */
-Error checkExtraneousTextError(const char *line, param_num lastParam);// paramtype pType);
-
-/* Checks for errors in the stop command.
- * Returns NO_ERROR if there are no errors, otherwise the specific error caught. */
-Error checkStopError(const char *line);
+/*
+ * Checks for extraneous text error in the given line starting from the specified index.
+ *
+ * @param   line              The input line to check for errors.
+ * @param   indexOfLastToken  The index of the last token in the line before the error check.
+ * @return                    Specific extraneous text error.
+ */
+Error checkExtraneousTextError(const char *line, int indexOfLastToken);
 
 /* Checks if an input line is too long ( > 80).
  * param const char *line is the input line.

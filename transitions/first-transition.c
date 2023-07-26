@@ -52,6 +52,7 @@ process_result first_transition(const char *file_name,
                                 NameTable *regLabels, NameTable *entLabels, NameTable *extLabels,
                                 MemoryImage *memoryImage)
 {
+    regLabels = createNameTable(INT_TYPE); /* Will hold normal labels */
     entLabels = createNameTable(INT_TYPE); /* Will hold the .entry labels. */
     extLabels = createNameTable(INT_TYPE); /* Will hold the .extern labels. */
 
@@ -98,16 +99,16 @@ Error handleLine(const char *line,
                  MemoryImage *memoryImage, int *IC, int *DC, boolean *wasError)
 {
     /* Value to return. Represents the error in the line (if there is). */
-    Error line_error = handleLineErrors(FIRST_TRANSITION,
+    Error lineError = handleLineErrors(FIRST_TRANSITION,
                                         line, regLabels, entLabels, extLabels);
 
-    if (*wasError == FALSE && line_error != NO_ERROR)
+    if (*wasError == FALSE && lineError != NO_ERROR)
         *wasError = TRUE;
 
     if (*wasError == FALSE)
         firstAssemblerAlgo(line, regLabels, entLabels, extLabels, memoryImage, IC, DC);
 
-    return line_error;
+    return lineError;
 }
 
 void firstAssemblerAlgo(const char *line,

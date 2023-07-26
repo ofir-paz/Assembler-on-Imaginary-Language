@@ -9,8 +9,8 @@
 #define MMN_14_ERRORS_H
 
 /* ---------------Prototypes--------------- */
-
-Error handleLineErrors(TransitionNumber_t transitionNumber, ...);
+void printERR(Error error, int lineNumber);
+Error handleLineErrors(TransitionNumber_t transitionNumber, const char *line, int lineNumber, ...);
 int handle_lineTooLong_error(const char *line, int lineIndex);
 
 /* ---------------------------------------- */

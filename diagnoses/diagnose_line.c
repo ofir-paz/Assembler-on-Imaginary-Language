@@ -18,36 +18,35 @@
 /* -------------------------- */
 
 /* -----Finals----- */
+#define SPACE_DELIM " "
 /* ---------------- */
 
-/* Gets the size of a specified word in a line string.
- * param const char *line is the line that's the word in it
- * param word_number wordNumber is the number of the word to seek the size of
- * Returns the size in size_t type. */
-size_t getWordSize(const char *line, word_number wordNumber)
-{
-    int start = findStartIndexOfWord(line, wordNumber); /* Start index of the word */
-    int end = nextEmptyIndex(line, start); /* End index of the word */
-
-    return end - start; /* Returns the size (length) */
-}
-
-/* Finds a specified word in a given line string.
- * param const char *line is the line string that holds the word
- * param char **word is a pointer to the string that will hold the found word
- * param word_number wordNumber is the number of the word to seek, must be positive !
- * Returns nothing. */
+/*
+ * Finds the specified word in the given line and stores it in the provided pointer.
+ *
+ * @param   line        The input line containing words separated by spaces.
+ * @param   word        A pointer to a char pointer that will store the found word.
+ * @param   wordNumber  The position of the word to be extracted (0-indexed).
+ *                      If wordNumber is negative or greater than the number of words in the line,
+ *                      *word will be set to NULL.
+ */
 void findWord(const char *line, char **word, word_number wordNumber)
 {
-    size_t wordSize = getWordSize(line, wordNumber); /* Finding the size of the word */
-    int start = findStartIndexOfWord(line, wordNumber); /* Start index of the word */
+    if (line != NULL && word != NULL && wordNumber > ZERO_WORD) /* Check for invalid params. */
+    {
+        char *lineCopy, *rest, *token; /* Will be used to find the tokens. */
+        int i = ZERO_INDEX; /* Loop variable. */
 
-    /* Allocating space for the string */
-    *word = (char *) allocate_space(wordSize + SIZE_FOR_NULL);
-    (*word)[wordSize] = NULL_TERMINATOR; /* Add null terminator to the end of the string */
+        lineCopy = my_strdup(line);
+        rest = lineCopy;
 
-    /* Copying the command from line to string command */
-    (void) strncpy(*word, line + start, wordSize);
+        /* Finding the right word. */
+        do token = strtok_r(rest, SPACE_DELIM, &rest);
+        while (++i < wordNumber && token != NULL);
+
+        *word = my_strdup(token);
+        free_ptr(POINTER(lineCopy));
+    }
 }
 
 /*
@@ -75,55 +74,6 @@ int findParamIndex(const char *line, param_num paramNum)
         index = nextCharIndex(line, nextCommaIndex(line, index));
 
     return index;
-}
-
-/* Finds the length of the float parameter numbered paramNum in
- * param const char *line.
- * Returns the length of the specified float parameter. */
-int getFloatParamLen(const char *line, param_num paramNum)
-{
-    int start = findParamIndex(line, paramNum); /* Start index of the float */
-    int end = start + ONE_INDEX; /* End index of the float */
-    while (isPartOfNumber(line, end) == TRUE) /* While end is still in the number */
-        end++; /* Move end forward */
-    return end - start; /* Return the length */
-}
-
-/* Finds the length of the parameter number paramNum with type paramtype pType
- * in const char *line.
- * Returns the length of the specific parameter. */
-int findParamLen(const char *line, param_num paramNum)// paramtype pType)
-{
-    int len; /* Value to return */
-    /* Addressing every option for the parameter type */
-//    switch () {
-//        case FLOAT: /* Option of float param */
-//            len = getFloatParamLen(line, paramNum);
-//            break;
-//        case CHAR: /* Option of char param */
-//            len = getCharParamLen();
-//            break;
-//        default: /* Extreme case */
-//            len = DEFAULT_ZERO_LEN;
-//    }
-    return len;
-}
-
-/* Gets the float parameter numbered paramNum from param const char *line.
- * Returns the specified float value. */
-float getFloatParamFromLine(const char *line, param_num paramNum)
-{
-    int index = findParamIndex(line, paramNum);
-    char *endPtr;
-    return (float) strtod(line + index, &endPtr);
-}
-
-/* Gets the char parameter numbered paramNum from param const char *line.
- * Returns the specified char. */
-char getCharParamFromLine(const char *line, param_num paramNum)
-{
-    int index = findParamIndex(line, paramNum);
-    return line[index];
 }
 
 /* Checks if the given line is an empty line (contains spaces and tabs only).
