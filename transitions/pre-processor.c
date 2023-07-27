@@ -7,18 +7,16 @@
 
 /* ---Include header files--- */
 #include <stdio.h>
-#include <string.h>
 #include "../new-data-types/boolean.h"
 #include "../new-data-types/process_result.h"
 #include "../NameTable/NameTable.h"
-#include "../errors/error_types/error_types.h"
 #include "../general-enums/programEnums.h"
-#include "TransitionNumber.h"
 #include "../general_help_methods.h"
 #include "../FileHandling/readFromFile.h"
 #include "../FileHandling/writeToFile.h"
-#include "../errors/errors.h"
+#include "../errors/PreProcessorErrors/PreProcessorErrors.h"
 #include "../diagnoses/diagnose_line.h"
+#include "../diagnoses/assembler_lang_related_diagnoses.h"
 /* -------------------------- */
 
 /* ---Finals--- */
@@ -29,24 +27,18 @@
 /* ------------ */
 
 /* ----------Prototypes---------- */
-process_result traverse_before_macro_file(const char *file_name, NameTable *amFile,
-                                          NameTable *macro_table);
-Error handleLine(const char *line, char **macro_name, NameTable *amFile, NameTable *macro_table,
-                boolean *wasError);
-Error preProcessorAssemblerAlgo(const char *line, char **macro_name,
+process_result traverse_before_macro_file(const char *file_name,
+                                          NameTable *amFile, NameTable *macro_table);
+Error handleLineInPreProc(const char *file_name, const char *line, char **macro_name,
+                          NameTable *amFile, NameTable *macro_table, boolean *wasError);
+Error preProcessorAssemblerAlgo(const char *file_name, const char *line, char **macro_name,
                                 NameTable *amFile, NameTable *macro_table,
                                 int lineCount, boolean *wasError);
-boolean isInMacroDef(const char *line, boolean wasInMacroDef);
-void getMacroName(const char *line, char **macro_name, boolean wasInMacroDef, boolean inMacroDef);
-void addToTablesIfNeeded(const char *line, char *macro_name, boolean wasInMacroDef,
-                         boolean inMacroDef, NameTable *amFile, NameTable *macro_table);
-boolean isInNewMacroDef(boolean wasInMacroDef, boolean inMacroDef);
-boolean isStillInMacroDef(boolean wasInMacroDef, boolean inMacroDef);
-boolean isFinishMacroDef(boolean wasInMacroDef, boolean inMacroDef);
-boolean isCallingMacro(const char *line, NameTable *macro_table);
+boolean isInMcroDef(const char *line, boolean wasInMacroDef);
+void getMacroName(const char *line, char **macro_name, boolean wasInMacroDef, boolean isInMacroDef);
+void addToTablesIfNeededInPreProc(const char *line, char *macro_name, boolean wasInMacroDef,
+                         boolean isInMacroDef, NameTable *amFile, NameTable *macro_table);
 char *getMacroIfCalling(const char *line, NameTable *macro_table);
-boolean isMacroLine(const char *line, NameTable *macro_table,
-                    boolean wasInMacroDef, boolean inMacroDef);
 /* ------------------------------ */
 
 /*
@@ -93,7 +85,7 @@ process_result traverse_before_macro_file(const char *file_name,
     /* Read the file line-by-line and handle it. */
     while (readNextLineFromFile(file_name, BEFORE_MACRO, &line) != EOF)
     {
-        (void) handleLine(line, &macro_name, amFile, macro_table, &wasError);
+        (void) handleLineInPreProc(file_name, line, &macro_name, amFile, macro_table, &wasError);
 
         (void) free_ptr(POINTER(line)); /* Next line */
     }
@@ -110,8 +102,8 @@ process_result traverse_before_macro_file(const char *file_name,
  * @param   *amFile Data structure to hold the file to print.
  * @param   *macro_table Data structure to hold the macro names and contents.
  */
-Error handleLine(const char *line, char **macro_name, NameTable *amFile, NameTable *macro_table,
-                boolean *wasError)
+Error handleLineInPreProc(const char *file_name, const char *line, char **macro_name,
+                          NameTable *amFile, NameTable *macro_table, boolean *wasError)
 {
     static int lineCount = ZERO_COUNT; /* Counter of line */
     Error lineError = NO_ERROR; /* Value to return. Represents the error in the line. */
@@ -119,13 +111,13 @@ Error handleLine(const char *line, char **macro_name, NameTable *amFile, NameTab
     lineCount++; /* Increasing line counter by 1 since we reached a new line */
 
     if (isSkipLine(line) == FALSE) /* Go to next line if we can skip this one */
-        lineError = preProcessorAssemblerAlgo(line, macro_name, amFile, macro_table,
+        lineError = preProcessorAssemblerAlgo(file_name, line, macro_name, amFile, macro_table,
                                               lineCount, wasError);
 
     return lineError;
 }
 
-Error preProcessorAssemblerAlgo(const char *line, char **macro_name,
+Error preProcessorAssemblerAlgo(const char *file_name, const char *line, char **macro_name,
                                NameTable *amFile, NameTable *macro_table,
                                int lineCount, boolean *wasError)
 {
@@ -134,22 +126,26 @@ Error preProcessorAssemblerAlgo(const char *line, char **macro_name,
     /* Value to return. Represents the error in the line (if there is). */
     Error lineError = NO_ERROR;
 
-    boolean inMacroDef = isInMacroDef(line, wasInMacroDef); /* Is curr line in mcro def */
-    getMacroName(line, macro_name, wasInMacroDef, inMacroDef); /* Get curr macro name */
+    boolean isInMacroDef = isInMcroDef(line, wasInMacroDef); /* Is curr line in mcro def */
+    getMacroName(line, macro_name, wasInMacroDef, isInMacroDef); /* Get curr macro name */
 
-    lineError = handleLineErrors(PRE_PROCESS,
-                                 line, lineCount, *macro_name,
-                                 isMacroLine(line, macro_table, wasInMacroDef, inMacroDef));
-    if (*wasError == FALSE && lineError != NO_ERROR)
+    lineError = handlePreProcessErrors(file_name, line,lineCount, *macro_name,
+                                       wasInMacroDef, isInMacroDef);
+    if (lineError != NO_ERROR)
         *wasError = TRUE;
 
+    if (lineError == INVALID_MACRO_NAME_ERR) /* Address a specific error */
+    {
+        isInMacroDef = FALSE;
+        (void) free_ptr(POINTER(*macro_name));
+    }
+
     /* Will make the necessary actions. add to amFile, or macro_table */
-    if (lineError == INVALID_MACRO_NAME_ERR)
-        inMacroDef = FALSE;
+    addToTablesIfNeededInPreProc(line, *macro_name, wasInMacroDef, isInMacroDef,
+                                 amFile, macro_table);
 
-    addToTablesIfNeeded(line, *macro_name, wasInMacroDef, inMacroDef, amFile, macro_table);
-
-    wasInMacroDef = inMacroDef;
+    wasInMacroDef = isInMacroDef;
+    return lineError;
 }
 
 /*
@@ -160,22 +156,22 @@ Error preProcessorAssemblerAlgo(const char *line, char **macro_name,
  * @param   wasInMacroDef Flag to indicate of there was already a "mcro" statement.
  * @return  TRUE if line is inside a macro definition, otherwise FALSE.
  */
-boolean isInMacroDef(const char *line, boolean wasInMacroDef)
+boolean isInMcroDef(const char *line, boolean wasInMacroDef)
 {
-    boolean inMacroDef; /* Value to return */
+    boolean isInMacroDef; /* Value to return */
     char *firstWord = NULL; /* Will hold the first word in the line */
     findWord(line, &firstWord, FIRST_WORD); /* Find the first word */
 
     /* Check if we are in a macro definition. */
     if (wasInMacroDef == FALSE)
         /* Did we enter a new macro definition? */
-        inMacroDef = (sameStrings(firstWord, START_MACRO) == TRUE)? TRUE : FALSE;
+        isInMacroDef = (sameStrings(firstWord, START_MACRO) == TRUE)? TRUE : FALSE;
     else
         /* Did we exit a macro definition? */
-        inMacroDef = (sameStrings(firstWord, END_MACRO) == TRUE)? FALSE : TRUE;
+        isInMacroDef = (sameStrings(firstWord, END_MACRO) == TRUE)? FALSE : TRUE;
 
     (void) free_ptr(POINTER(firstWord)); /* Free unnecessary variable. */
-    return inMacroDef;
+    return isInMacroDef;
 }
 
 /*
@@ -186,11 +182,11 @@ boolean isInMacroDef(const char *line, boolean wasInMacroDef)
  * @param   wasInMacroDef Flag to indicate if the last line was in a macro definition.
  * @param   inMacroDef Flag to indicate if the current line is in a macro definition.
  */
-void getMacroName(const char *line, char **macro_name, boolean wasInMacroDef, boolean inMacroDef)
+void getMacroName(const char *line, char **macro_name, boolean wasInMacroDef, boolean isInMacroDef)
 {
-    if (wasInMacroDef == FALSE && inMacroDef == TRUE) /* Check for start of definition. */
+    if (wasInMacroDef == FALSE && isInMacroDef == TRUE) /* Check for start of definition. */
         findWord(line, macro_name, SECOND_WORD); /* Find the macro name */
-    else if (inMacroDef == FALSE) /* Check if the program isn't handle macros right now. */
+    else if (isInMacroDef == FALSE) /* Check if the program doesn't handle macros right now. */
         *macro_name = NULL;
     /* else -- wasInMacroDef == TRUE ** inMacroDef == TRUE -> nothing to do. */
 }
@@ -206,19 +202,19 @@ void getMacroName(const char *line, char **macro_name, boolean wasInMacroDef, bo
  * @param   *amFile The data structure to hold the contents of the .am file.
  * @param   *macro_table The data structure to hold the macros and their contents.
  */
-void addToTablesIfNeeded(const char *line, char *macro_name, boolean wasInMacroDef,
-                         boolean inMacroDef, NameTable *amFile, NameTable *macro_table)
+void addToTablesIfNeededInPreProc(const char *line, char *macro_name, boolean wasInMacroDef,
+                         boolean isInMacroDef, NameTable *amFile, NameTable *macro_table)
 {
     /* Entered new macro definition, add the macro to the macro table. */
-    if (isInNewMacroDef(wasInMacroDef, inMacroDef) == TRUE)
+    if (isInNewMacroDef(wasInMacroDef, isInMacroDef) == TRUE)
         (void) addNameToTable(macro_table, macro_name);
 
     /* Currently defining a macro, add the line to the macro data. */
-    else if (isStillInMacroDef(wasInMacroDef, inMacroDef) == TRUE)
+    else if (isStillInMacroDef(wasInMacroDef, isInMacroDef) == TRUE)
         (void) addStringToData(macro_table, macro_name, line);
 
     /* End macro statement, Ignore the line. */
-    else if (isFinishMacroDef(wasInMacroDef, inMacroDef) == TRUE);
+    else if (isFinishMacroDef(wasInMacroDef, isInMacroDef) == TRUE);
 
     /* Check if there is a macro call */
     else if (isCallingMacro(line, macro_table) == TRUE)
@@ -235,56 +231,6 @@ void addToTablesIfNeeded(const char *line, char *macro_name, boolean wasInMacroD
 
 }
 
-/*
- * Checks if the current line is a "mcro" statement.
- *
- * @param   wasInMacroDef Flag to indicate if the last line was in a macro definition.
- * @param   inMacroDef Flag to indicate if the current line is in a macro definition.
- * @return  TRUE if the current line is a "mcro" statement, otherwise FALSE.
- */
-boolean isInNewMacroDef(boolean wasInMacroDef, boolean inMacroDef)
-{
-    return (wasInMacroDef == FALSE && inMacroDef == TRUE)? TRUE : FALSE;
-}
-
-/*
- * Checks if the current line and the line before is inside a "mcro" definition.
- *
- * @param   wasInMacroDef Flag to indicate if the last line was in a macro definition.
- * @param   inMacroDef Flag to indicate if the current line is in a macro definition.
- * @return  TRUE if the current line and the line before is inside a "mcro" definition,
- *          otherwise FALSE.
- */
-boolean isStillInMacroDef(boolean wasInMacroDef, boolean inMacroDef)
-{
-    return (wasInMacroDef == TRUE && inMacroDef == TRUE)? TRUE : FALSE;
-}
-
-/*
- * Checks if the current line is an "endmcro" statement.
- *
- * @param   wasInMacroDef Flag to indicate if the last line was in a macro definition.
- * @param   inMacroDef Flag to indicate if the current line is in a macro definition.
- * @return  TRUE  if the current line is an "endmcro" statement, otherwise FALSE.
- */
-boolean isFinishMacroDef(boolean wasInMacroDef, boolean inMacroDef)
-{
-    return (wasInMacroDef == TRUE && inMacroDef == FALSE)? TRUE : FALSE;
-}
-
-boolean isCallingMacro(const char *line, NameTable *macro_table)
-{
-    boolean isCallingMacro; /* Value to return. */
-    char *firstWord = NULL; /* Will hold first word in line. */
-    findWord(line, &firstWord, FIRST_WORD); /* Find the first word. */
-
-    /* Check if a macro has been called. */
-    isCallingMacro = isNameInTable(macro_table, firstWord);
-
-    (void) free_ptr(POINTER(firstWord)); /* Free unnecessary variable. */
-    return isCallingMacro;
-}
-
 char *getMacroIfCalling(const char *line, NameTable *macro_table)
 {
     char *firstWord = NULL; /* Will hold first word in line. */
@@ -293,12 +239,4 @@ char *getMacroIfCalling(const char *line, NameTable *macro_table)
         findWord(line, &firstWord, FIRST_WORD); /* Find the first word. */
 
     return firstWord;
-}
-
-boolean isMacroLine(const char *line, NameTable *macro_table,
-                    boolean wasInMacroDef, boolean inMacroDef)
-{
-    return (isInNewMacroDef(wasInMacroDef, inMacroDef) ||
-            isFinishMacroDef(wasInMacroDef, inMacroDef) ||
-            isCallingMacro(line, macro_table))? TRUE : FALSE;
 }

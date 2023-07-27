@@ -13,7 +13,7 @@
 typedef enum
 {
     /* Indicates no error. !! add new errors after this one !! */
-        SYNTAX_ERR_START = start_of_error(1),
+        SYNTAX_ERR_START = start_of_error(2),
     /* Macro related syntax errors */
         INVALID_MACRO_NAME_ERR, EXTRANEOUS_TEXT_IN_MACRO_LINE_ERR,
     /* Label related syntax errors */

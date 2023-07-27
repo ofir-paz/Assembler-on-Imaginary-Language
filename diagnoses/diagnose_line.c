@@ -18,7 +18,7 @@
 /* -------------------------- */
 
 /* -----Finals----- */
-#define SPACE_DELIM " "
+#define EMPTY_DELIM " \t\n"
 /* ---------------- */
 
 /*
@@ -41,7 +41,7 @@ void findWord(const char *line, char **word, word_number wordNumber)
         rest = lineCopy;
 
         /* Finding the right word. */
-        do token = strtok_r(rest, SPACE_DELIM, &rest);
+        do token = strtok_r(rest, EMPTY_DELIM, &rest);
         while (++i < wordNumber && token != NULL);
 
         *word = my_strdup(token);

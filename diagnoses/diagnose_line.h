@@ -31,20 +31,20 @@ char *getCmdFix(const char *command, Error error);
  * This functions presumes that the command and the commas (up to the parameter to find)
  * are valid since it is supposed to be called after they are validated.
  * Returns the index of the wanted parameter or index of last char ('\0') in line if there isn't. */
-int findParamIndex(const char *line, param_num paramNum);
+int findParamIndex(const char *line, word_number paramNum);
 
 /* Finds the length of the parameter number paramNum with type paramtype pType
  * in const char *line.
  * Returns the length of the specific parameter. */
-int findParamLen(const char *line, param_num paramNum);// paramtype pType);
+int findParamLen(const char *line, word_number paramNum);// paramtype pType);
 
 /* Gets the float parameter numbered paramNum from param const char *line.
  * Returns the specified float value. */
-float getFloatParamFromLine(const char *line, param_num paramNum);
+float getFloatParamFromLine(const char *line, word_number paramNum);
 
 /* Gets the char parameter numbered paramNum from param const char *line.
  * Returns the specified char. */
-char getCharParamFromLine(const char *line, param_num paramNum);
+char getCharParamFromLine(const char *line, word_number paramNum);
 
 /* Checks if the line needs to be skipped.
  * param const char *line is the line to check

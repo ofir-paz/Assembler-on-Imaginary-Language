@@ -13,7 +13,7 @@
 typedef enum
 {
     /* Indicates no error. !! add new errors after this one !! */
-        IMG_SYSTEM_ERR_START = start_of_error(2),
+        IMG_SYSTEM_ERR_START = start_of_error(1),
     /* Memory limitations errors */
         MEMORY_OVERFLOW_ERR, LINE_OVERFLOW_ERR, NUMBER_TOO_BIG_ERR,
     /* CPU limitations errors */

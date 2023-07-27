@@ -30,13 +30,13 @@
 process_result firstFileTraverse(const char *file_name,
                                  NameTable *regLabels, NameTable *entLabels, NameTable *extLabels,
                                  MemoryImage *memoryImage);
-Error handleLine(const char *line,
+Error handleLineInFirstTrans(const char *file_name, const char *line,
                  NameTable *regLabels, NameTable *entLabels, NameTable *extLabels,
                  MemoryImage *memoryImage, int *IC, int *DC, boolean *wasError);
 void firstAssemblerAlgo(const char *line,
                         NameTable *regLabels, NameTable *entLabels, NameTable *extLabels,
                         MemoryImage *memoryImage, int *IC, int *DC);
-void addToTablesIfNeeded(const char *line,
+void addToTablesIfNeededInFirstTran(const char *line,
                          NameTable *regLabels, NameTable *entLabels, NameTable *extLabels,
                          int *IC, int *DC);
 /* ---------------------------------------- */
@@ -77,7 +77,8 @@ process_result firstFileTraverse(const char *file_name,
     /* Read the file line-by-line and handle it. */
     while (readNextLineFromFile(file_name, AFTER_MACRO, &line) != EOF)
     {
-        (void) handleLine(line, regLabels, entLabels, extLabels, memoryImage, &IC, &DC, &wasError);
+        (void) handleLineInFirstTrans(file_name, line, regLabels, entLabels, extLabels,
+                                      memoryImage, &IC, &DC, &wasError);
 
         (void) free_ptr(POINTER(line)); /* Next line */
     }
@@ -94,13 +95,15 @@ process_result firstFileTraverse(const char *file_name,
  * @param   *amFile Data structure to hold the file to print.
  * @param   *macro_table Data structure to hold the macro names and contents.
  */
-Error handleLine(const char *line,
+Error handleLineInFirstTrans(const char *file_name, const char *line,
                  NameTable *regLabels, NameTable *entLabels, NameTable *extLabels,
                  MemoryImage *memoryImage, int *IC, int *DC, boolean *wasError)
 {
+    static int lineCount = ZERO_COUNT; /* Counter of line */
+    lineCount++;
     /* Value to return. Represents the error in the line (if there is). */
-    Error lineError = handleLineErrors(FIRST_TRANSITION,
-                                        line, regLabels, entLabels, extLabels);
+    Error lineError = handleLineErrors(file_name, FIRST_TRANSITION,
+                                        line,lineCount, regLabels, entLabels, extLabels);
 
     if (*wasError == FALSE && lineError != NO_ERROR)
         *wasError = TRUE;
@@ -115,7 +118,7 @@ void firstAssemblerAlgo(const char *line,
                         NameTable *regLabels, NameTable *entLabels, NameTable *extLabels,
                         MemoryImage *memoryImage, int *IC, int *DC)
 {
-    addToTablesIfNeeded(line, regLabels, entLabels, extLabels, IC, DC);
+    addToTablesIfNeededInFirstTran(line, regLabels, entLabels, extLabels, IC, DC);
     encodeLine(line, memoryImage, FIRST_TRANSITION);
 }
 
@@ -130,7 +133,7 @@ void firstAssemblerAlgo(const char *line,
  * @param   *amFile The data structure to hold the contents of the .am file.
  * @param   *macro_table The data structure to hold the macros and their contents.
  */
-void addToTablesIfNeeded(const char *line,
+void addToTablesIfNeededInFirstTran(const char *line,
                          NameTable *regLabels, NameTable *entLabels, NameTable *extLabels,
                          int *IC, int *DC)
 {

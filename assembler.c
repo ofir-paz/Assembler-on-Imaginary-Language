@@ -26,8 +26,8 @@ void assemble(const char *file_name)
     //if (handle_filename_error(file_name) == NO_ERROR)
     //{
     (void) pre_process(file_name);
-    processResult = first_transition(file_name, regLabels, entLabels, extLabels, memoryImage);
+    //processResult = first_transition(file_name, regLabels, entLabels, extLabels, memoryImage);
     //}
 
-    (void) clearMemoryImage(memoryImage);
+    //(void) clearMemoryImage(memoryImage);
 }

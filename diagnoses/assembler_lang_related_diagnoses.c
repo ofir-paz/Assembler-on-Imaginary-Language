@@ -7,6 +7,7 @@
 
 /* ---Include header files--- */
 #include "../new-data-types/boolean.h"
+#include "../NameTable/NameTable.h"
 #include "../encoding/encoding-finals/encoding-finals.h"
 #include "../general-enums/indexes.h"
 #include "diagnose_line.h"
@@ -21,6 +22,82 @@
 
 /* ---------------Prototypes--------------- */
 /* ---------------------------------------- */
+
+
+/*
+ * Checks if the current line is a "mcro" statement.
+ *
+ * @param   wasInMacroDef Flag to indicate if the last line was in a macro definition.
+ * @param   inMacroDef Flag to indicate if the current line is in a macro definition.
+ *
+ * @return  TRUE if the current line is a "mcro" statement, otherwise FALSE.
+ */
+boolean isInNewMacroDef(boolean wasInMacroDef, boolean isInMacroDef)
+{
+    return (wasInMacroDef == FALSE && isInMacroDef == TRUE)? TRUE : FALSE;
+}
+
+/*
+ * Checks if the current line and the line before is inside a "mcro" definition.
+ *
+ * @param   wasInMacroDef Flag to indicate if the last line was in a macro definition.
+ * @param   inMacroDef Flag to indicate if the current line is in a macro definition.
+ *
+ * @return  TRUE if the current line and the line before is inside a "mcro" definition,
+ *          otherwise FALSE.
+ */
+boolean isStillInMacroDef(boolean wasInMacroDef, boolean isInMacroDef)
+{
+    return (wasInMacroDef == TRUE && isInMacroDef == TRUE)? TRUE : FALSE;
+}
+
+/*
+ * Checks if the current line is an "endmcro" statement.
+ *
+ * @param   wasInMacroDef Flag to indicate if the last line was in a macro definition.
+ * @param   inMacroDef Flag to indicate if the current line is in a macro definition.
+ *
+ * @return  TRUE  if the current line is an "endmcro" statement, otherwise FALSE.
+ */
+boolean isFinishMacroDef(boolean wasInMacroDef, boolean isInMacroDef)
+{
+    return (wasInMacroDef == TRUE && isInMacroDef == FALSE)? TRUE : FALSE;
+}
+
+/*
+ * Checks if the given line is calling a macro defined in the specified macro_table.
+ *
+ * @param   line The line to check if it's calling a macro.
+ * @param   macro_table The pointer to the NameTable containing macro names.
+ *
+ * @return  TRUE if the line is calling a macro, otherwise FALSE.
+ */
+boolean isCallingMacro(const char *line, NameTable *macro_table)
+{
+    boolean isCallingMacro; /* Value to return. */
+    char *firstWord = NULL; /* Will hold first word in line. */
+    findWord(line, &firstWord, FIRST_WORD); /* Find the first word. */
+
+    /* Check if a macro has been called. */
+    isCallingMacro = isNameInTable(macro_table, firstWord);
+
+    (void) free_ptr(POINTER(firstWord)); /* Free unnecessary variable. */
+    return isCallingMacro;
+}
+
+/*
+ * Checks if the given line is a special macro-related line (not a body of a mcro def).
+ *
+ * @param   wasInMacroDef Flag to indicate if the last line was in a macro definition.
+ * @param   inMacroDef Flag to indicate if the current line is in a macro definition.
+ *
+ * @return  TRUE if the current line is a macro statement (besides body), otherwise FALSE.
+ */
+boolean isMacroLine(boolean wasInMacroDef, boolean isInMacroDef)
+{
+    return (isInNewMacroDef(wasInMacroDef, isInMacroDef) ||
+            isFinishMacroDef(wasInMacroDef, isInMacroDef));
+}
 
 /*
  * Gets the guidance word that is represented by the given string word.

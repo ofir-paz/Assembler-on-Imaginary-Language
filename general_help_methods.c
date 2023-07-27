@@ -177,10 +177,10 @@ char *my_strdup(const char *str)
  */
 int getIndexOfStrInArray(const char *arr[], int size, const char *str)
 {
-    int i = size - 1; /* Loop variable and index to return. */
+    int i = size; /* Loop variable and index to return. */
 
     /* A loop that will stop until we find an element in arr that is equal to str, or i = -1. */
-    while (sameStrings(arr[i--], str) == FALSE && i >= ZERO_INDEX);
+    while (--i >= ZERO_INDEX && sameStrings(arr[i], str) == FALSE);
 
     return i;
 }

@@ -23,7 +23,9 @@ mcro m2
 m1
 m2
 
-mcro m3
+mcro mov
 m3 MACRO
 3 HELLO
 endmcro
+
+mov

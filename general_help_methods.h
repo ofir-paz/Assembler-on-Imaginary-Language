@@ -7,6 +7,7 @@
 #ifndef MMN_22_GENERAL_HELP_METHODS_H
 #define MMN_22_GENERAL_HELP_METHODS_H
 
+#include <stddef.h>
 #include "new-data-types/boolean.h"
 
 /* ---Macros--- */

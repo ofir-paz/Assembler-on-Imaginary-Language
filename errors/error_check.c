@@ -93,12 +93,12 @@ Error checkCommaError(const char *line, param_num paramNum)//, paramtype pType)
             commaIndex = nextCharIndex(line, index);
 
         if (isNextCharComma(line, commaIndex) == TRUE) /* check for multiple consecutive commas */
-            error = CONSEC_COMMAS;
+            error = 1;//CONSEC_COMMAS;
         else /* The area between this param and the next one is valid */
             error = NO_ERROR;
     }
     else /* Missing a comma */
-        error = NO_COMMA;
+        error = 1;//NO_COMMA;
 
     return error;
 }
@@ -166,23 +166,23 @@ Error checkParamFloatError(const char *line, param_num paramNum)
 
         /* Checks if the error is that the user entered only the sign of the float */
         if (isOnlySign(line, start - 1, end) == TRUE)
-            error = ONLY_SIGN;
+            error = 1;//ONLY_SIGN;
 
         /* Check if the param is a comma */
         else if (isCurrCharComma(line, start) == TRUE)
-            error = COMMA_AFTER_CMD;
+            error = 1;//COMMA_AFTER_CMD;
 
         /* Checks if the error is that the user didn't input a number */
         else if (isFloat(line, start, end) == FALSE)
-            error = NOT_A_FLOAT;
+            error = 1;//NOT_A_FLOAT;
 
         /* Checks if the error is invalid amount of dots in the number */
         else if (countDots(line, start, end) > LEGAL_DOTS_IN_FLOAT)
-            error = TOO_MANY_DOTS;
+            error = 1;//TOO_MANY_DOTS;
 
     }
     else /* The parameter doesn't exist */
-        error = NO_FLOAT_PARAM;
+        error = 1;//NO_FLOAT_PARAM;
 
     return error;
 }
@@ -245,18 +245,18 @@ Error checkParamCharError(const char *line, param_num paramNum)
         char param = *(line + index);
 
         if (isCurrCharComma(line, index) == TRUE) /* Check if the param is a comma */
-            error = COMMA_AFTER_CMD;
+            error = 1;//COMMA_AFTER_CMD;
         else if (isNextEmpty(line, index) == FALSE) /* Checks if the param is not one char */
-            error = NOT_ONE_CHAR;
+            error = 1;//NOT_ONE_CHAR;
         else if (isLetter(param) == FALSE) /* Checks if the param is not a letter */
-            error = NOT_LETTER;
+            error = 1;//NOT_LETTER;
         else if (isCapitalLetter(param) == FALSE) /* Checks if the param is not a capital letter */
-            error = NOT_CAPITAL;
+            error = 1;//NOT_CAPITAL;
         else
             error = NO_ERROR;
     }
     else
-        error = NO_CHAR_PARAM;
+        error = 1;//NO_CHAR_PARAM;
 
     return error;
 }

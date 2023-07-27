@@ -6,9 +6,9 @@
  */
 
 /* ---Include header files--- */
+#include <stdio.h>
 #include <stdarg.h>
 #include "../new-data-types/boolean.h"
-#include "../NameTable/NameTable.h"
 #include "../transitions/TransitionNumber.h"
 #include "error_types/error_types.h"
 #include "PreProcessorErrors/PreProcessorErrors.h"
@@ -17,48 +17,55 @@
 /* -------------------------- */
 
 /* ---Finals--- */
+
+/* ANSI escape codes for text color */
+#define ANSI_COLOR_RED      "\x1b[31m"
+#define ANSI_COLOR_BLUE     "\x1B[34m"
+#define ANSI_COLOR_RESET    "\x1b[0m"
+
 #define INPUT_ERROR_CODE (-1)
 /* ------------ */
 
-void printERR(Error error, int lineNumber)
+void print_assembler_ERR(Error error, const char *file_name, int lineNumber)
 {
+    /* Arrays to hold all the different error messages. */
     const char *imgSystemErrorMSG[] =
             {
                 "NO_ERROR",
-                ""
             };
     const char *syntaxErrorMSG[] =
             {
                     "NO_ERROR",
-                    ""
+                    "Invalid macro name!! a macro name cannot be a saved word.",
+                    "Extraneous text in a macro definition line !!"
             };
     const char *logicalErrorMSG[] =
             {
                     "NO_ERROR",
                     ""
             };
+    const char **errorMSG[] = {imgSystemErrorMSG, syntaxErrorMSG, logicalErrorMSG};
 
+    /* Printing the errors. */
+    fprintf(stderr, ANSI_COLOR_RED "\nERROR: " ANSI_COLOR_RESET "%s\n",
+            errorMSG[(error / MAX_ERRORS_IN_ENUM) - 1][error % MAX_ERRORS_IN_ENUM]);
+    fprintf(stderr, ANSI_COLOR_BLUE "In file: " ANSI_COLOR_RESET "%s, "
+                    ANSI_COLOR_BLUE "On line: " ANSI_COLOR_RESET "%d\n", file_name, lineNumber);
 }
 
-Error handleLineErrors(TransitionNumber_t transitionNumber, const char *line, int lineNumber, ...)
+Error handleLineErrors(const char *file_name, TransitionNumber_t transitionNumber,
+                       const char *line, int lineNumber, ...)
 {
     Error error = INPUT_ERROR_CODE;
-    va_list ptr;
-    va_start(ptr, lineNumber);
-
     switch (transitionNumber)
     {
         case PRE_PROCESS:
-            error = handlePreProcessErrors(line, lineNumber,
-                                           va_arg(ptr, const char *), /* macro_name= */
-                                           va_arg(ptr, boolean)); /* isMacroLine= */
             break;
-        case FIRST_TRANSITION:
-            break;
-        case SECOND_TRANSITION:
-            break;
+//        case FIRST_TRANSITION:
+//            break;
+//        case SECOND_TRANSITION:
+//            break;
     }
-    va_end(ptr);
     return error;
 }
 
@@ -69,7 +76,7 @@ Error handle_lineTooLong_error(const char *line, int lineIndex)
     if (isLineTooLong(line) == TRUE)
     {
         handle_lineTooLong_ERR(lineIndex);
-        error = LINE_TOO_LONG;
+        error = 1;//LINE_TOO_LONG_ERR;
     }
 
     return error;

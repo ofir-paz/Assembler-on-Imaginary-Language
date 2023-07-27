@@ -32,7 +32,7 @@ boolean isIndexInStr(const char *str, int i)
 /* Returns TRUE if param char ch is empty (space; tab; enter), otherwise FALSE */
 boolean isEmpty(char ch)
 {
-    return ch == SPACE_KEY || ch == TAB_KEY || ch == ENTER_KEY;
+    return ch == SPACE_KEY || ch == TAB_KEY || ch == ENTER_KEY || ch == NULL_TERMINATOR;
 }
 
 /* Finds the next index in param const char *str where it is not an empty space (tab/space/enter).

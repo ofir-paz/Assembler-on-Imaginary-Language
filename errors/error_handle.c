@@ -8,7 +8,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "../new-data-types/Error.h"
 #include "error_check.h"
 /* -------------------------- */
 
@@ -64,7 +63,7 @@ void printERR(Error error, const char *fix)
  * Returns nothing. */
 void noAllocationERR()
 {
-    printERR(NO_SPACE_IN_MEM, NO_FIX); /* Prints the error */
+    printERR(1/*NO_SPACE_IN_MEM*/, NO_FIX); /* Prints the error */
     exit(EXIT_CODE); /* Terminates the program */
 }
 
@@ -74,7 +73,7 @@ void noAllocationERR()
 void caseSensitiveERR(char **lowerCaseFunc)
 {
 
-    printERR(WRONG_CASE_FUNC, NULL);
+    printERR(1/*WRONG_CASE_FUNC*/, NULL);
 
     /* Freeing the unneeded strings */
     free(*lowerCaseFunc);
@@ -84,14 +83,14 @@ void caseSensitiveERR(char **lowerCaseFunc)
  * Returns nothing. */
 void undefinedFuncERR()
 {
-    printERR(UNDEFINED_FUNC, NO_FIX);
+    printERR(1/*UNDEFINED_FUNC*/, NO_FIX);
 }
 
 /* Handles the error where there is a comma after the function in the input.
  * Returns nothing. */
 void commaAfterCmdERR()
 {
-    printERR(COMMA_AFTER_CMD, NO_FIX);
+    printERR(1/*COMMA_AFTER_CMD*/, NO_FIX);
 }
 
 /* Handles an unknown error.
@@ -99,7 +98,7 @@ void commaAfterCmdERR()
  * Returns nothing. */
 void unknownERR()
 {
-    printERR(GENERAL_ERR, NO_FIX);
+    printERR(1 /*GENERAL_ERR*/, NO_FIX);
 }
 
 /* Handles an invalid command with the given param Error cmdERR to indicate the error,
@@ -108,13 +107,13 @@ void unknownERR()
 void handleInvalidCommand(Error cmdERR, char **fix)
 {
     switch (cmdERR) {
-        case WRONG_CASE_FUNC:
+        case 1://WRONG_CASE_FUNC:
             caseSensitiveERR(fix);
             break;
-        case UNDEFINED_FUNC:
+        case 2://UNDEFINED_FUNC:
             undefinedFuncERR();
             break;
-        case COMMA_AFTER_CMD:
+        case 3://COMMA_AFTER_CMD:
             commaAfterCmdERR();
             break;
         default:
@@ -151,7 +150,7 @@ void handleExtraneousERR(Error extraERR, char **fix)
 
 void handle_lineTooLong_ERR(int lineIndex)
 {
-    printERR(LINE_TOO_LONG, NULL);
+    printERR(1/*LINE_TOO_LONG*/, NULL);
 }
 
 
