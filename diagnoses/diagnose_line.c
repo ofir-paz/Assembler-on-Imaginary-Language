@@ -9,7 +9,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "../new-data-types/word_number.h"
-#include "../new-data-types/param_num.h"
+#include "../new-data-types/param_num_t.h"
 #include "../general-enums/programEnums.h"
 #include "../general-enums/indexes.h"
 #include "../general-enums/neededKeys.h"

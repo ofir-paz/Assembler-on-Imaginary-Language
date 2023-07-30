@@ -11,8 +11,10 @@
 /* ---Include different enums--- */
 #include "opcodes.h"
 #include "guidance.h"
-#include "encoding-type.h"
-#include "addressing-methods.h"
+#include "sentence_types.h"
+#include "encoding_types.h"
+#include "addressing_methods.h"
+#include "registers.h"
 /* ----------------------------- */
 
 #endif /* MMN_14_ENCODING_FINALS_H */

@@ -9,7 +9,8 @@
 /* ---Include header files--- */
 #include <stdlib.h>
 #include "../new-data-types/boolean.h"
-#include "../general_help_methods.h"
+#include "../util/memoryUtil.h"
+#include "../util/stringsUtil.h"
 /* -------------------------- */
 
 /* New data type 'dataType' which indicates which data type the name table holds. */
@@ -91,8 +92,8 @@ Node *getToLastNode(const NameTable *name_table)
 
     if (name_table != NULL)
     {
-        /* Take last node to the last node of the name table.
-         * If the head is NULL, last node will also be NULL. */
+        /* Take lastNode to the last node of the name table.
+         * If the head is NULL, lastNode will also be NULL. */
         for (lastNode = name_table -> head;
             lastNode != NULL && lastNode -> next != NULL; lastNode = lastNode -> next);
     }

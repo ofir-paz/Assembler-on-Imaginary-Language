@@ -8,7 +8,7 @@
 /* ---Include header files--- */
 #include "../new-data-types/boolean.h"
 #include "../NameTable/NameTable.h"
-#include "../encoding/encoding-finals/encoding-finals.h"
+#include "../encoding/encoding-finals/encoding_finals.h"
 #include "../general-enums/indexes.h"
 #include "diagnose_line.h"
 #include "../general_help_methods.h"

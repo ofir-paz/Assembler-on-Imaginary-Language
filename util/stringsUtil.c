@@ -1,62 +1,30 @@
 /*
  * @author Ofir Paz
- * @Version (27/04/2023)
- * This file has help methods to assist various other files in this program.
- * */
+ * @version (29/07/2023)
+ *
+ * This file ...
+ */
 
-/* ---Includes--- */
+/* ---Include header files--- */
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-#include "new-data-types/boolean.h"
-#include "general-enums/programEnums.h"
-#include "general-enums/indexes.h"
-#include "general-enums/neededKeys.h"
-#include "errors/system_errors.h"
-/* -------------- */
+#include "../new-data-types/boolean.h"
+#include "../general-enums/programEnums.h"
+#include "../general-enums/indexes.h"
+#include "../general-enums/neededKeys.h"
+#include "memoryUtil.h"
+/* -------------------------- */
 
 /* ---Macros--- */
-#define POINTER(ptr) (void **)(&ptr)
 /* ------------ */
 
 /* ---Finals--- */
-#define WAS_NULL_RETURN_CODE (-1)
-#define FREED_RETURN_CODE 0
 #define SAME_STRINGS 0
 /* ------------ */
 
-/* Allocates space in the memory for a given pointer.
- * Terminates the program on allocation error !
- * param void *ptr is the pointer to allocate space for
- * param size_t size is the size of the space to allocate
- * Returns nothing. */
-void *allocate_space(size_t size)
-{
-    void *ptr = malloc(size); /* Allocating the space */
-    handle_allocation_error(ptr); /* Handling errors if there are */
-    return ptr;
-}
-
-/*
- * Frees a given pointer.
- *
- * @param **ptr Pointer to free.
- * @return 0 if the pointer was freed, (-1) if the pointer was already NULL.
- */
-int free_ptr(void **ptr)
-{
-    int returnCode = WAS_NULL_RETURN_CODE; /* Assume the given pointer doesn't need to be free */
-
-    if (ptr != NULL && *ptr != NULL) /* Check if we were given a NULL pointer */
-    {
-        /* Free the pointer */
-        free(*ptr);
-        *ptr = NULL;
-        returnCode = FREED_RETURN_CODE;
-    }
-
-    return returnCode;
-}
+/* ---------------Prototypes--------------- */
+/* ---------------------------------------- */
 
 /*
  * Creates a dynamically allocated string from a given string.
@@ -76,7 +44,7 @@ char *getDynamicString(char *str)
 char *strToLowerCase(const char *str)
 {
     int i; /* Loop variable */
-    
+
     /* Assigning space in the memory for the new string */
     char *lowerCase_str = (char *) allocate_space(strlen(str) + SIZE_FOR_NULL);
 

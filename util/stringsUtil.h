@@ -1,35 +1,16 @@
 /*
  * @author Ofir Paz
- * @Version (27/04/2023)
- * Header file for the general_help_methods.c file.
- * */
+ * @version (29/07/2023)
+ *
+ * Header file for the stringsUtil.c file.
+ */
 
-#ifndef MMN_22_GENERAL_HELP_METHODS_H
-#define MMN_22_GENERAL_HELP_METHODS_H
+#ifndef MMN_14_STRINGSUTIL_H
+#define MMN_14_STRINGSUTIL_H
 
-#include <stddef.h>
-#include "new-data-types/boolean.h"
-
-/* ---Macros--- */
-#define POINTER(ptr) (void **)(&ptr)
-/* ------------ */
+#include "../new-data-types/boolean.h"
 
 /* ---------------Prototypes--------------- */
-
-/* Allocates space in the memory for a given pointer.
- * Terminates the program on allocation error !
- * param void *ptr is the pointer to allocate space for
- * param size_t size is the size of the space to allocate
- * Returns nothing. */
-void *allocate_space(size_t size);
-
-/*
- * Frees a given pointer.
- *
- * @param **ptr Pointer to free.
- * @return 0 if the pointer was freed, (-1) if the pointer was already NULL.
- */
-int free_ptr(void **ptr);
 
 /*
  * Creates a dynamically allocated string from a given string.
@@ -87,4 +68,4 @@ int getIndexOfStrInArray(const char *arr[], int size, const char *str);
 
 /* ---------------------------------------- */
 
-#endif /* MMN_22_GENERAL_HELP_METHODS_H */
+#endif /* MMN_14_STRINGSUTIL_H */

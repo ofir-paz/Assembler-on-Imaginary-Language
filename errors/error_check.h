@@ -8,7 +8,7 @@
 #define MMN_22_ERROR_CHECK_H
 
 #include "../new-data-types/boolean.h"
-#include "../new-data-types/param_num.h"
+#include "../new-data-types/param_num_t.h"
 #include "error_types/error_types.h"
 
 /* ------------------Prototypes------------------- */
