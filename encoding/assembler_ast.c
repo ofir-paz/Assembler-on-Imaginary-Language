@@ -79,9 +79,17 @@ typedef struct
 /* -------------------------------------------------- */
 
 /* ---------------Prototypes--------------- */
+data_t createData(void *data, data_type_t dataType);
+addressing_method_t findAddressingMethod(ast_t *ast, data_type_t dataType);
+arg_node_t *gotoLastArgNode(ast_t *ast);
 /* ---------------------------------------- */
 
-ast_list_t *createAstList()
+/*
+ * Creates an empty AST (Abstract Syntax Tree) list.
+ *
+ * @return  ast_list_t* A pointer to the newly created ast list.
+ */
+ast_list_t *createAstList(void )
 {
     /* Creating the list. */
     ast_list_t *newAstList = (ast_list_t *) allocate_space(sizeof(ast_list_t));
@@ -90,6 +98,13 @@ ast_list_t *createAstList()
     return newAstList;
 }
 
+/*
+ * Creates a new AST list node with the given AST pointer.
+ *
+ * @param   **ast Pointer to the AST (Abstract Syntax Tree) to be stored in the new node.
+ *
+ * @return  ast_list_node_t* A pointer to the newly created AST list node.
+ */
 ast_list_node_t *createAstListNode(ast_t **ast)
 {
     /* Creating the list node. */
@@ -100,47 +115,55 @@ ast_list_node_t *createAstListNode(ast_t **ast)
     return newAstListNode;
 }
 
-ast_t *creatAst(boolean isLabel)
+/*
+ * Creates a new AST (Abstract Syntax Tree) to represent a line of assembly code.
+ *
+ * @return  A pointer to the newly created AST.
+ */
+ast_t *creatAst(void )
 {
     ast_t *newAst = (ast_t *) allocate_space(sizeof(ast_t)); /* Creating the ast. */
-    newAst -> isLabel = isLabel; /* Setting the 'isLabel' attribute to the given boolean. */
+    newAst -> isLabel = FALSE; /* Resetting the 'isLabel' attribute to FALSE. */
     newAst -> sentenceNode = NULL; /* Resetting the 'sentenceNode' attribute. */
     return newAst;
 }
 
-int addAstToList(ast_list_t *astList, ast_t **ast)
-{
-    int returnCode = INVALID_GIVEN_PARAM_CODE; /* Status code to return. */
-
-    if (astList != NULL)
-    {
-        ast_list_node_t *newAstListNode = createAstListNode(ast);
-        if (astList -> head == NULL)
-            astList -> head = astList -> tail = newAstListNode;
-
-        else{
-            astList -> tail -> next = newAstListNode;
-            astList -> tail = newAstListNode;
-        }
-        returnCode = SUCCESS_CODE;
-    }
-
-    return returnCode;
-}
-
+/*
+ * Creates a sentence node to hold a statement.
+ * A statement is an opcode or a guidance defined in the assembly language.
+ *
+ * @param   statement The statement to be held by the sentence node.
+ *
+ * @return  Pointer to the newly created sentence node.
+ */
 sentence_node_t *createSentenceNode(statement_t statement)
 {
+    /* Create the new statement node. */
     sentence_node_t *newSentenceNode =
             (sentence_node_t *) allocate_space(sizeof(sentence_node_t));
+
+    /* Initialize its attributes. */
     newSentenceNode -> statement = statement;
     newSentenceNode -> argListHead = NULL;
+
     return newSentenceNode;
 }
 
+/*
+ * Creates a statement of a given sentence type and value.
+ * A statement is an opcode or a guidance defined in the assembly language.
+ *
+ * @param   sentenceType The type of sentence.
+ * @param   statement The value of the statement.
+ *
+ * @return  The created statement.
+ */
 statement_t createStatement(sentence_type_t sentenceType, int statement)
 {
-    statement_t newStatement;
+    statement_t newStatement; /* Statement to return. */
     newStatement.sentenceType = sentenceType;
+
+    /* Add statement value to statement accordingly. */
     if (sentenceType == DIRECTION_SENTENCE)
         newStatement.statement.opcode = statement;
     else
@@ -149,24 +172,47 @@ statement_t createStatement(sentence_type_t sentenceType, int statement)
     return newStatement;
 }
 
-void addSentenceToAst(ast_t *ast, sentence_type_t sentenceType, int statement)
+/*
+ * Creates an argument node for the given data and data type.
+ *
+ * @param   data        The data to be stored in the argument node.
+ * @param   dataType    The type of data being stored.
+ *
+ * @return  A pointer to the created argument node.
+ */
+arg_node_t *createArgumentNode(void *data, data_type_t dataType)
 {
-    statement_t statementOfNewSentence = createStatement(sentenceType, statement);
-    sentence_node_t *newSentenceNode = createSentenceNode(statementOfNewSentence);
-    ast -> sentenceNode = newSentenceNode;
+    /* Create the argument node. */
+    arg_node_t *newArgNode = (arg_node_t *) allocate_space(sizeof(arg_node_t));
+
+    /* Initialized its values. */
+    newArgNode -> paramNum = UNKNOWN_NUMBER;
+    newArgNode -> argData = createData(data, dataType);
+    newArgNode -> addressingMethod = NO_ADD_METHOD;
+    newArgNode -> nextArg = NULL;
+
+    return newArgNode;
 }
 
+/*
+ * Creates a data_t object with the given data and data type.
+ *
+ * @param   data        The data to be stored in the data_t object.
+ * @param   dataType    The type of data being stored.
+ *
+ * @return  A data_t object containing the given data and data type.
+ */
 data_t createData(void *data, data_type_t dataType)
 {
-    data_t newData;
+    data_t newData; /* Object to return. */
     newData.dataType = dataType;
 
-    switch (dataType)
+    switch (dataType) /* Adding the data to the data_t object accordingly to its type. */
     {
         case INT:
             newData.data.num = *((short int *) data);
             break;
-        case STRING:
+        case STRING: /* In case of string, duplicate it. */
             newData.data.string = my_strdup((char *)data);
             break;
         case REG:
@@ -177,36 +223,128 @@ data_t createData(void *data, data_type_t dataType)
     return newData;
 }
 
+/*
+ * Adds an AST (Abstract Syntax Tree) to the AST list.
+ *
+ * @param   *astList Pointer to the AST list.
+ * @param   **ast Pointer to the AST to add to the list.
+ *
+ * @return  0 if the node was successfully added to the list, 1 if the given list is empty.
+ */
+int addAstToList(ast_list_t *astList, ast_t **ast)
+{
+    int returnCode = INVALID_GIVEN_PARAM_CODE; /* Code to return, assume error. */
+
+    if (astList != NULL) /* If the parameter is valid. */
+    {
+        ast_list_node_t *newAstListNode = createAstListNode(ast); /* Create a node for the ast. */
+        if (astList -> head == NULL) /* If the list is empty. */
+            astList -> head = astList -> tail = newAstListNode;
+        else
+        {
+            astList -> tail -> next = newAstListNode; /* Add the new ast to the end of the list. */
+            astList -> tail = newAstListNode; /* Fix the tail. */
+        }
+
+        returnCode = SUCCESS_CODE; /* New node added successfully to the list. */
+    }
+
+    return returnCode;
+}
+
+/*
+ * Add the 'isLabel' flag to the AST.
+ *
+ * @param   ast         Pointer to the AST.
+ * @param   isLabel     Flag indicating if the line has a label definition.
+ */
+void addIsLabelToAst(ast_t *ast, boolean isLabel)
+{
+    ast -> isLabel = isLabel; /* Setting the 'isLabel' attribute to the given boolean. */
+}
+
+/*
+ * Adds a sentence to the given Abstract Syntax Tree (AST).
+ *
+ * @param   ast The Abstract Syntax Tree.
+ * @param   sentenceType The type of sentence to add.
+ * @param   statement The value of the statement to add.
+ */
+void addSentenceToAst(ast_t *ast, sentence_type_t sentenceType, int statement)
+{
+    /* Create the statement of the sentence. */
+    statement_t statementOfNewSentence = createStatement(sentenceType, statement);
+    /* Create the sentence node. */
+    sentence_node_t *newSentenceNode = createSentenceNode(statementOfNewSentence);
+
+    ast -> sentenceNode = newSentenceNode; /* Add the new node to the ast. */
+}
+
+/*
+ * Adds an argument node to the given AST.
+ *
+ * @param   ast         The AST to which the argument node should be added.
+ * @param   data        The data for the argument node.
+ * @param   dataType    The data type of the data for the argument node.
+ */
+void addArgumentToAst(ast_t *ast, void *data, data_type_t dataType)
+{
+    arg_node_t *lastNode = gotoLastArgNode(ast); /* Finding the last argument node. */
+    arg_node_t *newArgNode = createArgumentNode(data, dataType); /* Creating the new argument */
+    newArgNode -> addressingMethod = findAddressingMethod(ast, dataType);
+
+    if (lastNode == NULL) /* If there are no arguments currently in the ast. */
+    {
+        newArgNode -> paramNum = FIRST_ARG;
+        ast -> sentenceNode -> argListHead = newArgNode;
+    }
+    else /* Add the new argument to the end of the arg list. */
+    {
+        newArgNode -> paramNum = lastNode -> paramNum + 1;
+        lastNode -> nextArg = newArgNode;
+    }
+}
+
+/*
+ * Finds the addressing method for the given AST and data type.
+ *
+ * @param   ast         The AST to be analyzed.
+ * @param   dataType    The type of data being analyzed.
+ *
+ * @return  The addressing method to be used for the given data type in the AST.
+ */
 addressing_method_t findAddressingMethod(ast_t *ast, data_type_t dataType)
 {
+    /* Value to return. Assuming there is no addressing method, in this case
+     * the ast represents a guidance sentence. */
     addressing_method_t addressingMethod = NO_ADD_METHOD;
+
+    /* If the ast represents a direction sentence (there is an addressing method). */
     if (ast -> sentenceNode -> statement.sentenceType == DIRECTION_SENTENCE)
-    {
-        switch (dataType) {
-            case INT:
+        switch (dataType)
+        {
+            case INT: /* Instant value. */
                 addressingMethod = INSTANT;
                 break;
-            case STRING:
+            case STRING: /* Label name. */
                 addressingMethod = DIRECT;
                 break;
-            case REG:
+            case REG: /* Register. */
                 addressingMethod = DIRECT_REGISTER;
                 break;
         }
-    }
+
     return addressingMethod;
 }
 
-arg_node_t *createArgumentNode(void *data, data_type_t dataType)
-{
-    arg_node_t *newArgNode = (arg_node_t *) allocate_space(sizeof(arg_node_t));
-    newArgNode -> paramNum = UNKNOWN_NUMBER;
-    newArgNode -> argData = createData(data, dataType);
-    newArgNode -> addressingMethod = NO_ADD_METHOD;
-    newArgNode -> nextArg = NULL;
-    return newArgNode;
-}
-
+/*
+ * Gets the last argument node in the given AST.
+ *
+ * @param   ast The AST for which to find the last argument node.
+ *
+ * @return      A pointer to the last argument node in the AST,
+ *              or NULL if the AST is empty or if there are no arguments.
+ */
 arg_node_t *gotoLastArgNode(ast_t *ast)
 {
     arg_node_t *lastNode = NULL;
@@ -216,18 +354,130 @@ arg_node_t *gotoLastArgNode(ast_t *ast)
          * If the head is NULL, lastNode will also be NULL. */
         for (lastNode = ast -> sentenceNode -> argListHead;
             lastNode != NULL && lastNode -> nextArg != NULL; lastNode = lastNode -> nextArg);
+
     return lastNode;
 }
 
-void addArgumentToAst(ast_t *ast, void *data, data_type_t dataType)
+/*
+ * Deletes the argument node and set the pointer to NULL.
+ *
+ * @param   pArgNode    A pointer to the argument node to be deleted.
+ *
+ * @return  0 on success, -1 if the given pointer is NULL.
+ */
+int deleteArgumentNode(arg_node_t **pArgNode)
 {
-    arg_node_t *newArgNode = createArgumentNode(data, dataType);
-    arg_node_t *lastNode = gotoLastArgNode(ast);
-    if (lastNode == NULL)
+    int returnCode = INVALID_GIVEN_PARAM_CODE; /* Code to return, assume error. */
+
+    if (pArgNode != NULL && *pArgNode != NULL) /* If the parameter is valid */
     {
-        newArgNode -> paramNum = 1;
+        if ((*pArgNode) -> argData.dataType == STRING) /* If the argument has a string. */
+            (void) free_ptr(POINTER((*pArgNode) -> argData.data.string)); /* Free it. */
+        (void) free_ptr(POINTER(*pArgNode)); /* Free the argument node itself. */
+
+        returnCode = SUCCESS_CODE; /* Argument node deleted successfully. */
     }
+
+    return returnCode;
 }
 
-int deleteAst(ast_t **pAst);
-int deleteAstList(ast_list_t **pAstList);
+/*
+ * Deletes the argument list and set the pointer to NULL.
+ *
+ * @param   pArgList    A pointer to the head of the argument list to be deleted.
+ * @return  0 on success, -1 if the pointer is NULL.
+ */
+int deleteArgumentList(arg_node_t **pArgList)
+{
+    int returnCode = INVALID_GIVEN_PARAM_CODE; /* Code to return, assume error. */
+
+    if (pArgList != NULL) /* If the parameter is valid */
+    {
+        arg_node_t *curr = *pArgList, *currDel = *pArgList; /* Helper nodes */
+
+        while (curr != NULL) /* While there are more nodes to delete. */
+        {
+            curr = curr -> nextArg; /* Take curr node forward in the list. */
+            (void) deleteArgumentNode(&currDel); /* Delete the current node. */
+            currDel = curr; /* Take the currDel node forward in the list. */
+        }
+
+        returnCode = SUCCESS_CODE; /* Argument list deleted successfully. */
+    }
+
+    return returnCode;
+}
+
+/*
+ * Deletes the AST and set the pointer to NULL.
+ *
+ * @param   pAst    A pointer to the AST to be deleted.
+ * @return  0 on success, -1 if the pointer is NULL.
+ */
+int deleteAst(ast_t **pAst)
+{
+    int returnCode = INVALID_GIVEN_PARAM_CODE; /* Code to return, assume error. */
+
+    if (pAst != NULL && *pAst != NULL) /* If the parameter is valid */
+    {
+        /* Deletes the arguments in the ast. */
+        (void) deleteArgumentList(&((*pAst) -> sentenceNode -> argListHead));
+        (void) free_ptr(POINTER((*pAst) -> sentenceNode)); /* Delete the sentence node. */
+        (void) free_ptr(POINTER(*pAst)); /* Delete the ast itself. */
+
+        returnCode = SUCCESS_CODE; /* ast deleted successfully. */
+    }
+
+    return returnCode;
+}
+
+/*
+ * Deletes the AST list node and set the pointer to NULL.
+ *
+ * @param   pAstListNode    A pointer to the AST list node to be deleted.
+ *
+ * @return  0 on success, -1 if the pointer is NULL.
+ */
+int deleteAstListNode(ast_list_node_t **pAstListNode)
+{
+    int returnCode = INVALID_GIVEN_PARAM_CODE; /* Code to return, assume error. */
+
+    if (pAstListNode != NULL && *pAstListNode != NULL) /* If the parameter is valid */
+    {
+        (void) deleteAst(&((*pAstListNode) -> ast)); /* Delete the ast in the node. */
+        (void) free_ptr(POINTER(*pAstListNode)); /* Delete the node itself. */
+
+        returnCode = SUCCESS_CODE; /* node deleted successfully. */
+    }
+
+    return returnCode;
+}
+
+/*
+ * Deletes the entire AST list and set the pointer to NULL.
+ *
+ * @param   pAstList    A pointer to the AST list to be deleted.
+ *
+ * @return  0 on success, -1 if the pointer is NULL.
+ */
+int deleteAstList(ast_list_t **pAstList)
+{
+    int returnCode = INVALID_GIVEN_PARAM_CODE; /* Code to return, assume error. */
+
+    if (pAstList != NULL) /* If the parameter is valid */
+    {
+        /* Helper nodes. */
+        ast_list_node_t *curr = (*pAstList) -> head, *currDel = (*pAstList) -> head;
+
+        while (curr != NULL) /* While there are more nodes to delete. */
+        {
+            curr = curr -> next; /* Take curr node forward in the list. */
+            (void) deleteAstListNode(&currDel); /* Delete the current node. */
+            currDel = curr; /* Take the currDel node forward in the list. */
+        }
+
+        returnCode = SUCCESS_CODE; /* List deleted successfully. */
+    }
+
+    return returnCode;
+}
