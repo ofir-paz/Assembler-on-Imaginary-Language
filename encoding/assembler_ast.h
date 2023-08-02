@@ -21,7 +21,8 @@ typedef enum {INT, STRING, REG} data_type_t;
 
 /* ---Data types prototypes--- */
 typedef struct ast_list_t ast_list_t;
-typedef struct ast__t ast_t;
+typedef struct ast_t ast_t;
+typedef struct data_t data_t;
 /* --------------------------- */
 
 /*
@@ -39,6 +40,16 @@ ast_list_t *createAstList(void );
 ast_t *creatAst(void );
 
 /*
+ * Creates a data_t object with the given data and data type.
+ *
+ * @param   data        The data to be stored in the data_t object.
+ * @param   dataType    The type of data being stored.
+ *
+ * @return  A data_t object containing the given data and data type.
+ */
+data_t createData(void *data, data_type_t dataType);
+
+/*
  * Adds an AST (Abstract Syntax Tree) to the AST list.
  *
  * @param   *astList Pointer to the AST list.
@@ -49,12 +60,12 @@ ast_t *creatAst(void );
 int addAstToList(ast_list_t *astList, ast_t **ast);
 
 /*
- * Add the 'isLabel' flag to the AST.
+ * Adds a label name to the AST.
  *
  * @param   ast         Pointer to the AST.
- * @param   isLabel     Flag indicating if the line has a label definition.
+ * @param   labelName   Name of the label to add.
  */
-void addIsLabelToAst(ast_t *ast, boolean isLabel);
+void addLabelToAst(ast_t *ast, const char *labelName);
 
 /*
  * Adds a sentence to the given Abstract Syntax Tree (AST).
@@ -73,6 +84,14 @@ void addSentenceToAst(ast_t *ast, sentence_type_t sentenceType, int statement);
  * @param   dataType    The data type of the data for the argument node.
  */
 void addArgumentToAst(ast_t *ast, void *data, data_type_t dataType);
+
+/*
+ * Check if the given AST has a label.
+ *
+ * @param   ast         Pointer to the AST.
+ * @return  TRUE if the AST has a label, otherwise FALSE.
+ */
+boolean isLabel(ast_t *ast);
 
 /*
  * Finds the addressing method for the given AST and data type.

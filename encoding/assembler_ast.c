@@ -52,14 +52,14 @@ typedef struct arg_node_t
 typedef struct
 {
     statement_t statement; /* Will be the statement, opcode or guidance. */
-    struct arg_node_t *argListHead; /* List of arguments for the sentence. */
+    arg_node_t *argListHead; /* List of arguments for the sentence. */
 } sentence_node_t; /* Sentence node type. */
 
 /* This is the abstract syntax tree. It is a data structure representing a line of code
  * in the imaginary assembly language. */
 typedef struct
 {
-    boolean isLabel;
+    char *label;
     sentence_node_t *sentenceNode;
 } ast_t; /* ast (abstract syntax tree) type. */
 
@@ -123,7 +123,7 @@ ast_list_node_t *createAstListNode(ast_t **ast)
 ast_t *creatAst(void )
 {
     ast_t *newAst = (ast_t *) allocate_space(sizeof(ast_t)); /* Creating the ast. */
-    newAst -> isLabel = FALSE; /* Resetting the 'isLabel' attribute to FALSE. */
+    newAst -> label = NULL; /* Resetting the label attribute to NULL. */
     newAst -> sentenceNode = NULL; /* Resetting the 'sentenceNode' attribute. */
     return newAst;
 }
@@ -253,14 +253,14 @@ int addAstToList(ast_list_t *astList, ast_t **ast)
 }
 
 /*
- * Add the 'isLabel' flag to the AST.
+ * Adds a label name to the AST.
  *
  * @param   ast         Pointer to the AST.
- * @param   isLabel     Flag indicating if the line has a label definition.
+ * @param   labelName   Name of the label to add.
  */
-void addIsLabelToAst(ast_t *ast, boolean isLabel)
+void addLabelToAst(ast_t *ast, const char *labelName)
 {
-    ast -> isLabel = isLabel; /* Setting the 'isLabel' attribute to the given boolean. */
+    ast -> label = my_strdup(labelName); /* Making a duplicate of the name and adding it. */
 }
 
 /*
@@ -303,6 +303,17 @@ void addArgumentToAst(ast_t *ast, void *data, data_type_t dataType)
         newArgNode -> paramNum = lastNode -> paramNum + 1;
         lastNode -> nextArg = newArgNode;
     }
+}
+
+/*
+ * Check if the given AST has a label.
+ *
+ * @param   ast         Pointer to the AST.
+ * @return  TRUE if the AST has a label, otherwise FALSE.
+ */
+boolean isLabel(ast_t *ast)
+{
+    return (ast != NULL && ast -> label != NULL)? TRUE : FALSE;
 }
 
 /*
@@ -423,6 +434,7 @@ int deleteAst(ast_t **pAst)
         /* Deletes the arguments in the ast. */
         (void) deleteArgumentList(&((*pAst) -> sentenceNode -> argListHead));
         (void) free_ptr(POINTER((*pAst) -> sentenceNode)); /* Delete the sentence node. */
+        (void) free_ptr(POINTER((*pAst) -> label)); /* Delete the label name */
         (void) free_ptr(POINTER(*pAst)); /* Delete the ast itself. */
 
         returnCode = SUCCESS_CODE; /* ast deleted successfully. */

@@ -10,13 +10,15 @@
 #include <string.h>
 #include "../NameTable/NameTable.h"
 #include "../new-data-types/process_result.h"
+#include "../encoding/assembler_ast.h"
 #include "../errors/error_types/error_types.h"
-#include "../general-enums/programEnums.h"
-#include "TransitionNumber.h"
+#include "../general-enums/programFinals.h"
+#include "../general-enums/assemblerFinals.h"
 #include "../FileHandling/readFromFile.h"
 #include "../errors/errors.h"
-#include "../general_help_methods.h"
+#include "../util/memoryUtil.h"
 #include "../encoding/encoding.h"
+#include "first_transition_util.h"
 /* -------------------------- */
 
 /* ---Macros--- */
@@ -27,18 +29,13 @@
 /* ------------ */
 
 /* ---------------Prototypes--------------- */
-process_result firstFileTraverse(const char *file_name,
-                                 NameTable *regLabels, NameTable *entLabels, NameTable *extLabels,
-                                 MemoryImage *memoryImage);
-Error handleLineInFirstTrans(const char *file_name, const char *line,
-                 NameTable *regLabels, NameTable *entLabels, NameTable *extLabels,
-                 MemoryImage *memoryImage, int *IC, int *DC, boolean *wasError);
-void firstAssemblerAlgo(const char *line,
-                        NameTable *regLabels, NameTable *entLabels, NameTable *extLabels,
+process_result firstFileTraverse(const char *file_name, NameTable *labelsMap[],
+                                 MemoryImage *memoryImage, ast_list_t *astList);
+ast_t *handleLineInFirstTrans(const char *file_name, const char *line, NameTable *labelsMap[],
+                              MemoryImage *memoryImage, int *IC, int *DC, boolean *wasError);
+void firstAssemblerAlgo(const char *line, NameTable *labelsMap[],
                         MemoryImage *memoryImage, int *IC, int *DC);
-void addToTablesIfNeededInFirstTran(const char *line,
-                         NameTable *regLabels, NameTable *entLabels, NameTable *extLabels,
-                         int *IC, int *DC);
+void addToTablesIfNeededInFirstTran(const char *line, NameTable *labelsMap[], int *IC, int *DC);
 /* ---------------------------------------- */
 
 /*
@@ -48,15 +45,15 @@ void addToTablesIfNeededInFirstTran(const char *line,
  * @param   *file_name The name of the file to process.
  * @return
  */
-process_result first_transition(const char *file_name,
-                                NameTable *regLabels, NameTable *entLabels, NameTable *extLabels,
-                                MemoryImage *memoryImage)
+process_result first_transition(const char *file_name, NameTable *labelsMap[],
+                                MemoryImage **memoryImage, ast_list_t **astList)
 {
-    regLabels = createNameTable(INT_TYPE); /* Will hold normal labels */
-    entLabels = createNameTable(INT_TYPE); /* Will hold the .entry labels. */
-    extLabels = createNameTable(INT_TYPE); /* Will hold the .extern labels. */
+    labelsMap[REG_LABELS] = createNameTable(INT_TYPE); /* Will hold normal labels */
+    labelsMap[ENT_LABELS] = createNameTable(INT_TYPE); /* Will hold the .entry labels. */
+    labelsMap[EXT_LABELS] = createNameTable(INT_TYPE); /* Will hold the .extern labels. */
+    *astList = createAstList(); /* Data structure to help diagnose and encode each line. */
 
-    return firstFileTraverse(file_name, regLabels, entLabels, extLabels, memoryImage);
+    return firstFileTraverse(file_name, labelsMap, *memoryImage, *astList);
 }
 
 /*
@@ -66,9 +63,8 @@ process_result first_transition(const char *file_name,
  * @param   *amFile The data structure to hold the contents of the .am file.
  * @param   *macro_table The data structure to hold the macros and their contents.
  */
-process_result firstFileTraverse(const char *file_name,
-                                 NameTable *regLabels, NameTable *entLabels, NameTable *extLabels,
-                                 MemoryImage *memoryImage)
+process_result firstFileTraverse(const char *file_name, NameTable *labelsMap[],
+                                 MemoryImage *memoryImage, ast_list_t *astList)
 {
     boolean wasError = FALSE;
     int IC, DC;
@@ -77,9 +73,9 @@ process_result firstFileTraverse(const char *file_name,
     /* Read the file line-by-line and handle it. */
     while (readNextLineFromFile(file_name, AFTER_MACRO, &line) != EOF)
     {
-        (void) handleLineInFirstTrans(file_name, line, regLabels, entLabels, extLabels,
-                                      memoryImage, &IC, &DC, &wasError);
-
+        ast_t *lineAst = handleLineInFirstTrans(file_name, line, labelsMap, memoryImage,
+                                                &IC, &DC, &wasError);
+        addAstToList(astList, &lineAst); /* Add the ast to the list. */
         (void) free_ptr(POINTER(line)); /* Next line */
     }
 
@@ -95,31 +91,28 @@ process_result firstFileTraverse(const char *file_name,
  * @param   *amFile Data structure to hold the file to print.
  * @param   *macro_table Data structure to hold the macro names and contents.
  */
-Error handleLineInFirstTrans(const char *file_name, const char *line,
-                 NameTable *regLabels, NameTable *entLabels, NameTable *extLabels,
-                 MemoryImage *memoryImage, int *IC, int *DC, boolean *wasError)
+ast_t *handleLineInFirstTrans(const char *file_name, const char *line, NameTable *labelsMap[],
+                              MemoryImage *memoryImage, int *IC, int *DC, boolean *wasError)
 {
+    Error lineError; /* Represents the error in the line (if there is). */
     static int lineCount = ZERO_COUNT; /* Counter of line */
     lineCount++;
-    /* Value to return. Represents the error in the line (if there is). */
-    Error lineError = handleLineErrors(file_name, FIRST_TRANSITION,
-                                        line,lineCount, regLabels, entLabels, extLabels);
 
-    if (*wasError == FALSE && lineError != NO_ERROR)
-        *wasError = TRUE;
+    /* AST (abstract syntax tree) representing the line to return. */
+    ast_t *lineAst = buildAstFromLine(line, labelsMap, &lineError);
+
+    handleFirstTransLineError(file_name, lineCount, lineError, wasError);
 
     if (*wasError == FALSE)
-        firstAssemblerAlgo(line, regLabels, entLabels, extLabels, memoryImage, IC, DC);
+        firstAssemblerAlgo(line, labelsMap, memoryImage, IC, DC);
 
-    return lineError;
+    return lineAst;
 }
 
-void firstAssemblerAlgo(const char *line,
-                        NameTable *regLabels, NameTable *entLabels, NameTable *extLabels,
+void firstAssemblerAlgo(const char *line, NameTable *labelsMap[],
                         MemoryImage *memoryImage, int *IC, int *DC)
 {
-    addToTablesIfNeededInFirstTran(line, regLabels, entLabels, extLabels, IC, DC);
-    encodeLine(line, memoryImage, FIRST_TRANSITION);
+    addToTablesIfNeededInFirstTran(line, labelsMap, IC, DC);
 }
 
 /*
@@ -133,9 +126,7 @@ void firstAssemblerAlgo(const char *line,
  * @param   *amFile The data structure to hold the contents of the .am file.
  * @param   *macro_table The data structure to hold the macros and their contents.
  */
-void addToTablesIfNeededInFirstTran(const char *line,
-                         NameTable *regLabels, NameTable *entLabels, NameTable *extLabels,
-                         int *IC, int *DC)
+void addToTablesIfNeededInFirstTran(const char *line, NameTable *labelsMap[], int *IC, int *DC)
 {
 
 }

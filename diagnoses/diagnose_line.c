@@ -9,12 +9,12 @@
 #include <stdlib.h>
 #include <string.h>
 #include "../new-data-types/word_number.h"
-#include "../new-data-types/param_num_t.h"
-#include "../general-enums/programEnums.h"
+#include "../general-enums/programFinals.h"
 #include "../general-enums/indexes.h"
 #include "../general-enums/neededKeys.h"
 #include "diagnose_help_methods.h"
-#include "../general_help_methods.h"
+#include "../util/memoryUtil.h"
+#include "../util/stringsUtil.h"
 /* -------------------------- */
 
 /* -----Finals----- */
@@ -49,32 +49,32 @@ void findWord(const char *line, char **word, word_number wordNumber)
     }
 }
 
-/*
- * Finds index of parameter in const char *line.
- * param paramNum specifies the number of parameter to seek.
- * This functions presumes that the command and the commas (up to the parameter to find)
- * are valid since it is supposed to be called after they are validated.
- * Returns the index of the wanted parameter or index of last char ('\0') in line if there isn't.
- */
-int findParamIndex(const char *line, param_num paramNum)
-{
-    /* Start index of the command in line. */
-    int startOfCmd = nextCharIndex(line, MINUS_ONE_INDEX);
-
-    /* Here we make the assumption on the command's validation. */
-    int index = nextWordIndex(line, startOfCmd); /* Start from first parameter */
-
-    int j; /* Loop variable */
-
-    /* In this loop we take index to the next parameter until we get to the wanted parameter.
-     * We also start the loop from 1 because index already points to the first parameter in line.
-     * We assume here that the commas are valid up to the parameter to find. */
-    for (j = ONE_INDEX; j < paramNum; j++)
-        /* Assign the index to the last index of the curr param */
-        index = nextCharIndex(line, nextCommaIndex(line, index));
-
-    return index;
-}
+///*
+// * Finds index of parameter in const char *line.
+// * param paramNum specifies the number of parameter to seek.
+// * This functions presumes that the command and the commas (up to the parameter to find)
+// * are valid since it is supposed to be called after they are validated.
+// * Returns the index of the wanted parameter or index of last char ('\0') in line if there isn't.
+// */
+//int findParamIndex(const char *line, param_num paramNum)
+//{
+//    /* Start index of the command in line. */
+//    int startOfCmd = nextCharIndex(line, MINUS_ONE_INDEX);
+//
+//    /* Here we make the assumption on the command's validation. */
+//    int index = nextWordIndex(line, startOfCmd); /* Start from first parameter */
+//
+//    int j; /* Loop variable */
+//
+//    /* In this loop we take index to the next parameter until we get to the wanted parameter.
+//     * We also start the loop from 1 because index already points to the first parameter in line.
+//     * We assume here that the commas are valid up to the parameter to find. */
+//    for (j = ONE_INDEX; j < paramNum; j++)
+//        /* Assign the index to the last index of the curr param */
+//        index = nextCharIndex(line, nextCommaIndex(line, index));
+//
+//    return index;
+//}
 
 /* Checks if the given line is an empty line (contains spaces and tabs only).
  * param const char *line is the line to check if it is empty or not

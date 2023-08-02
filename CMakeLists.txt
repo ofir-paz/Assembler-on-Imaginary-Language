@@ -23,12 +23,12 @@ add_executable(mmn_14 main.c new-data-types/boolean.h
         encoding/encoding-help-methods.c encoding/encoding-help-methods.h
         errors/error_types/ImgSystemError.h diagnoses/diagnose_help_methods.c
         diagnoses/diagnose_help_methods.h new-data-types/word_number.h NameTable/NameTable.h
-        general-enums/programEnums.h
+        general-enums/programFinals.h
         errors/error_types/error_constant.h errors/error_types/error_types.h
-        transitions/TransitionNumber.h errors/PreProcessorErrors/PreProcessorErrors.c
+        errors/PreProcessorErrors/PreProcessorErrors.c
         errors/PreProcessorErrors/PreProcessorErrors.h diagnoses/assembler_lang_related_diagnoses.c
         diagnoses/assembler_lang_related_diagnoses.h encoding/encoding-finals/encoding_finals.h
         encoding/encoding-finals/sentence_types.h encoding/assembler_ast.c encoding/assembler_ast.h
-        encoding/encoding-finals/registers.h transitions/first_transition_uitl.c
-        transitions/first_transition_uitl.h util/memoryUtil.c util/memoryUtil.h
-        util/stringsUtil.c util/stringsUtil.h)
+        encoding/encoding-finals/registers.h transitions/first_transition_util.c
+        transitions/first_transition_util.h util/memoryUtil.c util/memoryUtil.h
+        util/stringsUtil.c util/stringsUtil.h general-enums/assemblerFinals.h)

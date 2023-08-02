@@ -10,7 +10,7 @@
 #include <string.h>
 #include <ctype.h>
 #include "../new-data-types/boolean.h"
-#include "../general-enums/programEnums.h"
+#include "../general-enums/programFinals.h"
 #include "../general-enums/indexes.h"
 #include "../general-enums/neededKeys.h"
 #include "memoryUtil.h"

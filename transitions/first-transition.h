@@ -21,9 +21,8 @@
  * @param   *file_name The name of the file to process.
  * @return
  */
-process_result first_transition(const char *file_name,
-                      NameTable *regLabels, NameTable *entLabels, NameTable *extLabels,
-                      MemoryImage *memoryImage);
+process_result first_transition(const char *file_name, NameTable *labelsMap[],
+                                MemoryImage **memoryImage, ast_list_t **astList);
 /* ---------------------------------------- */
 
 #endif /* MMN_14_FIRST_TRANSITION_H */

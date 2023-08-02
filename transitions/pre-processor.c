@@ -10,13 +10,14 @@
 #include "../new-data-types/boolean.h"
 #include "../new-data-types/process_result.h"
 #include "../NameTable/NameTable.h"
-#include "../general-enums/programEnums.h"
-#include "../general_help_methods.h"
+#include "../general-enums/programFinals.h"
 #include "../FileHandling/readFromFile.h"
 #include "../FileHandling/writeToFile.h"
 #include "../errors/PreProcessorErrors/PreProcessorErrors.h"
 #include "../diagnoses/diagnose_line.h"
 #include "../diagnoses/assembler_lang_related_diagnoses.h"
+#include "../util/memoryUtil.h"
+#include "../util/stringsUtil.h"
 /* -------------------------- */
 
 /* ---Finals--- */
