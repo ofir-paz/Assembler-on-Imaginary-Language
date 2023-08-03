@@ -6,18 +6,21 @@
  */
 
 /* ---Include header files--- */
+#include <stddef.h>
 #include "../new-data-types/boolean.h"
 #include "../NameTable/NameTable.h"
 #include "../encoding/encoding-finals/encoding_finals.h"
 #include "../general-enums/indexes.h"
 #include "diagnose_line.h"
-#include "../general_help_methods.h"
+#include "../util/memoryUtil.h"
+#include "../util/stringsUtil.h"
 /* -------------------------- */
 
 /* ---Macros--- */
 /* ------------ */
 
 /* ---Finals--- */
+#define NO_SAVED_WORD (-1)
 /* ------------ */
 
 /* ---------------Prototypes--------------- */
@@ -141,12 +144,73 @@ opcodes_t getOpcode(const char *word)
 }
 
 /*
+ * Retrieves the sentence type of the line based on the command at the specified location.
+ *
+ * @param   *line           The line to check the sentence type of.
+ * @param   commandNumber   The location of the command to help determine the sentence type.
+ *
+ * @return  The sentence type represented by the command.
+ */
+sentence_type_t getSentenceTypeOfLine(const char *line, word_number commandNumber)
+{
+    sentence_type_t sentenceType; /* Value to return. */
+    char *commandName = NULL; /* Will hold the specific command name. */
+    findWord(line, &commandName, commandNumber); /* Find the command name. */
+
+    /* Check which sentence type does the command represents. */
+    if (getGuidance(commandName) != NO_GUIDANCE)
+        sentenceType = GUIDANCE_SENTENCE;
+    else if (getOpcode(commandName) != NO_OPCODE)
+        sentenceType = DIRECTION_SENTENCE;
+    else /* The command is invalid. */
+        sentenceType = NO_TYPE;
+
+    free_ptr(POINTER(commandName)); /* Free unnecessary variable. */
+    return sentenceType;
+}
+
+/*
  * Checks if the give word is a saved word in the language.
  *
  * @param   word The word to check.
+ *
  * @return  TRUE if the word is a saved word, otherwise FALSE.
  */
 boolean isSavedWord(const char *word)
 {
     return (getGuidance(word) == NO_GUIDANCE && getOpcode(word) == NO_OPCODE)? FALSE : TRUE;
+}
+
+/*
+ * Retrieves the command at the specified position in the line.
+ *
+ * @param   line            The input line to retrieve the word from.
+ * @param   commandNumber   The position of the command to retrieve in the line.
+ *
+ * @return  The command at the given position, or -1 if there was no command.
+ */
+int getCommandFromLine(const char *line, word_number commandNumber)
+{
+    int command; /* Value to return, represents the command (if there is). */
+    char *commandName = NULL; /* Will hold the specific command name. */
+    findWord(line, &commandName, commandNumber); /* Find the word. */
+
+    if ((command = getGuidance(commandName)) == NO_GUIDANCE) /* Get the command */
+        command = getOpcode(commandName);
+
+    free_ptr(POINTER(commandName)); /* Free unnecessary variable. */
+    return command;
+}
+
+/*
+ * Checks if the word at the specified position in the line matches a saved word.
+ *
+ * @param   line        The input line to check.
+ * @param   wordNumber  The position of the word to check in the line.
+ *
+ * @return  TRUE if the word at the given position matches a saved word, otherwise FALSE.
+ */
+boolean isSavedWordInLine(const char *line, word_number wordNumber)
+{
+    return (getCommandFromLine(line, wordNumber) == NO_SAVED_WORD)? FALSE : TRUE;
 }

@@ -10,6 +10,8 @@
 #include "../NameTable/NameTable.h"
 #include "../encoding/assembler_ast.h"
 #include "../errors/error_types/error_types.h"
+#include "../diagnoses/assembler_lang_related_diagnoses.h"
+#include "../diagnoses/diagnose_line.h"
 #include "../util/memoryUtil.h"
 /* -------------------------- */
 
@@ -33,37 +35,61 @@ Error collectDataFromLine(const char *line, char **label, int *statement,
  *
  * @return  Pointer to the root of the AST, or NULL if there was an error during the build process.
  */
-ast_t *buildAstFromLine(const char *line, Error *lineError) {
-    ast_t *lineAst = creatAst(); /* Create the AST. */
-    char *label = NULL; /* Will hold the label name to insert to the ast (if there is a label). */
-    int statement; /* Will hold the statement to insert to the ast. */
-    sentence_type_t sentenceType; /* Will hold the type of sentence (line). */
-    data_t *dataArr;
+ast_t *buildAstFromLine(const char *line, Error *lineError)
+{
+    ast_t *lineAST = creatAst(); /* Create the AST. */
+    *lineError = addDataFromLineToAST(lineAST, line);
 
-    *lineError = collectDataFromLine(line, &label, &statement, &sentenceType, &dataArr);
-
-    if (*lineError == NO_ERROR)
-    {
-        addLabelToAst(lineAst, label);
-        addSentenceToAst(lineAst, sentenceType, statement);
+    if (*lineError == NO_ERROR) /* Check logical errors in the code if it passed syntax check. */
         *lineError = checkFirstTransLogicalErrorsInLine(lineAst);
-    }
 
-    (void) free_ptr(POINTER(label)); /* Free unnecessary variable. */
-    return lineAst;
+    if (*lineError != NO_ERROR)
+        deleteAst(&lineAST);
+
+    return lineAST;
 }
 
-Error collectDataFromLine(const char *line, char **label, int *statement,
-                          sentence_type_t *sentenceType, data_t **dataArr)
+Error addDataFromLineToAST(ast_t *lineAST, const char *line)
 {
     Error lineError; /* Value to return, will represent the error found in the line. */
 
     /* Get the tokens of the line or errors found in the process. */
-    lineError = getLabel(line, label);
+    lineError = addLabelFromLineToAST(lineAST, line);
     if (lineError == NO_ERROR) /* Continue to next token if there was no error... */
-        lineError = getStatement(line, statement, sentenceType, *label);
+        lineError = addStatementFromLineToAST(lineAST, line);
     if (lineError == NO_ERROR)
-        lineError = getArguments(line, dataArr, *label);
+        lineError = addArguemntsFromLineToAST(lineAST, line);
 
     return lineError;
+}
+
+Error addLabelFromLineToAST(ast_t *lineAST, const char *line)
+{
+    Error foundError = NO_ERROR; /* Error to return, assume success. */
+    char *label = NULL;
+
+    if (isColonInLineForLabel(line) == TRUE)
+        if ((foundError = checkSyntaxErrorInLabel(line)) == NO_ERROR)
+            findWord(line, &label, FIRST_WORD);
+
+    /* Add label (will do nothing if there was an error). */
+    addLabelToAst(lineAST, label);
+
+    return foundError;
+}
+
+Error addSentenceFromLineToAST(ast_t *lineAST, const char *line)
+{
+    Error foundError = NO_ERROR; /* Error to return, assume success. */
+    word_number sentenceNumber = (isLabel(lineAST) == TRUE)? SECOND_WORD : FIRST_WORD;
+
+    if (isSavedWordInLine(line, sentenceNumber))
+        addSentenceToAst(lineAST,
+                         getCommandFromLine(line, sentenceNumber),
+                         getSentenceTypeOfLine(line, sentenceNumber));
+
+    else
+        foundError = checkSyntaxErrorInCommand(line, sentenceNumber);
+
+    return foundError;
 }

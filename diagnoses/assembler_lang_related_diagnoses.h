@@ -10,8 +10,12 @@
 
 #include "../new-data-types/boolean.h"
 #include "../NameTable/NameTable.h"
+#include "../new-data-types/word_number.h"
 
 /* ---------------Prototypes--------------- */
+
+/* ---Data types prototypes--- */
+/* --------------------------- */
 
 /*
  * Checks if the current line is a "mcro" statement.
@@ -65,12 +69,43 @@ boolean isCallingMacro(const char *line, NameTable *macro_table);
 boolean isMacroLine(boolean wasInMacroDef, boolean isInMacroDef);
 
 /*
+ * Retrieves the sentence type of the line based on the command at the specified location.
+ *
+ * @param   *line           The line to check the sentence type of.
+ * @param   commandNumber   The location of the command to help determine the sentence type.
+ *
+ * @return  The sentence type represented by the command.
+ */
+sentence_type_t getSentenceTypeOfLine(const char *line, word_number commandNumber);
+
+/*
  * Checks of the give word is a saved word in the language.
  *
  * @param   word The word to check.
+ *
  * @return  TRUE if the word is a saved word, otherwise FALSE.
  */
 boolean isSavedWord(const char *word);
+
+/*
+ * Retrieves the command at the specified position in the line.
+ *
+ * @param   line            The input line to retrieve the word from.
+ * @param   commandNumber   The position of the command to retrieve in the line.
+ *
+ * @return  The command at the given position, or -1 if there was no command.
+ */
+int getCommandFromLine(const char *line, word_number commandNumber);
+
+/*
+ * Checks if the word at the specified position in the line matches a saved word.
+ *
+ * @param   line        The input line to check.
+ * @param   wordNumber  The position of the word to check in the line.
+ *
+ * @return  TRUE if the word at the given position matches a saved word, otherwise FALSE.
+ */
+boolean isSavedWordInLine(const char *line, word_number wordNumber);
 
 /* ---------------------------------------- */
 

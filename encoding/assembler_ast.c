@@ -51,7 +51,7 @@ typedef struct arg_node_t
 /* This is a sentence node type. will represent the sentence. */
 typedef struct
 {
-    statement_t statement; /* Will be the statement, opcode or guidance. */
+    sentence_t sentence; /* Will be the sentence, opcode or guidance. */
     arg_node_t *argListHead; /* List of arguments for the sentence. */
 } sentence_node_t; /* Sentence node type. */
 
@@ -129,47 +129,47 @@ ast_t *creatAst(void )
 }
 
 /*
- * Creates a sentence node to hold a statement.
- * A statement is an opcode or a guidance defined in the assembly language.
+ * Creates a sentence node to hold a sentence.
+ * A sentence is an opcode or a guidance defined in the assembly language.
  *
- * @param   statement The statement to be held by the sentence node.
+ * @param   sentence The sentence to be held by the sentence node.
  *
  * @return  Pointer to the newly created sentence node.
  */
-sentence_node_t *createSentenceNode(statement_t statement)
+sentence_node_t *createSentenceNode(sentence_t sentence)
 {
-    /* Create the new statement node. */
+    /* Create the new sentence node. */
     sentence_node_t *newSentenceNode =
             (sentence_node_t *) allocate_space(sizeof(sentence_node_t));
 
     /* Initialize its attributes. */
-    newSentenceNode -> statement = statement;
+    newSentenceNode -> sentence = sentence;
     newSentenceNode -> argListHead = NULL;
 
     return newSentenceNode;
 }
 
 /*
- * Creates a statement of a given sentence type and value.
- * A statement is an opcode or a guidance defined in the assembly language.
+ * Creates a sentence of a given sentence type and value.
+ * A sentence is an opcode or a guidance defined in the assembly language.
  *
+ * @param   sentence The value of the sentence.
  * @param   sentenceType The type of sentence.
- * @param   statement The value of the statement.
  *
- * @return  The created statement.
+ * @return  The created sentence.
  */
-statement_t createStatement(sentence_type_t sentenceType, int statement)
+sentence_t createSentence(int sentence, sentence_type_t sentenceType)
 {
-    statement_t newStatement; /* Statement to return. */
-    newStatement.sentenceType = sentenceType;
+    sentence_t newSentence; /* sentence to return. */
+    newSentence.sentenceType = sentenceType;
 
-    /* Add statement value to statement accordingly. */
+    /* Add sentence value to sentence accordingly. */
     if (sentenceType == DIRECTION_SENTENCE)
-        newStatement.statement.opcode = statement;
+        newSentence.sentence.opcode = sentence;
     else
-        newStatement.statement.guidance = statement;
+        newSentence.sentence.guidance = sentence;
 
-    return newStatement;
+    return newSentence;
 }
 
 /*
@@ -267,15 +267,15 @@ void addLabelToAst(ast_t *ast, const char *labelName)
  * Adds a sentence to the given Abstract Syntax Tree (AST).
  *
  * @param   ast The Abstract Syntax Tree.
+ * @param   sentence The value of the sentence to add.
  * @param   sentenceType The type of sentence to add.
- * @param   statement The value of the statement to add.
  */
-void addSentenceToAst(ast_t *ast, sentence_type_t sentenceType, int statement)
+void addSentenceToAst(ast_t *ast, int sentence, sentence_type_t sentenceType)
 {
-    /* Create the statement of the sentence. */
-    statement_t statementOfNewSentence = createStatement(sentenceType, statement);
+    /* Create the sentence of the sentence value. */
+    sentence_t sentenceObj = createSentence(sentenceType, sentence);
     /* Create the sentence node. */
-    sentence_node_t *newSentenceNode = createSentenceNode(statementOfNewSentence);
+    sentence_node_t *newSentenceNode = createSentenceNode(sentenceObj);
 
     ast -> sentenceNode = newSentenceNode; /* Add the new node to the ast. */
 }
@@ -331,7 +331,7 @@ addressing_method_t findAddressingMethod(ast_t *ast, data_type_t dataType)
     addressing_method_t addressingMethod = NO_ADD_METHOD;
 
     /* If the ast represents a direction sentence (there is an addressing method). */
-    if (ast -> sentenceNode -> statement.sentenceType == DIRECTION_SENTENCE)
+    if (ast -> sentenceNode -> sentence.sentenceType == DIRECTION_SENTENCE)
         switch (dataType)
         {
             case INT: /* Instant value. */

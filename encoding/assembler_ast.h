@@ -71,10 +71,10 @@ void addLabelToAst(ast_t *ast, const char *labelName);
  * Adds a sentence to the given Abstract Syntax Tree (AST).
  *
  * @param   ast The Abstract Syntax Tree.
+ * @param   sentence The value of the sentence to add.
  * @param   sentenceType The type of sentence to add.
- * @param   statement The value of the statement to add.
  */
-void addSentenceToAst(ast_t *ast, sentence_type_t sentenceType, int statement);
+void addSentenceToAst(ast_t *ast, int sentence, sentence_type_t sentenceType);
 
 /*
  * Adds an argument node to the given AST.
@@ -102,6 +102,14 @@ boolean isLabel(ast_t *ast);
  * @return  The addressing method to be used for the given data type in the AST.
  */
 addressing_method_t findAddressingMethod(ast_t *ast, data_type_t dataType);
+
+/*
+ * Deletes the AST and set the pointer to NULL.
+ *
+ * @param   pAst    A pointer to the AST to be deleted.
+ * @return  0 on success, -1 if the pointer is NULL.
+ */
+int deleteAst(ast_t **pAst);
 
 /*
  * Deletes the entire AST list and set the pointer to NULL.
