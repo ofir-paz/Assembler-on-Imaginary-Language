@@ -12,7 +12,7 @@
 #include "../general-enums/programFinals.h"
 #include "../general-enums/indexes.h"
 #include "../general-enums/neededKeys.h"
-#include "diagnose_help_methods.h"
+#include "diagnose_util.h"
 #include "../util/memoryUtil.h"
 #include "../util/stringsUtil.h"
 /* -------------------------- */
@@ -26,27 +26,13 @@
  *
  * @param   line        The input line containing words separated by spaces.
  * @param   word        A pointer to a char pointer that will store the found word.
- * @param   wordNumber  The position of the word to be extracted (0-indexed).
+ * @param   wordNumber  The position of the word to be extracted.
  *                      If wordNumber is negative or greater than the number of words in the line,
  *                      *word will be set to NULL.
  */
 void findWord(const char *line, char **word, word_number wordNumber)
 {
-    if (line != NULL && word != NULL && wordNumber > ZERO_WORD) /* Check for invalid params. */
-    {
-        char *lineCopy, *rest, *token; /* Will be used to find the tokens. */
-        int i = ZERO_INDEX; /* Loop variable. */
-
-        lineCopy = my_strdup(line);
-        rest = lineCopy;
-
-        /* Finding the right word. */
-        do token = strtok_r(rest, EMPTY_DELIM, &rest);
-        while (++i < wordNumber && token != NULL);
-
-        *word = my_strdup(token);
-        free_ptr(POINTER(lineCopy));
-    }
+    findTokenFromStr(line, word, wordNumber, EMPTY_DELIM);
 }
 
 ///*

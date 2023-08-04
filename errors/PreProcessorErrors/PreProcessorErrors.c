@@ -11,7 +11,7 @@
 #include "../error_types/error_types.h"
 #include "../errors.h"
 #include "../error_check.h"
-#include "../../diagnoses/diagnose_help_methods.h"
+#include "../../diagnoses/diagnose_util.h"
 #include "../../diagnoses/assembler_lang_related_diagnoses.h"
 /* -------------------------- */
 

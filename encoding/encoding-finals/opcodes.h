@@ -7,7 +7,8 @@
 #ifndef MMN_14_OPCODES_H
 #define MMN_14_OPCODES_H
 
-typedef enum {mov, cmp, add, sub, not, clr, lea, inc, dec, jmp, bne, red, prn, jsr, rts, stop,
-              NO_OPCODE = -1} opcodes_t;
+typedef enum {NO_OPCODE = -1,
+              mov, cmp, add, sub, not, clr, lea, inc, dec, jmp, bne, red, prn, jsr, rts, stop,
+              } opcodes_t;
 
 #endif /* MMN_14_OPCODES_H */

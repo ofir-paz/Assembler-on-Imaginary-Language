@@ -21,8 +21,8 @@ add_executable(mmn_14 main.c new-data-types/boolean.h
         errors/error_types/SyntaxError.h errors/error_types/LogicalError.h
         NameTable/NameTable.c encoding/encoding.c encoding/encoding.h
         encoding/encoding-help-methods.c encoding/encoding-help-methods.h
-        errors/error_types/ImgSystemError.h diagnoses/diagnose_help_methods.c
-        diagnoses/diagnose_help_methods.h new-data-types/word_number.h NameTable/NameTable.h
+        errors/error_types/ImgSystemError.h diagnoses/diagnose_util.c
+        diagnoses/diagnose_util.h new-data-types/word_number.h NameTable/NameTable.h
         general-enums/programFinals.h
         errors/error_types/error_constant.h errors/error_types/error_types.h
         errors/PreProcessorErrors/PreProcessorErrors.c
@@ -31,4 +31,4 @@ add_executable(mmn_14 main.c new-data-types/boolean.h
         encoding/encoding-finals/sentence_types.h encoding/assembler_ast.c encoding/assembler_ast.h
         encoding/encoding-finals/registers.h transitions/first_transition_util.c
         transitions/first_transition_util.h util/memoryUtil.c util/memoryUtil.h
-        util/stringsUtil.c util/stringsUtil.h general-enums/assemblerFinals.h)
+        util/stringsUtil.c util/stringsUtil.h general-enums/assemblerFinals.h util/numberUtil.c util/numberUtil.h)

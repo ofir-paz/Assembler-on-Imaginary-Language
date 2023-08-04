@@ -11,6 +11,18 @@
 
 /* ----------Prototypes---------- */
 
+/*
+ * Finds the specified token in the given string and stores it in the provided pointer.
+ *
+ * @param   str         The input string containing tokens seperated by the given delim.
+ * @param   word        A pointer to a char pointer that will store the found word.
+ * @param   wordNumber  The position of the token to be extracted.
+ *                      If wordNumber is negative or greater than the number of words in the line,
+ *                      *word will be set to NULL.
+ * @param   delim       The delim that separates the tokens in the string.
+ */
+void findTokenFromStr(const char *str, char **token, word_number tokenNumber, const char *delim);
+
 /* Checks if the param int i is an index of param const char *str.
  * Returns TRUE if i is an index of the given string, otherwise FALSE. */
 boolean isIndexInStr(const char *str, int i);

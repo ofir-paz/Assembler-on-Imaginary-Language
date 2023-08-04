@@ -15,7 +15,7 @@
 #include "../general-enums/neededKeys.h"
 #include "../general_help_methods.h"
 #include "../diagnoses/diagnose_line.h"
-#include "../diagnoses/diagnose_help_methods.h"
+#include "../diagnoses/diagnose_util.h"
 /* -------------------------- */
 
 /* ---Finals--- */

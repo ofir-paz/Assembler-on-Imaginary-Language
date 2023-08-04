@@ -6,21 +6,29 @@
  */
 
 /* ---Include header files--- */
+#include <string.h>
 #include <stddef.h>
 #include "../new-data-types/boolean.h"
 #include "../NameTable/NameTable.h"
 #include "../encoding/encoding-finals/encoding_finals.h"
 #include "../general-enums/indexes.h"
+#include "../general-enums/neededKeys.h"
 #include "diagnose_line.h"
+#include "diagnose_util.h"
 #include "../util/memoryUtil.h"
 #include "../util/stringsUtil.h"
+#include "../util/numberUtil.h"
 /* -------------------------- */
 
 /* ---Macros--- */
 /* ------------ */
 
 /* ---Finals--- */
+#define REG_LEN 3
+#define FIRST_REGISTER 0
+#define LAST_REGISTER 7
 #define NO_SAVED_WORD (-1)
+#define COMMA_DELIM ","
 /* ------------ */
 
 /* ---------------Prototypes--------------- */
@@ -144,6 +152,30 @@ opcodes_t getOpcode(const char *word)
 }
 
 /*
+ * Get the register value from the given word.
+ *
+ * This function checks if the given word represents a register and returns the register value.
+ * A register is assumed to be a string of length 2, where the first character is '@' and the
+ * second character is 'r', followed by a valid register number ('0' to '7').
+ *
+ * @param   word        The word to check if it represents a register.
+ *
+ * @return  register_t  The register value if the word is a valid register, otherwise NO_REGISTER.
+ */
+register_t getRegister(const char *word)
+{
+    register_t aRegister = NO_REGISTER; /* Register to return, assume word is not a register. */
+
+    /* Finding the register based on the assumption of what a register is in the lang. */
+    if (strlen(word) == REG_LEN)
+        if (word[ZERO_INDEX] == AT && word[ONE_INDEX] == CHAR_r)
+            if (between(word[TWO_INDEX], FIRST_REGISTER, LAST_REGISTER) == TRUE)
+                aRegister = (register_t) word[TWO_INDEX];
+
+    return aRegister;
+}
+
+/*
  * Retrieves the sentence type of the line based on the command at the specified location.
  *
  * @param   *line           The line to check the sentence type of.
@@ -178,7 +210,8 @@ sentence_type_t getSentenceTypeOfLine(const char *line, word_number commandNumbe
  */
 boolean isSavedWord(const char *word)
 {
-    return (getGuidance(word) == NO_GUIDANCE && getOpcode(word) == NO_OPCODE)? FALSE : TRUE;
+    return (getGuidance(word) == NO_GUIDANCE && getOpcode(word) == NO_OPCODE &&
+            getRegister(word) == NO_REGISTER)? FALSE : TRUE;
 }
 
 /*
@@ -212,5 +245,32 @@ int getCommandFromLine(const char *line, word_number commandNumber)
  */
 boolean isSavedWordInLine(const char *line, word_number wordNumber)
 {
-    return (getCommandFromLine(line, wordNumber) == NO_SAVED_WORD)? FALSE : TRUE;
+    boolean isSavedWordInLine; /* Value to return. */
+    char *word;
+    findWord(line, &word, wordNumber); /* Find the specific word. */
+
+    isSavedWordInLine = isSavedWord(word); /* Check if it's a saved word. */
+
+    (void) free_ptr(POINTER(word)); /* Free unnecessary variable. */
+    return isSavedWordInLine;
+}
+
+/*
+ * Find the specified argument in the given line.
+ *
+ * This function tokenizes the line using the delimiter "," and returns
+ * the argument at the specified position. If the argument number is out
+ * of range or the line is NULL, the function sets *arg to NULL.
+ *
+ * @param   line        The line containing the arguments.
+ * @param   arg         Pointer to a pointer where the argument will be stored.
+ * @param   argumentNum The position of the argument to retrieve (starting from 1).
+ * @param   isLabel     Flag to indicate if the line has a label definition.
+ */
+void findArg(const char *line, char **arg, int argumentNum, boolean isLabel)
+{
+    int skip = nextWordIndex(line, MINUS_ONE_INDEX);
+    skip += (isLabel)? nextWordIndex(line, skip) : ZERO_INDEX;
+
+    findTokenFromStr(line + skip, arg, argumentNum, COMMA_DELIM);
 }

@@ -69,6 +69,19 @@ boolean isCallingMacro(const char *line, NameTable *macro_table);
 boolean isMacroLine(boolean wasInMacroDef, boolean isInMacroDef);
 
 /*
+ * Get the register value from the given word.
+ *
+ * This function checks if the given word represents a register and returns the register value.
+ * A register is assumed to be a string of length 2, where the first character is '@' and the
+ * second character is 'r', followed by a valid register number ('0' to '7').
+ *
+ * @param   word        The word to check if it represents a register.
+ *
+ * @return  register_t  The register value if the word is a valid register, otherwise NO_REGISTER.
+ */
+register_t getRegister(const char *word);
+
+/*
  * Retrieves the sentence type of the line based on the command at the specified location.
  *
  * @param   *line           The line to check the sentence type of.
@@ -106,6 +119,20 @@ int getCommandFromLine(const char *line, word_number commandNumber);
  * @return  TRUE if the word at the given position matches a saved word, otherwise FALSE.
  */
 boolean isSavedWordInLine(const char *line, word_number wordNumber);
+
+/*
+ * Find the specified argument in the given line.
+ *
+ * This function tokenizes the line using the delimiter "," and returns
+ * the argument at the specified position. If the argument number is out
+ * of range or the line is NULL, the function sets *arg to NULL.
+ *
+ * @param   line        The line containing the arguments.
+ * @param   arg         Pointer to a pointer where the argument will be stored.
+ * @param   argumentNum The position of the argument to retrieve (starting from 1).
+ * @param   isLabel     Flag to indicate if the line has a label definition.
+ */
+void findArg(const char *line, char **arg, int argumentNum, boolean isLabel);
 
 /* ---------------------------------------- */
 

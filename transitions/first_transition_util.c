@@ -6,6 +6,7 @@
  */
 
 /* ---Include header files--- */
+#include <stdlib.h>
 #include <stddef.h>
 #include "../NameTable/NameTable.h"
 #include "../encoding/assembler_ast.h"
@@ -22,8 +23,9 @@
 /* ------------ */
 
 /* ---------------Prototypes--------------- */
-Error collectDataFromLine(const char *line, char **label, int *statement,
-                          sentence_type_t *sentenceType, data_t **dataArr);
+void getArgDataFromLine(const char *line, int argumentNum, boolean isLabel,
+                        void **argData, data_type_t *dataType);
+void *getArgDataFromString(const char *arg, data_type_t dataType);
 /* ---------------------------------------- */
 
 /*
@@ -41,7 +43,7 @@ ast_t *buildAstFromLine(const char *line, Error *lineError)
     *lineError = addDataFromLineToAST(lineAST, line);
 
     if (*lineError == NO_ERROR) /* Check logical errors in the code if it passed syntax check. */
-        *lineError = checkFirstTransLogicalErrorsInLine(lineAst);
+        *lineError = checkFirstTransLogicalErrorsInLine(lineAST);
 
     if (*lineError != NO_ERROR)
         deleteAst(&lineAST);
@@ -58,7 +60,7 @@ Error addDataFromLineToAST(ast_t *lineAST, const char *line)
     if (lineError == NO_ERROR) /* Continue to next token if there was no error... */
         lineError = addStatementFromLineToAST(lineAST, line);
     if (lineError == NO_ERROR)
-        lineError = addArguemntsFromLineToAST(lineAST, line);
+        lineError = addArgumentsFromLineToAST(lineAST, line);
 
     return lineError;
 }
@@ -83,7 +85,7 @@ Error addSentenceFromLineToAST(ast_t *lineAST, const char *line)
     Error foundError = NO_ERROR; /* Error to return, assume success. */
     word_number sentenceNumber = (isLabel(lineAST) == TRUE)? SECOND_WORD : FIRST_WORD;
 
-    if (isSavedWordInLine(line, sentenceNumber))
+    if (isValidCommand(line, sentenceNumber) == TRUE)
         addSentenceToAst(lineAST,
                          getCommandFromLine(line, sentenceNumber),
                          getSentenceTypeOfLine(line, sentenceNumber));
@@ -92,4 +94,56 @@ Error addSentenceFromLineToAST(ast_t *lineAST, const char *line)
         foundError = checkSyntaxErrorInCommand(line, sentenceNumber);
 
     return foundError;
+}
+
+Error addArgumentsFromLineToAST(ast_t *lineAST, const char *line)
+{
+    Error foundError = NO_ERROR; /* Error to return, assume success. */
+    int argumentNum = (isLabel(lineAST) == TRUE)? THIRD_WORD : SECOND_WORD;
+    void *argData = NULL;
+    data_type_t dataType;
+
+    while ((foundError = isValidArgumentSyntax(line, argumentNum)) == NO_ERROR &&
+           (foundError = isValidSpaceAfterArgument(line, argumentNum)) == NO_ERROR)
+    {
+        getArgDataFromLine(line, argumentNum, isLabel(lineAST), &argData, &dataType);
+        addArgumentToAst(lineAST, argData, dataType);
+        if (isLastArg(line, argumentNum, isLabel(lineAST)) == TRUE) break;
+        argumentNum++;
+    }
+
+    return foundError;
+}
+
+void getArgDataFromLine(const char *line, int argumentNum, boolean isLabel,
+                        void **argData, data_type_t *dataType)
+{
+    char *arg;
+    findArg(line, &arg, argumentNum, isLabel);
+    *dataType = diagnoseArgDataType(arg);
+    *argData = getArgDataFromString(arg, *dataType);
+}
+
+void *getArgDataFromString(const char *arg, data_type_t dataType)
+{
+    void *data = NULL;
+    int num;
+    register_t aRegister;
+
+    switch (dataType)
+    {
+        case INT:
+            num = atoi(arg);
+            data = &num;
+            break;
+        case STRING:
+            data = (void *) arg;
+            break;
+        case REG:
+            aRegister = getRegister(arg);
+            data = &aRegister;
+            break;
+    }
+
+    return data;
 }
