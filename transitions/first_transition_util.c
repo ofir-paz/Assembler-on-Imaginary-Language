@@ -20,12 +20,17 @@
 /* ------------ */
 
 /* ---Finals--- */
+#define FIRST_ARGUMENT 1
 /* ------------ */
 
 /* ---------------Prototypes--------------- */
+Error addDataFromLineToAST(ast_t *lineAST, const char *line);
+Error addLabelFromLineToAST(ast_t *lineAST, const char *line);
+Error addSentenceFromLineToAST(ast_t *lineAST, const char *line);
+Error addArgumentsFromLineToAST(ast_t *lineAST, const char *line);
 void getArgDataFromLine(const char *line, int argumentNum, boolean isLabel,
                         void **argData, data_type_t *dataType);
-void *getArgDataFromString(const char *arg, data_type_t dataType);
+void getArgDataFromString(const char *arg, data_type_t dataType, void **argData)
 /* ---------------------------------------- */
 
 /*
@@ -43,7 +48,7 @@ ast_t *buildAstFromLine(const char *line, Error *lineError)
     *lineError = addDataFromLineToAST(lineAST, line);
 
     if (*lineError == NO_ERROR) /* Check logical errors in the code if it passed syntax check. */
-        *lineError = checkFirstTransLogicalErrorsInLine(lineAST);
+        *lineError = checkErrorsInAstFirstTrans(lineAST);
 
     if (*lineError != NO_ERROR)
         deleteAst(&lineAST);
@@ -58,7 +63,7 @@ Error addDataFromLineToAST(ast_t *lineAST, const char *line)
     /* Get the tokens of the line or errors found in the process. */
     lineError = addLabelFromLineToAST(lineAST, line);
     if (lineError == NO_ERROR) /* Continue to next token if there was no error... */
-        lineError = addStatementFromLineToAST(lineAST, line);
+        lineError = addSentenceFromLineToAST(lineAST, line);
     if (lineError == NO_ERROR)
         lineError = addArgumentsFromLineToAST(lineAST, line);
 
@@ -72,9 +77,9 @@ Error addLabelFromLineToAST(ast_t *lineAST, const char *line)
 
     if (isColonInLineForLabel(line) == TRUE)
         if ((foundError = checkSyntaxErrorInLabel(line)) == NO_ERROR)
-            findWord(line, &label, FIRST_WORD);
+            label = getLabelFromLine(line);
 
-    /* Add label (will do nothing if there was an error). */
+    /* Add label (will do nothing if there was an error or there was no label). */
     addLabelToAst(lineAST, label);
 
     return foundError;
@@ -82,16 +87,13 @@ Error addLabelFromLineToAST(ast_t *lineAST, const char *line)
 
 Error addSentenceFromLineToAST(ast_t *lineAST, const char *line)
 {
-    Error foundError = NO_ERROR; /* Error to return, assume success. */
-    word_number sentenceNumber = (isLabel(lineAST) == TRUE)? SECOND_WORD : FIRST_WORD;
+    Error foundError; /* Error to return. */
+    boolean isLabelDef = isLabel(lineAST);
 
-    if (isValidCommand(line, sentenceNumber) == TRUE)
+    if ((foundError = checkSyntaxErrorInCommand(line, isLabelDef)) == NO_ERROR)
         addSentenceToAst(lineAST,
-                         getCommandFromLine(line, sentenceNumber),
-                         getSentenceTypeOfLine(line, sentenceNumber));
-
-    else
-        foundError = checkSyntaxErrorInCommand(line, sentenceNumber);
+                         getCommandFromLine(line, isLabelDef),
+                         getSentenceTypeOfLine(line, isLabelDef));
 
     return foundError;
 }
@@ -99,12 +101,13 @@ Error addSentenceFromLineToAST(ast_t *lineAST, const char *line)
 Error addArgumentsFromLineToAST(ast_t *lineAST, const char *line)
 {
     Error foundError = NO_ERROR; /* Error to return, assume success. */
-    int argumentNum = (isLabel(lineAST) == TRUE)? THIRD_WORD : SECOND_WORD;
+    int argumentNum = FIRST_ARGUMENT;
+    boolean isLabelDef = isLabel(lineAST);
     void *argData = NULL;
     data_type_t dataType;
 
-    while ((foundError = isValidArgumentSyntax(line, argumentNum)) == NO_ERROR &&
-           (foundError = isValidSpaceAfterArgument(line, argumentNum)) == NO_ERROR)
+    while ((foundError = checkSyntaxErrorInArgument(line, argumentNum, isLabelDef)) == NO_ERROR &&
+           (foundError = checkSyntaxErrorAfterArgument(line, argumentNum, isLabelDef)) == NO_ERROR)
     {
         getArgDataFromLine(line, argumentNum, isLabel(lineAST), &argData, &dataType);
         addArgumentToAst(lineAST, argData, dataType);
@@ -120,30 +123,29 @@ void getArgDataFromLine(const char *line, int argumentNum, boolean isLabel,
 {
     char *arg;
     findArg(line, &arg, argumentNum, isLabel);
-    *dataType = diagnoseArgDataType(arg);
-    *argData = getArgDataFromString(arg, *dataType);
+    getArgDataTypeFromString(arg, dataType);
+    getArgDataFromString(arg, *dataType, argData);
+    (void) free_ptr(POINTER(arg));
 }
 
-void *getArgDataFromString(const char *arg, data_type_t dataType)
+void getArgDataFromString(const char *arg, data_type_t dataType, void **argData)
 {
-    void *data = NULL;
-    int num;
-    register_t aRegister;
-
     switch (dataType)
     {
         case INT:
-            num = atoi(arg);
-            data = &num;
+            **((int **) argData) = atoi(arg);
             break;
         case STRING:
-            data = (void *) arg;
+            *((char **) argData) = arg;
             break;
         case REG:
-            aRegister = getRegister(arg);
-            data = &aRegister;
+            **((register_t **) argData) = getRegister(arg);
             break;
     }
+}
 
-    return data;
+void addLabelToTable(NameTable *labelMap, char *labelName, int address)
+{
+    (void) addNameToTable(labelMap, labelName);
+    (void) setNumberInData(labelMap, labelName, address);
 }

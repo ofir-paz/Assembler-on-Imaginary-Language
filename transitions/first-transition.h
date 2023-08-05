@@ -9,7 +9,6 @@
 #define MMN_14_FIRST_TRANSITION_H
 
 /* ---Finals--- */
-#define REAL_BYTES_FOR_WORD 2
 /* ------------ */
 
 /* ---------------Prototypes--------------- */
@@ -22,7 +21,7 @@
  * @return
  */
 process_result first_transition(const char *file_name, NameTable *labelsMap[],
-                                MemoryImage **memoryImage, ast_list_t **astList);
+                                ast_list_t **astList);
 /* ---------------------------------------- */
 
 #endif /* MMN_14_FIRST_TRANSITION_H */

@@ -66,6 +66,17 @@ char *my_strdup(const char *str);
  */
 int getIndexOfStrInArray(const char *arr[], int size, const char *str);
 
+/*
+ * Copies a part of a given string into a new one and returns it.
+ *
+ * @param   str     The given string to copy the part from.
+ * @param   start   The start index of the part.
+ * @param   end     The end index of the part.
+ *
+ * @return  The partial string: str[start...end] (null-terminated).
+ */
+char *strcpyPart(const char *str, int start, int end);
+
 /* ---------------------------------------- */
 
 #endif /* MMN_14_STRINGSUTIL_H */

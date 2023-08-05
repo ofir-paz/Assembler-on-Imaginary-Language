@@ -12,6 +12,7 @@
 #include "opcodes.h"
 #include "guidance.h"
 #include "sentence_types.h"
+#include "label_types.h"
 #include "encoding_types.h"
 #include "addressing_methods.h"
 #include "registers.h"

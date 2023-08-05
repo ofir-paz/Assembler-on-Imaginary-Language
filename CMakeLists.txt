@@ -31,4 +31,4 @@ add_executable(mmn_14 main.c new-data-types/boolean.h
         encoding/encoding-finals/sentence_types.h encoding/assembler_ast.c encoding/assembler_ast.h
         encoding/encoding-finals/registers.h transitions/first_transition_util.c
         transitions/first_transition_util.h util/memoryUtil.c util/memoryUtil.h
-        util/stringsUtil.c util/stringsUtil.h general-enums/assemblerFinals.h util/numberUtil.c util/numberUtil.h)
+        util/stringsUtil.c util/stringsUtil.h general-enums/assemblerFinals.h util/numberUtil.c util/numberUtil.h encoding/encoding-finals/label_types.h)

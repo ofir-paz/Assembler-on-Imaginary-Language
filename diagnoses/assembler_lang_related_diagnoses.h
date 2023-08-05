@@ -69,6 +69,22 @@ boolean isCallingMacro(const char *line, NameTable *macro_table);
 boolean isMacroLine(boolean wasInMacroDef, boolean isInMacroDef);
 
 /*
+ * Extracts the label from the given line of text.
+ *
+ * The function searches for the first occurrence of a colon (':') in the line
+ * and extracts the label that comes before it. The label is returned as a
+ * dynamically allocated C-string (char *) which needs to be freed by the caller
+ * when it's no longer needed.
+ *
+ * @param line      The input line of text to extract the label from.
+ *
+ * @return          A pointer to the extracted label as a dynamically allocated
+ *                  C-string (char *). The function returns NULL if no label is
+ *                  found in the line.
+ */
+char *getLabelFromLine(const char *line);
+
+/*
  * Get the register value from the given word.
  *
  * This function checks if the given word represents a register and returns the register value.
@@ -82,14 +98,24 @@ boolean isMacroLine(boolean wasInMacroDef, boolean isInMacroDef);
 register_t getRegister(const char *word);
 
 /*
+ * Retrieves the command at the specified position in the line.
+ *
+ * @param   line            The input line to retrieve the word from.
+ * @param   isLabelDef      Flag indicating if the line has a label definition.
+ *
+ * @return  The command at the given position, or -1 if there was no command.
+ */
+int getCommandFromLine(const char *line, boolean isLabelDef);
+
+/*
  * Retrieves the sentence type of the line based on the command at the specified location.
  *
  * @param   *line           The line to check the sentence type of.
- * @param   commandNumber   The location of the command to help determine the sentence type.
+ * @param   isLabelDef      Flag indicating if the line has a label definition.
  *
  * @return  The sentence type represented by the command.
  */
-sentence_type_t getSentenceTypeOfLine(const char *line, word_number commandNumber);
+sentence_type_t getSentenceTypeOfLine(const char *line, boolean isLabelDef);
 
 /*
  * Checks of the give word is a saved word in the language.
@@ -99,16 +125,6 @@ sentence_type_t getSentenceTypeOfLine(const char *line, word_number commandNumbe
  * @return  TRUE if the word is a saved word, otherwise FALSE.
  */
 boolean isSavedWord(const char *word);
-
-/*
- * Retrieves the command at the specified position in the line.
- *
- * @param   line            The input line to retrieve the word from.
- * @param   commandNumber   The position of the command to retrieve in the line.
- *
- * @return  The command at the given position, or -1 if there was no command.
- */
-int getCommandFromLine(const char *line, word_number commandNumber);
 
 /*
  * Checks if the word at the specified position in the line matches a saved word.
@@ -133,6 +149,15 @@ boolean isSavedWordInLine(const char *line, word_number wordNumber);
  * @param   isLabel     Flag to indicate if the line has a label definition.
  */
 void findArg(const char *line, char **arg, int argumentNum, boolean isLabel);
+
+/*
+ * Gets the data type of the given argument (in string type).
+ * assumes the given string represents a valid argument !!
+ *
+ * @param   *arg        The given argument in string type.
+ * @param   *dataType   Pointer for the found data type.
+ */
+void getArgDataTypeFromString(char *arg, data_type_t *dataType);
 
 /* ---------------------------------------- */
 

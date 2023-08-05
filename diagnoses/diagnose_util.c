@@ -114,18 +114,18 @@ int nextWordIndex(const char *str, int i)
         nextCharIndex(str, nextEmptyIndex(str, i));
 }
 
-/* Finds the next index in param const char *str where it is a comma.
+/* Finds the next index in param const char *str where it is the given char ch.
  * If param int i is not an index of str returns i,
- * otherwise returns the index of the next comma in str (index of null if there isn't) */
-int nextCommaIndex(const char *str, int i)
+ * otherwise returns the index of the next ch in str or (index of null if there isn't) */
+int nextSpecificCharIndex(const char *str, int i, char ch)
 {
     int index = i; /* Value to return */
     if (isIndexInStr(str, i + ONE_INDEX) == TRUE) /* If the next index exists */
     {
-        /* Increasing index by 1 until we get to an index of char that is a comma or null. */
+        /* Increasing index by 1 until we get to an index of char that is ch or null. */
         do
             index = nextCharIndex(str, index); /* Go to the next char index */
-        while (str[index] != COMMA && str[index] != NULL_TERMINATOR);
+        while (str[index] != ch && str[index] != NULL_TERMINATOR);
     }
     return index; /* Returning the found index */
 }
@@ -223,14 +223,14 @@ boolean isCurrCharDot(const char *str, int index)
 }
 
 /* Returns TRUE if the char in param const char *str at index param int index is an
- * element of a number (+; -; .; 0-9), otherwise FALSE. */
+ * element of an integer (+; -; 0-9), otherwise FALSE. */
 boolean isPartOfNumber(const char *str, int index)
 {
     boolean isPartOfNumber = FALSE; /* Value to return, assume ch is not a part of a number. */
     if (isIndexInStr(str, index) == TRUE) {
         char ch = str[index];
         /* Check if ch is an element of a number */
-        if (ch == PLUS || ch == MINUS || ch == DOT || isCharNumber(ch))
+        if (ch == PLUS || ch == MINUS || isCharNumber(ch))
             isPartOfNumber = TRUE; /* Assign value to return to TRUE if so */
     }
 
@@ -244,7 +244,7 @@ int nextEmptyCommaIndex(const char *str, int index)
 {
     int nextCommaEmptyIndex; /* Value to return */
     int nextEmpty = nextEmptyIndex(str, index); /* Next empty index of str */
-    int nextComma = nextCommaIndex(str, index); /* Next Comma index of str */
+    int nextComma = nextSpecificCharIndex(str, index, COMMA); /* Next Comma index of str */
     nextCommaEmptyIndex = MIN(nextEmpty, nextComma); /* Taking the minimum of them */
     return nextCommaEmptyIndex;
 }

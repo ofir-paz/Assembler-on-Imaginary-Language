@@ -36,7 +36,7 @@ void assemble(const char *file_name)
     //{
     processResult = pre_process(file_name);
     if (processResult == SUCCESS)
-        processResult = first_transition(file_name, labelsMap, &memoryImage, &astList);
+        processResult = first_transition(file_name, labelsMap, &astList);
     // if (processResult == SUCCESS)
     //      processResult = second_transition(...);
     // if (processResult == SUCCESS)

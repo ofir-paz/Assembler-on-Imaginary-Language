@@ -82,6 +82,8 @@ typedef struct
 data_t createData(void *data, data_type_t dataType);
 addressing_method_t findAddressingMethod(ast_t *ast, data_type_t dataType);
 arg_node_t *gotoLastArgNode(ast_t *ast);
+sentence_type_t getSentenceType(ast_t *ast);
+boolean isLabel(ast_t *ast);
 /* ---------------------------------------- */
 
 /*
@@ -229,7 +231,7 @@ data_t createData(void *data, data_type_t dataType)
  * @param   *astList Pointer to the AST list.
  * @param   **ast Pointer to the AST to add to the list.
  *
- * @return  0 if the node was successfully added to the list, 1 if the given list is empty.
+ * @return  0 if the node was successfully added to the list, or -1 if the given list is empty.
  */
 int addAstToList(ast_list_t *astList, ast_t **ast)
 {
@@ -303,6 +305,47 @@ void addArgumentToAst(ast_t *ast, void *data, data_type_t dataType)
         newArgNode -> paramNum = lastNode -> paramNum + 1;
         lastNode -> nextArg = newArgNode;
     }
+}
+
+/*
+ * Gets the label name from the given AST.
+ *
+ * @param   *ast The ast to get the label name from.
+ *
+ * @return  The label name in the given AST, or NULL if there is no label.
+ */
+char *getLabelName(ast_t *ast)
+{
+    return my_strdup(ast -> label);
+}
+
+//label_type_t getLabelType(ast_t *ast)
+//{
+//    label_type_t labelType = NO_LABEL_TYPE;
+//
+//    if (isLabel(ast) == TRUE)
+//    {
+//        if (getSentenceType(ast) == DIRECTION_SENTENCE)
+//            labelType = NORMAL;
+//        else /* ast.sentenceType == GUIDANCE_SENTENCE */
+//        {
+//            ast -> sentenceNode -> sentence.sentence.guidance ==
+//        }
+//    }
+//
+//    return labelType;
+//}
+
+/*
+ * Gets the sentence type from the given AST.
+ *
+ * @param   *ast The ast to get the sentence type from.
+ *
+ * @return  The sentence type in the given AST.
+ */
+sentence_type_t getSentenceType(ast_t *ast)
+{
+    return ast -> sentenceNode -> sentence.sentenceType;
 }
 
 /*
@@ -434,7 +477,7 @@ int deleteAst(ast_t **pAst)
         /* Deletes the arguments in the ast. */
         (void) deleteArgumentList(&((*pAst) -> sentenceNode -> argListHead));
         (void) free_ptr(POINTER((*pAst) -> sentenceNode)); /* Delete the sentence node. */
-        (void) free_ptr(POINTER((*pAst) -> label)); /* Delete the label name */
+        (void) free_ptr(POINTER((*pAst) -> label)); /* Delete the label name (if there is). */
         (void) free_ptr(POINTER(*pAst)); /* Delete the ast itself. */
 
         returnCode = SUCCESS_CODE; /* ast deleted successfully. */

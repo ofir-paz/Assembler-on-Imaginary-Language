@@ -55,7 +55,7 @@ data_t createData(void *data, data_type_t dataType);
  * @param   *astList Pointer to the AST list.
  * @param   **ast Pointer to the AST to add to the list.
  *
- * @return  0 if the node was successfully added to the list, 1 if the given list is empty.
+ * @return  0 if the node was successfully added to the list, or -1 if the given list is empty.
  */
 int addAstToList(ast_list_t *astList, ast_t **ast);
 
@@ -84,6 +84,24 @@ void addSentenceToAst(ast_t *ast, int sentence, sentence_type_t sentenceType);
  * @param   dataType    The data type of the data for the argument node.
  */
 void addArgumentToAst(ast_t *ast, void *data, data_type_t dataType);
+
+/*
+ * Gets the label name from the given AST.
+ *
+ * @param   *ast The ast to get the label name from.
+ *
+ * @return  The label name in the given AST, or NULL if there is no label.
+ */
+char *getLabelName(ast_t *ast);
+
+/*
+ * Gets the sentence type from the given AST.
+ *
+ * @param   *ast The ast to get the sentence type from.
+ *
+ * @return  The sentence type in the given AST.
+ */
+sentence_type_t getSentenceType(ast_t *ast);
 
 /*
  * Check if the given AST has a label.

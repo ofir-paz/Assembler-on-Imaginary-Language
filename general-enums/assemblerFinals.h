@@ -10,7 +10,4 @@
 
 /* ---Assembler related finals--- */
 
-/* Types of labels and how many there are. */
-enum {REG_LABELS, ENT_LABELS, EXT_LABELS, TYPES_OF_LABELS};
-
 #endif /* MMN_14_ASSEMBLERFINALS_H */

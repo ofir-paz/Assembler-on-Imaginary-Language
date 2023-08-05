@@ -51,10 +51,10 @@ int nextEmptyIndex(const char *str, int i);
  */
 int nextWordIndex(const char *str, int i);
 
-/* Finds the next index in param const char *str where it is a comma.
+/* Finds the next index in param const char *str where it is the given char ch.
  * If param int i is not an index of str returns i,
- * otherwise returns the index of the next comma in str (index of null if there isn't) */
-int nextCommaIndex(const char *str, int i);
+ * otherwise returns the index of the next ch in str or (index of null if there isn't) */
+int nextSpecificCharIndex(const char *str, int i, char ch);
 
 /* Finds the start of a specific word in a given line string.
  * param const char *line is the line that holds the word

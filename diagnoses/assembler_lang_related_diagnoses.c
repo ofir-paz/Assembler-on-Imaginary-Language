@@ -10,7 +10,7 @@
 #include <stddef.h>
 #include "../new-data-types/boolean.h"
 #include "../NameTable/NameTable.h"
-#include "../encoding/encoding-finals/encoding_finals.h"
+#include "../encoding/assembler_ast.h"
 #include "../general-enums/indexes.h"
 #include "../general-enums/neededKeys.h"
 #include "diagnose_line.h"
@@ -111,6 +111,28 @@ boolean isMacroLine(boolean wasInMacroDef, boolean isInMacroDef)
 }
 
 /*
+ * Extracts the label from the given line of text.
+ *
+ * The function searches for the first occurrence of a colon (':') in the line
+ * and extracts the label that comes before it. The label is returned as a
+ * dynamically allocated C-string (char *) which needs to be freed by the caller
+ * when it's no longer needed.
+ *
+ * @param line      The input line of text to extract the label from.
+ *
+ * @return          A pointer to the extracted label as a dynamically allocated
+ *                  C-string (char *). The function returns NULL if no label is
+ *                  found in the line.
+ */
+char *getLabelFromLine(const char *line)
+{
+    int start = nextCharIndex(line, MINUS_ONE_INDEX);
+    int end = nextSpecificCharIndex(line, start, COLON);
+
+    return strcpyPart(line, start, end);
+}
+
+/*
  * Gets the guidance word that is represented by the given string word.
  *
  * @param   word The given word.
@@ -176,18 +198,58 @@ register_t getRegister(const char *word)
 }
 
 /*
+ * Gets the command from a given line string in a string type.
+ *
+ * @param   *line           The given line string.
+ * @param   isLabelDef      Flag indicating if the line has a label definition.
+ *
+ * @return  The found command in string type.
+ */
+char *getCommandStringFromLine(const char *line, boolean isLabelDef)
+{
+    char *commandName = NULL; /* Will hold the specific command name. */
+    int endIndexOfLabelDef = (isLabelDef == TRUE)?
+                             nextSpecificCharIndex(line, ZERO_INDEX, COLON) : ZERO_INDEX;
+
+    /* Find the command name. */
+    findWord(line + endIndexOfLabelDef, &commandName, FIRST_WORD);
+
+    return commandName;
+}
+
+/*
+ * Retrieves the command at the specified position in the line.
+ *
+ * @param   line            The input line to retrieve the word from.
+ * @param   isLabelDef      Flag indicating if the line has a label definition.
+ *
+ * @return  The command at the given position, or -1 if there was no command.
+ */
+int getCommandFromLine(const char *line, boolean isLabelDef)
+{
+    int command; /* Value to return, represents the command (if there is). */
+    /* Will hold the specific command name. */
+    char *commandName = getCommandStringFromLine(line, isLabelDef);
+
+    if ((command = getGuidance(commandName)) == NO_GUIDANCE) /* Get the command */
+        command = getOpcode(commandName);
+
+    free_ptr(POINTER(commandName)); /* Free unnecessary variable. */
+    return command;
+}
+
+/*
  * Retrieves the sentence type of the line based on the command at the specified location.
  *
  * @param   *line           The line to check the sentence type of.
- * @param   commandNumber   The location of the command to help determine the sentence type.
+ * @param   isLabelDef      Flag indicating if the line has a label definition.
  *
  * @return  The sentence type represented by the command.
  */
-sentence_type_t getSentenceTypeOfLine(const char *line, word_number commandNumber)
+sentence_type_t getSentenceTypeOfLine(const char *line, boolean isLabelDef)
 {
     sentence_type_t sentenceType; /* Value to return. */
-    char *commandName = NULL; /* Will hold the specific command name. */
-    findWord(line, &commandName, commandNumber); /* Find the command name. */
+    char *commandName = getCommandStringFromLine(line, isLabelDef);
 
     /* Check which sentence type does the command represents. */
     if (getGuidance(commandName) != NO_GUIDANCE)
@@ -195,7 +257,7 @@ sentence_type_t getSentenceTypeOfLine(const char *line, word_number commandNumbe
     else if (getOpcode(commandName) != NO_OPCODE)
         sentenceType = DIRECTION_SENTENCE;
     else /* The command is invalid. */
-        sentenceType = NO_TYPE;
+        sentenceType = NO_SENTENCE_TYPE;
 
     free_ptr(POINTER(commandName)); /* Free unnecessary variable. */
     return sentenceType;
@@ -212,27 +274,6 @@ boolean isSavedWord(const char *word)
 {
     return (getGuidance(word) == NO_GUIDANCE && getOpcode(word) == NO_OPCODE &&
             getRegister(word) == NO_REGISTER)? FALSE : TRUE;
-}
-
-/*
- * Retrieves the command at the specified position in the line.
- *
- * @param   line            The input line to retrieve the word from.
- * @param   commandNumber   The position of the command to retrieve in the line.
- *
- * @return  The command at the given position, or -1 if there was no command.
- */
-int getCommandFromLine(const char *line, word_number commandNumber)
-{
-    int command; /* Value to return, represents the command (if there is). */
-    char *commandName = NULL; /* Will hold the specific command name. */
-    findWord(line, &commandName, commandNumber); /* Find the word. */
-
-    if ((command = getGuidance(commandName)) == NO_GUIDANCE) /* Get the command */
-        command = getOpcode(commandName);
-
-    free_ptr(POINTER(commandName)); /* Free unnecessary variable. */
-    return command;
 }
 
 /*
@@ -269,8 +310,27 @@ boolean isSavedWordInLine(const char *line, word_number wordNumber)
  */
 void findArg(const char *line, char **arg, int argumentNum, boolean isLabel)
 {
-    int skip = nextWordIndex(line, MINUS_ONE_INDEX);
-    skip += (isLabel)? nextWordIndex(line, skip) : ZERO_INDEX;
+    /* Define skip and set it to the start index of the first argument based on the given flag. */
+    int skip = (isLabel == TRUE)?
+            nextSpecificCharIndex(line, MINUS_ONE_INDEX, COLON) : ZERO_INDEX;
+    skip = nextWordIndex(line ,nextCharIndex(line, skip));
 
     findTokenFromStr(line + skip, arg, argumentNum, COMMA_DELIM);
+}
+
+/*
+ * Gets the data type of the given argument (in string type).
+ * assumes the given string represents a valid argument !!
+ *
+ * @param   *arg        The given argument in string type.
+ * @param   *dataType   Pointer for the found data type.
+ */
+void getArgDataTypeFromString(char *arg, data_type_t *dataType)
+{
+    if (isPartOfNumber(arg, ZERO_INDEX) == TRUE) /* Is number */
+        *dataType = INT;
+    else if (*arg == AT) /* Is register */
+        *dataType = REG;
+    else /* Otherwise, string. */
+        *dataType = STRING;
 }

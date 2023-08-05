@@ -8,7 +8,7 @@
 #ifndef MMN_14_SENTENCE_TYPES_H
 #define MMN_14_SENTENCE_TYPES_H
 
-typedef enum {NO_TYPE, GUIDANCE_SENTENCE, DIRECTION_SENTENCE} sentence_type_t;
+typedef enum {NO_SENTENCE_TYPE, GUIDANCE_SENTENCE, DIRECTION_SENTENCE} sentence_type_t;
 
 typedef struct
 {

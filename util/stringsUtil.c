@@ -152,3 +152,25 @@ int getIndexOfStrInArray(const char *arr[], int size, const char *str)
 
     return i;
 }
+
+/*
+ * Copies a part of a given string into a new one and returns it.
+ *
+ * @param   str     The given string to copy the part from.
+ * @param   start   The start index of the part.
+ * @param   end     The end index of the part.
+ *
+ * @return  The partial string: str[start...end] (null-terminated).
+ */
+char *strcpyPart(const char *str, int start, int end)
+{
+    int len = end - start; /* Length of the specific part. */
+
+    /* Initializing the new part-string. */
+    char *part = (char *) allocate_space(len + SIZE_FOR_NULL);
+    part[len] = NULL_TERMINATOR;
+
+    (void) strncpy(part, str + start, len); /* Copying the part from str the part. */
+
+    return part;
+}
