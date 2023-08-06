@@ -17,12 +17,24 @@
 
 typedef enum {INT, STRING, REG} data_type_t;
 
+/* This is an argument data type. represents an argument and it's data. */
+typedef struct
+{
+    union
+    {
+        short int num;
+        char *string; /* Can be a label name or string */
+        register_t reg;
+    } data;
+    data_type_t dataType; /* Will hold the type of data of the argument. */
+} data_t; /* Will be the data of the argument (data; label name; register) */
+
 /* ---------------Prototypes--------------- */
 
 /* ---Data types prototypes--- */
 typedef struct ast_list_t ast_list_t;
 typedef struct ast_t ast_t;
-typedef struct data_t data_t;
+typedef struct arg_node_t arg_node_t;
 /* --------------------------- */
 
 /*
@@ -95,13 +107,70 @@ void addArgumentToAst(ast_t *ast, void *data, data_type_t dataType);
 char *getLabelName(ast_t *ast);
 
 /*
- * Gets the sentence type from the given AST.
+ * Finds if there are labels in the ast that needs to be added to a table.
+ * Finds also which table the labels need to be added to.
  *
- * @param   *ast The ast to get the sentence type from.
+ * @param   *ast    The given ast to check the labels in.
  *
- * @return  The sentence type in the given AST.
+ * @return  NO_LABEL_TYPE if there are no labels to be added to tables in the ast,
+ *          NORMAL if there is a normal label, ENTRY if there are labels to be added to
+ *          an entry table, EXTERN if there are labels to be added to an extern table.
  */
-sentence_type_t getSentenceType(ast_t *ast);
+label_type_t getLabelTypeForTable(ast_t *ast);
+
+/*
+ * Gets the sentence from the given AST.
+ *
+ * @param   *ast The ast to get the sentence from.
+ *
+ * @return  The sentence from the given AST.
+ */
+sentence_t getSentence(ast_t *ast);
+
+/*
+ * Gets the argument list from the given AST.
+ *
+ * @param   *ast    The ast to get the argument list from.
+ *
+ * @return  The argument list from the given AST.
+ */
+arg_node_t *getArgList(ast_t *ast);
+
+/*
+ * Gets the next argument node from the given argument node.
+ *
+ * @param   *argNode    The argument node to get the next one from.
+ *
+ * @return  The next argument node from the given one.
+ */
+arg_node_t *getNextNode(arg_node_t *argNode);
+
+/*
+ * Gets the data from the given argument node.
+ *
+ * @param   *argNode    The node to extract the data from.
+ *
+ * @return  The data from the given argument node.
+ */
+data_t getArgData(arg_node_t *argNode);
+
+/*
+ * Gets the addressing method for the given argument.
+ *
+ * @param   *argNode    The given argument to check its addressing method.
+ *
+ * @return  The addressing method for the given argument.
+ */
+addressing_method_t getArgAddressingMethod(arg_node_t *argNode);
+
+/*
+ * Gets the amount of arguments in the given AST.
+ *
+ * @param   *ast    The AST to get the amount of arguments from.
+ *
+ * @return  The amount of arguments in the given AST.
+ */
+unsigned short getArgAmount(ast_t *ast);
 
 /*
  * Check if the given AST has a label.

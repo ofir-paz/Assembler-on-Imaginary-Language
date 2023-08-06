@@ -86,6 +86,11 @@ int addStringToData(NameTable *name_table, const char *name, const char *str);
 int setNumberInData(NameTable *name_table, const char *name, int num);
 
 /*
+ *
+ */
+int changeToPosAndAdd(NameTable *name_table, int add);
+
+/*
  * Deletes the entire NameTable and frees the memory.
  *
  * @param   **table Pointer to the NameTable to delete.

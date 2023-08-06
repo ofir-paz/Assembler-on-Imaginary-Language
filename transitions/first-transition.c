@@ -22,9 +22,16 @@
 /* -------------------------- */
 
 /* ---Macros--- */
+
+/* Will be used to distinguish between data labels and instruction labels. */
+#define DATA_TEMP_ADDRESS(address) (-1 * (address))
+
 /* ------------ */
 
 /* ---Finals--- */
+/* The address of the first instruction in the memory.
+ * Cannot be zero, will produce errors if set to !! */
+#define START_OF_PROGRAM_IN_MEM 100
 #define AFTER_MACRO ".am" /* File end of after pre-processor type file */
 /* ------------ */
 
@@ -35,8 +42,10 @@ ast_t *handleLineInFirstTrans(const char *file_name, const char *line, NameTable
                               int *IC, int *DC, boolean *wasError);
 ast_t *firstAssemblerAlgo(const char *file_name, const char *line, int lineNumber,
                           NameTable *labelsMap[], int *IC, int *DC, boolean *wasError);
-void addToTablesIfNeededInFirstTran(ast_t *lineAst, NameTable *labelsMap[], int IC,
+void addToTablesIfNeededInFirstTrans(ast_t *lineAst, NameTable *labelsMap[], int IC, int DC,
                                     Error *lineError);
+Error addToNormalTable(ast_t *lineAst, NameTable *normalTable, NameTable *extTable, int IC, int DC);
+Error addToOtherTable(ast_t *lineAst, NameTable *labelsMap[], label_type_t table);
 /* ---------------------------------------- */
 
 /*
@@ -68,7 +77,7 @@ process_result firstFileTraverse(const char *file_name, NameTable *labelsMap[],
                                  ast_list_t *astList)
 {
     boolean wasError = FALSE;
-    int IC = ZERO_COUNT, DC = ZERO_COUNT;
+    int IC = START_OF_PROGRAM_IN_MEM, DC = START_OF_PROGRAM_IN_MEM;
     char *line = NULL; /* This will hold the current line */
 
     /* Read the file line-by-line and handle it. */
@@ -79,8 +88,11 @@ process_result firstFileTraverse(const char *file_name, NameTable *labelsMap[],
             (void) addAstToList(astList, &lineAst);
         (void) free_ptr(POINTER(line)); /* Next line */
     }
+    (void) free_ptr(POINTER(line)); /* Free the last line. */
 
-    (void) free_ptr(POINTER(line));
+    /* Separate instructions and data */
+    updateDataLabels(labelsMap[NORMAL], IC - START_OF_PROGRAM_IN_MEM);
+
     return (wasError == FALSE)? SUCCESS : FAILURE;
 }
 
@@ -108,10 +120,13 @@ ast_t *firstAssemblerAlgo(const char *file_name, const char *line, int lineNumbe
 
     /* AST (abstract syntax tree) representing the line to return. */
     ast_t *lineAst = buildAstFromLine(line, &lineError);
-    addToTablesIfNeededInFirstTran(lineAst, labelsMap, *IC, &lineError);
-    updateCounters(lineAst, IC, DC);
+    lineError = handle_FirstTransLine_Error(file_name, lineNumber, lineAst, lineError);
 
-    *wasError = handleFirstTransLineError(file_name, lineNumber, lineError);
+    addToTablesIfNeededInFirstTrans(lineAst, labelsMap, *IC, *DC, &lineError);
+
+    if (lineError == NO_ERROR)
+        updateCounters(lineAst, IC, DC);
+
     return lineAst;
 }
 
@@ -126,35 +141,44 @@ ast_t *firstAssemblerAlgo(const char *file_name, const char *line, int lineNumbe
  * @param   *amFile The data structure to hold the contents of the .am file.
  * @param   *macro_table The data structure to hold the macros and their contents.
  */
-void addToTablesIfNeededInFirstTran(ast_t *lineAst, NameTable *labelsMap[], int IC,
-                                    Error *lineError)
+void addToTablesIfNeededInFirstTrans(ast_t *lineAst, NameTable *labelsMap[], int IC, int DC,
+                                      Error *lineError)
 {
     label_type_t labelType = getLabelTypeForTable(lineAst);
 
-    if (labelType != NO_LABEL_TYPE)
+    if (labelType == NORMAL)
+            *lineError = addToNormalTable(lineAst, labelsMap[NORMAL],
+                                          labelsMap[EXTERN], IC, DC);
+    else if (labelType == ENTRY || labelType == EXTERN)
+            *lineError = addToOtherTable(lineAst, labelsMap, labelType);
+}
+
+Error addToNormalTable(ast_t *lineAst, NameTable *normalTable, NameTable *extTable, int IC, int DC)
+{
+    Error lineError = checkLabelDefTableError(lineAst, normalTable, extTable);
+
+    if (lineError == NO_ERROR)
     {
-        if (labelType == NORMAL && (*lineError = checkLabelDefTableError
-                (lineAst, labelsMap[NORMAL], labelsMap[EXTERN])) == NO_ERROR)
-            addLabelToTable(labelsMap[labelType],
-                            getLabelName(lineAst), IC);
-
-        else if (labelType == ENTRY)
-            *lineError = addToEntryTable(lineAst, labelsMap);
-
-        else /* labelType == EXTERN */
-            *lineError = addToExternTable(lineAst, labelsMap);
+        /* The address will be decided based on the type of sentence. */
+        int address = (getSentence(lineAst).sentenceType == DIRECTION_SENTENCE)?
+                IC : DATA_TEMP_ADDRESS(DC);
+        addLabelToTable(normalTable, getLabelName(lineAst), address);
     }
+
+    return lineError;
 }
 
-Error addToEntryTable(ast_t *lineAst, NameTable *labelsMap[])
+Error addToOtherTable(ast_t *lineAst, NameTable *labelsMap[], label_type_t table)
 {
-    Error lineError;
+    Error lineError = NO_ERROR; /* Value to return, assume no error. */
 
-    if (labelType == ENTRY)
-        addToEn
-}
+    arg_node_t *currArg = getArgList(lineAst);
+    while (currArg != NULL)
+    {
+        addLabelToOtherTable(getArgData(currArg).data.string, labelsMap, table,
+                             &lineError);
+        currArg = getNextNode(currArg);
+    }
 
-Error addToExternTable(ast_t *lineAst, NameTable *labelsMap[])
-{
-
+    return lineError;
 }

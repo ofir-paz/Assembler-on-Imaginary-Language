@@ -297,6 +297,45 @@ boolean isSavedWordInLine(const char *line, word_number wordNumber)
 }
 
 /*
+ * Check if a colon is present in the given assembly code line for a label definition.
+ *
+ * Will also return TRUE if there is space between the label and the colon,
+ * for example: line = "label  : ...". This error needs to be checked !
+ *
+ * @param   *line   The assembly code line to check for the specific presence of a colon.
+ *
+ * @return  TRUE if a colon is present for a label definition, otherwise FALSE.
+ */
+boolean isColonInLineForLabel(const char *line)
+{
+    int firstColonIndex = nextSpecificCharIndex(line, ZERO_INDEX, COLON);
+    int secondWordIndex = findStartIndexOfWord(line, SECOND_WORD);
+
+    /* Return TRUE if the colon is before or at the start of the second word (if it exist). */
+    return (firstColonIndex <= secondWordIndex &&
+            line[firstColonIndex] == COLON)? TRUE : FALSE;
+}
+
+/*
+ * Get the starting index of arguments in the assembly code line.
+ *
+ * @param   *line       The assembly code line to search for arguments.
+ * @param   isLabel     Flag indicating if the line has a label definition.
+ *
+ * @return  The starting index of the arguments in the line, or index of null terminator of no
+ *          arguments are found in the line.
+ */
+int getStartIndexOfArguments(const char *line, boolean isLabel)
+{
+    /* Define skip and set it to the start index of the first argument based on the given flag. */
+    int skip = (isLabel == TRUE)?
+               nextSpecificCharIndex(line, MINUS_ONE_INDEX, COLON) : ZERO_INDEX;
+    skip = nextWordIndex(line ,nextCharIndex(line, skip));
+
+    return skip;
+}
+
+/*
  * Find the specified argument in the given line.
  *
  * This function tokenizes the line using the delimiter "," and returns
@@ -310,11 +349,7 @@ boolean isSavedWordInLine(const char *line, word_number wordNumber)
  */
 void findArg(const char *line, char **arg, int argumentNum, boolean isLabel)
 {
-    /* Define skip and set it to the start index of the first argument based on the given flag. */
-    int skip = (isLabel == TRUE)?
-            nextSpecificCharIndex(line, MINUS_ONE_INDEX, COLON) : ZERO_INDEX;
-    skip = nextWordIndex(line ,nextCharIndex(line, skip));
-
+    int skip = getStartIndexOfArguments(line, isLabel);
     findTokenFromStr(line + skip, arg, argumentNum, COMMA_DELIM);
 }
 
@@ -333,4 +368,26 @@ void getArgDataTypeFromString(char *arg, data_type_t *dataType)
         *dataType = REG;
     else /* Otherwise, string. */
         *dataType = STRING;
+}
+
+/*
+ * Check if the current argument is the last one in the assembly code line.
+ *
+ * @param   line            The assembly code line to check for the last argument.
+ * @param   argumentNum     The current argument number being processed.
+ * @param   isLabel         Flag indicating if the line has a label definition.
+ *
+ * @return  TRUE if the current argument is the last one, FALSE otherwise.
+ */
+boolean isLastArg(const char *line, int argumentNum, boolean isLabel)
+{
+    int currArg = getStartIndexOfArguments(line, isLabel);
+
+    while (argumentNum--)
+    {
+        currArg = nextSpecificCharIndex(line, currArg, COMMA); /* Next comma index. */
+        currArg = nextCharIndex(line, currArg); /* Next start of arg index. */
+    }
+
+    return (line[currArg] == NULL_TERMINATOR)? TRUE : FALSE;
 }

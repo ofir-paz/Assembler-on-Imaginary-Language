@@ -6,11 +6,12 @@
  */
 
 /* ---Include header files--- */
+#include <string.h>
 #include <stdlib.h>
 #include <stddef.h>
 #include "../NameTable/NameTable.h"
 #include "../encoding/assembler_ast.h"
-#include "../errors/error_types/error_types.h"
+#include "../general-enums/programFinals.h"
 #include "../diagnoses/assembler_lang_related_diagnoses.h"
 #include "../diagnoses/diagnose_line.h"
 #include "../util/memoryUtil.h"
@@ -20,6 +21,10 @@
 /* ------------ */
 
 /* ---Finals--- */
+
+/* Word counter */
+enum {ZERO_WORDS, ONE_WORDS, TWO_WORDS, THREE_WORDS};
+
 #define FIRST_ARGUMENT 1
 /* ------------ */
 
@@ -30,8 +35,18 @@ Error addSentenceFromLineToAST(ast_t *lineAST, const char *line);
 Error addArgumentsFromLineToAST(ast_t *lineAST, const char *line);
 void getArgDataFromLine(const char *line, int argumentNum, boolean isLabel,
                         void **argData, data_type_t *dataType);
-void getArgDataFromString(const char *arg, data_type_t dataType, void **argData)
+void getArgDataFromString(const char *arg, data_type_t dataType, void **argData);
+Error addLabelToEntryTable(char *label, NameTable *entLabels, NameTable *extLabels);
+Error addLabelToExternTable(char *label, NameTable *labelsMap[]);
+void addLabelToTable(NameTable *labelMap, char *labelName, int address);
+int howManyWordsForInstruction(ast_t *lineAst);
+int howManyWordsForData(ast_t *lineAst);
 /* ---------------------------------------- */
+
+void updateDataLabels(NameTable *labels, int finalIC)
+{
+    (void) changeToPosAndAdd(labels, finalIC);
+}
 
 /*
  * Build an abstract syntax tree (AST) from the given line of assembly code.
@@ -111,9 +126,13 @@ Error addArgumentsFromLineToAST(ast_t *lineAST, const char *line)
     {
         getArgDataFromLine(line, argumentNum, isLabel(lineAST), &argData, &dataType);
         addArgumentToAst(lineAST, argData, dataType);
+        (void) free_ptr(POINTER(argData));
         if (isLastArg(line, argumentNum, isLabel(lineAST)) == TRUE) break;
         argumentNum++;
     }
+
+    if (argumentNum == FIRST_ARGUMENT)
+        handleExeptionsAndWarningInFirstArg(lineAST, line, &foundError);
 
     return foundError;
 }
@@ -133,19 +152,103 @@ void getArgDataFromString(const char *arg, data_type_t dataType, void **argData)
     switch (dataType)
     {
         case INT:
+            *((int **) argData) = (int *) allocate_space(sizeof(int));
             **((int **) argData) = atoi(arg);
             break;
         case STRING:
             *((char **) argData) = arg;
             break;
         case REG:
+            *((register_t **) argData) = (register_t *) allocate_space(sizeof(register_t));
             **((register_t **) argData) = getRegister(arg);
             break;
     }
+}
+
+void addLabelToOtherTable(char *label, NameTable *labelsMap[], label_type_t table,
+                          Error *argError)
+{
+    if (table == ENTRY)
+        *argError = addLabelToEntryTable(label, labelsMap[ENTRY],
+                                         labelsMap[EXTERN]);
+    else /* table == EXTERN */
+        *argError = addLabelToExternTable(label, labelsMap);
+}
+
+Error addLabelToEntryTable(char *label, NameTable *entLabels, NameTable *extLabels)
+{
+    Error argLabelError = checkLogicalErrorInAddToEntryTable(label, entLabels, extLabels);
+
+    if (argLabelError == NO_ERROR)
+        addLabelToTable(entLabels, label, ZERO_NUMBER);
+
+    return argLabelError;
+}
+
+Error addLabelToExternTable(char *label, NameTable *labelsMap[])
+{
+    Error argLabelError = checkLogicalErrorInAddToExternTable(label, labelsMap);
+
+    if (argLabelError == NO_ERROR)
+        addLabelToTable(labelsMap[EXTERN], label, ZERO_NUMBER);
+
+    return argLabelError;
 }
 
 void addLabelToTable(NameTable *labelMap, char *labelName, int address)
 {
     (void) addNameToTable(labelMap, labelName);
     (void) setNumberInData(labelMap, labelName, address);
+}
+
+/*
+ * Updates one of the give counters IC or DC based on the amount of words
+ * needs to encode the line of code represented by lienAst.
+ *
+ * Assumes that lineAst represents a valid line of code !!
+ *
+ * @param   *lineAst    The AST representing the line of code.
+ * @param   *IC         Instruction counter.
+ * @param   *DC         Data counter.
+ */
+void updateCounters(ast_t *lineAst, int *IC, int *DC)
+{
+    if (getSentence(lineAst).sentenceType == DIRECTION_SENTENCE)
+        *IC += howManyWordsForInstruction(lineAst);
+    else /* lineAst.sentenceType == GUIDANCE_SENTENCE */
+        *DC += howManyWordsForData(lineAst);
+}
+
+int howManyWordsForInstruction(ast_t *lineAst)
+{
+    int amountOfWords = ZERO_WORDS; /* Value to return, reset it to zero. */
+    arg_node_t *firstArg; /* Helper variable. */
+
+    if (firstArg == NULL)
+        amountOfWords = ONE_WORDS; /* Only command. */
+
+    /* One argument only OR two register arguments. */
+    else if (getNextNode(firstArg) == NULL ||
+            (getArgAddressingMethod(firstArg) == DIRECT_REGISTER &&
+             getArgAddressingMethod(getNextNode(firstArg)) == DIRECT_REGISTER))
+        amountOfWords = TWO_WORDS;
+
+    else /* Two arguments, not both of them are registers. */
+        amountOfWords = THREE_WORDS;
+
+    return amountOfWords;
+}
+
+int howManyWordsForData(ast_t *lineAst)
+{
+    unsigned short amountOfWords = ZERO_WORDS; /* Value to return, reset it to zero. */
+
+    if (getSentence(lineAst).sentence.guidance == data)
+        amountOfWords = getArgAmount(lineAst);
+
+    else if (getSentence(lineAst).sentence.guidance == str)
+        amountOfWords = strlen(getArgData(getArgList(lineAst)).data.string)
+                + SIZE_FOR_NULL;
+
+    return amountOfWords;
 }

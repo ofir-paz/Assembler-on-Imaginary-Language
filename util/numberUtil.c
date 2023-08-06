@@ -13,6 +13,7 @@
 /* ------------ */
 
 /* ---Finals--- */
+#define ZERO_NUMBER 0
 /* ------------ */
 
 /* ---------------Prototypes--------------- */
@@ -30,4 +31,16 @@
 boolean between(int num, int low, int high)
 {
     return (low <= num && num <= high)? TRUE : FALSE;
+}
+
+/*
+ * Checks if a given number is negative.
+ *
+ * @param   num     The number to check if it's negative.
+ *
+ * @return TRUE if the given number is negative, otherwise FALSE.
+ */
+boolean isNegative(int num)
+{
+    return (num < ZERO_NUMBER)? TRUE : FALSE;
 }

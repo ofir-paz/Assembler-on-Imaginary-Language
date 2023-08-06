@@ -137,6 +137,18 @@ boolean isSavedWord(const char *word);
 boolean isSavedWordInLine(const char *line, word_number wordNumber);
 
 /*
+ * Check if a colon is present in the given assembly code line for a label definition.
+ *
+ * Will also return TRUE if there is space between the label and the colon,
+ * for example: line = "label  : ...". This error needs to be checked !
+ *
+ * @param   *line   The assembly code line to check for the specific presence of a colon.
+ *
+ * @return  TRUE if a colon is present for a label definition, otherwise FALSE.
+ */
+boolean isColonInLineForLabel(const char *line);
+
+/*
  * Find the specified argument in the given line.
  *
  * This function tokenizes the line using the delimiter "," and returns
@@ -158,6 +170,17 @@ void findArg(const char *line, char **arg, int argumentNum, boolean isLabel);
  * @param   *dataType   Pointer for the found data type.
  */
 void getArgDataTypeFromString(char *arg, data_type_t *dataType);
+
+/*
+ * Check if the current argument is the last one in the assembly code line.
+ *
+ * @param   line            The assembly code line to check for the last argument.
+ * @param   argumentNum     The current argument number being processed.
+ * @param   isLabel         Flag indicating if the line has a label definition.
+ *
+ * @return  TRUE if the current argument is the last one, FALSE otherwise.
+ */
+boolean isLastArg(const char *line, int argumentNum, boolean isLabel);
 
 /* ---------------------------------------- */
 

@@ -20,6 +20,7 @@
 #define SUCCESS_CODE 0
 #define INVALID_GIVEN_PARAM_CODE (-1)
 #define UNKNOWN_NUMBER 0
+#define ZERO_ARGUMENTS 0
 #define FIRST_ARG 1
 /* ------------ */
 
@@ -319,33 +320,121 @@ char *getLabelName(ast_t *ast)
     return my_strdup(ast -> label);
 }
 
-//label_type_t getLabelType(ast_t *ast)
-//{
-//    label_type_t labelType = NO_LABEL_TYPE;
-//
-//    if (isLabel(ast) == TRUE)
-//    {
-//        if (getSentenceType(ast) == DIRECTION_SENTENCE)
-//            labelType = NORMAL;
-//        else /* ast.sentenceType == GUIDANCE_SENTENCE */
-//        {
-//            ast -> sentenceNode -> sentence.sentence.guidance ==
-//        }
-//    }
-//
-//    return labelType;
-//}
+/*
+ * Finds if there are labels in the ast that needs to be added to a table.
+ * Finds also which table the labels need to be added to.
+ *
+ * @param   *ast    The given ast to check the labels in.
+ *
+ * @return  NO_LABEL_TYPE if there are no labels to be added to tables in the ast,
+ *          NORMAL if there is a normal label, ENTRY if there are labels to be added to
+ *          an entry table, EXTERN if there are labels to be added to an extern table.
+ */
+label_type_t getLabelTypeForTable(ast_t *ast)
+{
+    label_type_t labelType = NO_LABEL_TYPE; /* Value to return, assume no labels. */
+
+    if (isLabel(ast) == TRUE) /* If there is a label definition it's a normal label. */
+        labelType = NORMAL;
+
+    /* Check if there is a .entry or .extern guidance and set the value to return accordingly. */
+    else if (ast -> sentenceNode -> sentence.sentenceType == GUIDANCE_SENTENCE)
+    {
+        if (ast -> sentenceNode -> sentence.sentence.guidance == ent)
+            labelType = ENTRY;
+        else if (ast -> sentenceNode -> sentence.sentence.guidance == ext)
+            labelType = EXTERN;
+    }
+
+    return labelType;
+}
 
 /*
- * Gets the sentence type from the given AST.
+ * Gets the sentence from the given AST.
  *
- * @param   *ast The ast to get the sentence type from.
+ * @param   *ast The ast to get the sentence from.
  *
- * @return  The sentence type in the given AST.
+ * @return  The sentence from the given AST.
  */
-sentence_type_t getSentenceType(ast_t *ast)
+sentence_t getSentence(ast_t *ast)
 {
-    return ast -> sentenceNode -> sentence.sentenceType;
+    return ast -> sentenceNode -> sentence;
+}
+
+/*
+ * Gets the argument list from the given AST.
+ *
+ * @param   *ast    The ast to get the argument list from.
+ *
+ * @return  The argument list from the given AST.
+ */
+arg_node_t *getArgList(ast_t *ast)
+{
+    return ast -> sentenceNode -> argListHead;
+}
+
+/*
+ * Gets the next argument node from the given argument node.
+ *
+ * @param   *argNode    The argument node to get the next one from.
+ *
+ * @return  The next argument node from the given one.
+ */
+arg_node_t *getNextNode(arg_node_t *argNode)
+{
+    return argNode -> nextArg;
+}
+
+/*
+ * Gets the data from the given argument node.
+ *
+ * @param   *argNode    The node to extract the data from.
+ *
+ * @return  The data from the given argument node.
+ */
+data_t getArgData(arg_node_t *argNode)
+{
+    return argNode -> argData;
+}
+
+/*
+ * Gets the addressing method for the given argument.
+ *
+ * @param   *argNode    The given argument to check its addressing method.
+ *
+ * @return  The addressing method for the given argument.
+ */
+addressing_method_t getArgAddressingMethod(arg_node_t *argNode)
+{
+    addressing_method_t addressingMethod; /* Value to return. */
+
+    switch (argNode -> argData.dataType)
+    {
+        case INT: /* Instant value. */
+            addressingMethod = INSTANT;
+            break;
+        case STRING: /* Label name. */
+            addressingMethod = DIRECT;
+            break;
+        case REG: /* Register. */
+            addressingMethod = DIRECT_REGISTER;
+            break;
+    }
+
+    return addressingMethod;
+}
+
+/*
+ * Gets the amount of arguments in the given AST.
+ *
+ * @param   *ast    The AST to get the amount of arguments from.
+ *
+ * @return  The amount of arguments in the given AST.
+ */
+unsigned short getArgAmount(ast_t *ast)
+{
+    arg_node_t *lastNode = gotoLastArgNode(ast);
+    return (lastNode == NULL)? ZERO_ARGUMENTS : lastNode -> paramNum;
 }
 
 /*

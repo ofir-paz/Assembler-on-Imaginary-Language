@@ -23,6 +23,15 @@
  */
 boolean between(int num, int low, int high);
 
+/*
+ * Checks if a given number is negative.
+ *
+ * @param   num     The number to check if it's negative.
+ *
+ * @return TRUE if the given number is negative, otherwise FALSE.
+ */
+boolean isNegative(int num);
+
 /* ---------------------------------------- */
 
 #endif /* MMN_14_NUMBERUTIL_H */

@@ -11,6 +11,7 @@
 #include "../new-data-types/boolean.h"
 #include "../util/memoryUtil.h"
 #include "../util/stringsUtil.h"
+#include "../util/numberUtil.h"
 /* -------------------------- */
 
 /* New data type 'dataType' which indicates which data type the name table holds. */
@@ -20,6 +21,7 @@ typedef enum {
 } dataType;
 
 /* ---Macros--- */
+#define SWITCH_SIGN_AND_ADD(x, add) ((x) = (x) * (-1) + (add))
 /* ------------ */
 
 /* ---Finals--- */
@@ -215,12 +217,13 @@ int addStringToData(NameTable *name_table, const char *name, const char *str)
  * @param   name_table Pointer to the NameTable.
  * @param   name The name of node to change the data for.
  * @param   num The new number to set the data to.
+ *
  * @return  0 if successful, -1 if the data type is not (int), -2 if the
  *          name is not in the table.
  */
 int setNumberInData(NameTable *name_table, const char *name, int num)
 {
-    int returnCode = SUCCESS_CODE; /* Value to return. */
+    int returnCode = SUCCESS_CODE; /* Value to return, assume success. */
     Node *node = getNodeByName(name_table, name); /* Get the node by name. */
 
     if (node == NULL) /* Check if the node exists. */
@@ -229,6 +232,30 @@ int setNumberInData(NameTable *name_table, const char *name, int num)
         returnCode = NOT_MATCHING_DATA_CODE;
     else /* Add the string to the data */
         *((int *) (node -> data)) = num;
+
+    return returnCode;
+}
+
+/*
+ *
+ */
+int changeToPosAndAdd(NameTable *name_table, int add)
+{
+    int returnCode = SUCCESS_CODE; /* Value to return, assume success. */
+
+    if (name_table == NULL)
+        returnCode = TABLE_IS_NULL_CODE;
+
+    else if (name_table -> dataType != INT_TYPE)
+        returnCode = NOT_MATCHING_DATA_CODE;
+
+    else
+    {
+        Node *currNode;
+        for (currNode = name_table -> head; currNode != NULL; currNode = currNode -> next)
+            if (isNegative(*((int *) currNode -> data)) == TRUE)
+                SWITCH_SIGN_AND_ADD(*((int *) currNode -> data), add);
+    }
 
     return returnCode;
 }

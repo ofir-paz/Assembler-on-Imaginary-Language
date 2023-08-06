@@ -12,6 +12,8 @@
 
 /* ---------------Prototypes--------------- */
 
+void updateDataLabels(NameTable *labels, int finalIC);
+
 /*
  * Build an abstract syntax tree (AST) from the given line of assembly code.
  *
@@ -24,6 +26,8 @@
 ast_t *buildAstFromLine(const char *line, Error *lineError);
 
 void addLabelToTable(NameTable *labelMap, char *labelName, int address);
+void addLabelToOtherTable(char *label, NameTable *labelsMap[], label_type_t table,
+                          Error *argError);
 void updateCounters(ast_t *lineAst, int *IC, int *DC);
 /* ---------------------------------------- */
 
