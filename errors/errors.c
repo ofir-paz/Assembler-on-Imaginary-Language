@@ -9,7 +9,6 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include "../new-data-types/boolean.h"
-#include "../transitions/TransitionNumber.h"
 #include "error_types/error_types.h"
 #include "PreProcessorErrors/PreProcessorErrors.h"
 #include "error_check.h"
@@ -51,22 +50,6 @@ void print_assembler_ERR(Error error, const char *file_name, int lineNumber)
             errorMSG[(error / MAX_ERRORS_IN_ENUM) - 1][error % MAX_ERRORS_IN_ENUM]);
     fprintf(stderr, ANSI_COLOR_BLUE "In file: " ANSI_COLOR_RESET "%s, "
                     ANSI_COLOR_BLUE "On line: " ANSI_COLOR_RESET "%d\n", file_name, lineNumber);
-}
-
-Error handleLineErrors(const char *file_name, TransitionNumber_t transitionNumber,
-                       const char *line, int lineNumber, ...)
-{
-    Error error = INPUT_ERROR_CODE;
-    switch (transitionNumber)
-    {
-        case PRE_PROCESS:
-            break;
-//        case FIRST_TRANSITION:
-//            break;
-//        case SECOND_TRANSITION:
-//            break;
-    }
-    return error;
 }
 
 Error handle_lineTooLong_error(const char *line, int lineIndex)

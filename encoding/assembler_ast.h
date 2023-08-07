@@ -24,7 +24,7 @@ typedef struct
     {
         short int num;
         char *string; /* Can be a label name or string */
-        register_t reg;
+        reg_t reg;
     } data;
     data_type_t dataType; /* Will hold the type of data of the argument. */
 } data_t; /* Will be the data of the argument (data; label name; register) */
@@ -50,16 +50,6 @@ ast_list_t *createAstList(void );
  * @return  A pointer to the newly created AST.
  */
 ast_t *creatAst(void );
-
-/*
- * Creates a data_t object with the given data and data type.
- *
- * @param   data        The data to be stored in the data_t object.
- * @param   dataType    The type of data being stored.
- *
- * @return  A data_t object containing the given data and data type.
- */
-data_t createData(void *data, data_type_t dataType);
 
 /*
  * Adds an AST (Abstract Syntax Tree) to the AST list.
@@ -92,10 +82,9 @@ void addSentenceToAst(ast_t *ast, int sentence, sentence_type_t sentenceType);
  * Adds an argument node to the given AST.
  *
  * @param   ast         The AST to which the argument node should be added.
- * @param   data        The data for the argument node.
- * @param   dataType    The data type of the data for the argument node.
+ * @param   *argData    The data for the argument node.
  */
-void addArgumentToAst(ast_t *ast, void *data, data_type_t dataType);
+void addArgumentToAst(ast_t *ast, data_t *argData);
 
 /*
  * Gets the label name from the given AST.
@@ -206,6 +195,9 @@ int deleteAst(ast_t **pAst);
  * @return  0 on success, -1 if the pointer is NULL.
  */
 int deleteAstList(ast_list_t **pAstList);
+
+void printAst(ast_t *ast);
+void printAstList(ast_list_t *astList);
 
 /* ---------------------------------------- */
 

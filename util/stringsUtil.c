@@ -59,7 +59,7 @@ char *strToLowerCase(const char *str)
 /* Return TRUE if str1 == str2, otherwise FALSE. */
 boolean sameStrings(const char *str1, const char *str2)
 {
-    return (strcmp(str1, str2) == SAME_STRINGS)? TRUE : FALSE;
+    return (str1 != NULL && str2 != NULL && strcmp(str1, str2) == SAME_STRINGS)? TRUE : FALSE;
 }
 
 /*

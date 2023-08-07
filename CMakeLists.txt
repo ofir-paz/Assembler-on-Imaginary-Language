@@ -9,8 +9,8 @@ add_executable(mmn_14 main.c new-data-types/boolean.h
         FileHandling/readFromFile.h
         FileHandling/writeToFile.c FileHandling/writeToFile.h encoding/encoding-finals/opcodes.h
         encoding/encoding-finals/addressing_methods.h transitions/first-transition.c
-        transitions/first-transition.h transitions/second-transition.c
-        transitions/second-transition.h encoding/encoding-finals/encoding_types.h
+        transitions/first-transition.h
+        encoding/encoding-finals/encoding_types.h
         encoding/encoding-finals/encoding_types.h
         encoding/encoding-finals/encoding_types.h assembler.c assembler.h errors/warnings.c
         errors/warnings.h general-enums/indexes.h diagnoses/diagnose_line.c
@@ -32,4 +32,4 @@ add_executable(mmn_14 main.c new-data-types/boolean.h
         encoding/encoding-finals/registers.h transitions/first_transition_util.c
         transitions/first_transition_util.h util/memoryUtil.c util/memoryUtil.h
         util/stringsUtil.c util/stringsUtil.h general-enums/assemblerFinals.h util/numberUtil.c
-        util/numberUtil.h encoding/encoding-finals/label_types.h)
+        util/numberUtil.h encoding/encoding-finals/label_types.h errors/FirstTransitionErrors/FirstTransitionErrors.c errors/FirstTransitionErrors/FirstTransitionErrors.h transitions/second_transition.c transitions/second_transition.h)

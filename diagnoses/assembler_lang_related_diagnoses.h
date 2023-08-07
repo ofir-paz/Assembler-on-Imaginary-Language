@@ -11,6 +11,7 @@
 #include "../new-data-types/boolean.h"
 #include "../NameTable/NameTable.h"
 #include "../new-data-types/word_number.h"
+#include "../encoding/assembler_ast.h"
 
 /* ---------------Prototypes--------------- */
 
@@ -95,7 +96,7 @@ char *getLabelFromLine(const char *line);
  *
  * @return  register_t  The register value if the word is a valid register, otherwise NO_REGISTER.
  */
-register_t getRegister(const char *word);
+reg_t getRegister(const char *word);
 
 /*
  * Retrieves the command at the specified position in the line.
@@ -163,13 +164,14 @@ boolean isColonInLineForLabel(const char *line);
 void findArg(const char *line, char **arg, int argumentNum, boolean isLabel);
 
 /*
- * Gets the data type of the given argument (in string type).
- * assumes the given string represents a valid argument !!
+ * Gets the argument data from a given line string.
  *
- * @param   *arg        The given argument in string type.
- * @param   *dataType   Pointer for the found data type.
+ * @param   *line           The line string to get the data from.
+ * @param   argumentNum     The number of argument to get the data off.
+ * @param   isLabel         Flag indicating if the line has a label definition.
+ * @param   *argData        Pointer to store the found data.
  */
-void getArgDataTypeFromString(char *arg, data_type_t *dataType);
+void getArgDataFromLine(const char *line, int argumentNum, boolean isLabel, data_t *argData);
 
 /*
  * Check if the current argument is the last one in the assembly code line.

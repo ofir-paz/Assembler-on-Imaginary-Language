@@ -7,9 +7,9 @@
 #ifndef MMN_22_ERROR_CHECK_H
 #define MMN_22_ERROR_CHECK_H
 
-#include "../new-data-types/boolean.h"
-#include "../new-data-types/param_num_t.h"
 #include "error_types/error_types.h"
+#include "../new-data-types/boolean.h"
+#include "../new-data-types/word_number.h"
 
 /* ------------------Prototypes------------------- */
 
@@ -25,15 +25,15 @@ Error checkCommandError(const char *command);
  * the parameter in line numbered paramNum with type pType and the index
  * of the next param is valid (comma-wise)
  * Returns NO_ERROR if it's valid, otherwise the specific error that occurs. */
-Error checkCommaError(const char *line, param_num paramNum);//, paramtype pType);
+Error checkCommaError(const char *line, word_number paramNum);//, paramtype pType);
 
 /* Checks if float param number paramNum in const char *line is valid.
  * Returns NO_ERROR if it is, otherwise the specific error caught. */
-Error checkParamFloatError(const char *line, param_num paramNum);
+Error checkParamFloatError(const char *line, word_number paramNum);
 
 /* Checks for errors in the param numbered paramNum of const char *line.
  * Returns NO_ERROR if there is no error, otherwise the specific error caught. */
-Error checkParamCharError(const char *line, param_num paramNum);
+Error checkParamCharError(const char *line, word_number paramNum);
 
 /*
  * Checks for extraneous text error in the given line starting from the specified index.

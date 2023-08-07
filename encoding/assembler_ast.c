@@ -35,7 +35,7 @@ typedef struct
     {
         short int num;
         char *string; /* Can be a label name or string */
-        register_t reg;
+        reg_t reg;
     } data;
     data_type_t dataType; /* Will hold the type of data of the argument. */
 } data_t; /* Will be the data of the argument (data; label name; register) */
@@ -44,7 +44,7 @@ typedef struct
 typedef struct arg_node_t
 {
     unsigned short int paramNum; /* Current number of argument in sentence */
-    data_t argData;
+    data_t *argData;
     addressing_method_t addressingMethod;
     struct arg_node_t *nextArg; /* Next argument. will be NULL if there are no more arguments. */
 } arg_node_t; /* Argument node type */
@@ -80,10 +80,8 @@ typedef struct
 /* -------------------------------------------------- */
 
 /* ---------------Prototypes--------------- */
-data_t createData(void *data, data_type_t dataType);
 addressing_method_t findAddressingMethod(ast_t *ast, data_type_t dataType);
 arg_node_t *gotoLastArgNode(ast_t *ast);
-sentence_type_t getSentenceType(ast_t *ast);
 boolean isLabel(ast_t *ast);
 /* ---------------------------------------- */
 
@@ -178,52 +176,22 @@ sentence_t createSentence(int sentence, sentence_type_t sentenceType)
 /*
  * Creates an argument node for the given data and data type.
  *
- * @param   data        The data to be stored in the argument node.
- * @param   dataType    The type of data being stored.
+ * @param   *argData    The data to be stored in the argument node.
  *
  * @return  A pointer to the created argument node.
  */
-arg_node_t *createArgumentNode(void *data, data_type_t dataType)
+arg_node_t *createArgumentNode(data_t *argData)
 {
     /* Create the argument node. */
     arg_node_t *newArgNode = (arg_node_t *) allocate_space(sizeof(arg_node_t));
 
     /* Initialized its values. */
     newArgNode -> paramNum = UNKNOWN_NUMBER;
-    newArgNode -> argData = createData(data, dataType);
+    newArgNode -> argData = argData;
     newArgNode -> addressingMethod = NO_ADD_METHOD;
     newArgNode -> nextArg = NULL;
 
     return newArgNode;
-}
-
-/*
- * Creates a data_t object with the given data and data type.
- *
- * @param   data        The data to be stored in the data_t object.
- * @param   dataType    The type of data being stored.
- *
- * @return  A data_t object containing the given data and data type.
- */
-data_t createData(void *data, data_type_t dataType)
-{
-    data_t newData; /* Object to return. */
-    newData.dataType = dataType;
-
-    switch (dataType) /* Adding the data to the data_t object accordingly to its type. */
-    {
-        case INT:
-            newData.data.num = *((short int *) data);
-            break;
-        case STRING: /* In case of string, duplicate it. */
-            newData.data.string = my_strdup((char *)data);
-            break;
-        case REG:
-            newData.data.reg = *((register_t *) data);
-            break;
-    }
-
-    return newData;
 }
 
 /*
@@ -276,7 +244,7 @@ void addLabelToAst(ast_t *ast, const char *labelName)
 void addSentenceToAst(ast_t *ast, int sentence, sentence_type_t sentenceType)
 {
     /* Create the sentence of the sentence value. */
-    sentence_t sentenceObj = createSentence(sentenceType, sentence);
+    sentence_t sentenceObj = createSentence(sentence, sentenceType);
     /* Create the sentence node. */
     sentence_node_t *newSentenceNode = createSentenceNode(sentenceObj);
 
@@ -287,14 +255,13 @@ void addSentenceToAst(ast_t *ast, int sentence, sentence_type_t sentenceType)
  * Adds an argument node to the given AST.
  *
  * @param   ast         The AST to which the argument node should be added.
- * @param   data        The data for the argument node.
- * @param   dataType    The data type of the data for the argument node.
+ * @param   *argData    The data for the argument node.
  */
-void addArgumentToAst(ast_t *ast, void *data, data_type_t dataType)
+void addArgumentToAst(ast_t *ast, data_t *argData)
 {
     arg_node_t *lastNode = gotoLastArgNode(ast); /* Finding the last argument node. */
-    arg_node_t *newArgNode = createArgumentNode(data, dataType); /* Creating the new argument */
-    newArgNode -> addressingMethod = findAddressingMethod(ast, dataType);
+    arg_node_t *newArgNode = createArgumentNode(argData); /* Creating the new argument */
+    newArgNode -> addressingMethod = findAddressingMethod(ast, argData -> dataType);
 
     if (lastNode == NULL) /* If there are no arguments currently in the ast. */
     {
@@ -394,7 +361,7 @@ arg_node_t *getNextNode(arg_node_t *argNode)
  */
 data_t getArgData(arg_node_t *argNode)
 {
-    return argNode -> argData;
+    return *(argNode -> argData);
 }
 
 /*
@@ -408,7 +375,7 @@ addressing_method_t getArgAddressingMethod(arg_node_t *argNode)
 {
     addressing_method_t addressingMethod; /* Value to return. */
 
-    switch (argNode -> argData.dataType)
+    switch (argNode -> argData -> dataType)
     {
         case INT: /* Instant value. */
             addressingMethod = INSTANT;
@@ -514,8 +481,10 @@ int deleteArgumentNode(arg_node_t **pArgNode)
 
     if (pArgNode != NULL && *pArgNode != NULL) /* If the parameter is valid */
     {
-        if ((*pArgNode) -> argData.dataType == STRING) /* If the argument has a string. */
-            (void) free_ptr(POINTER((*pArgNode) -> argData.data.string)); /* Free it. */
+        if ((*pArgNode) -> argData -> dataType == STRING) /* If the argument has a string, */
+            (void) free_ptr(POINTER((*pArgNode) -> argData -> data.string)); /* Free it. */
+
+        (void) free_ptr(POINTER((*pArgNode) -> argData)); /* Free the data of the arg. */
         (void) free_ptr(POINTER(*pArgNode)); /* Free the argument node itself. */
 
         returnCode = SUCCESS_CODE; /* Argument node deleted successfully. */
@@ -620,8 +589,65 @@ int deleteAstList(ast_list_t **pAstList)
             currDel = curr; /* Take the currDel node forward in the list. */
         }
 
+        (void) free_ptr(POINTER(*pAstList)); /* Free the list itself. */
         returnCode = SUCCESS_CODE; /* List deleted successfully. */
     }
 
     return returnCode;
+}
+
+/* !!! -----DEBUGGING----- !!! */
+#include <stdio.h>
+
+void printArgRec(arg_node_t *argNode)
+{
+    while (argNode != NULL)
+    {
+        switch (argNode->argData->dataType)
+        {
+            case INT:
+                printf("\t[%d, I]=%9d", argNode->paramNum, argNode->argData->data.num);
+                break;
+            case STRING:
+                printf("\t[%d, S]=%9s", argNode->paramNum, argNode->argData->data.string);
+                break;
+            case REG:
+                printf("\t[%d, R]=%9d", argNode->paramNum, argNode->argData->data.reg);
+                break;
+        }
+        argNode = argNode -> nextArg;
+    }
+}
+
+void printAst(ast_t *ast)
+{
+    static int counter = 1;
+
+    char *label = (ast -> label == NULL)? "___" : ast -> label;
+    char *senType = (ast -> sentenceNode -> sentence.sentenceType == DIRECTION_SENTENCE)?
+            "dir" : "gui";
+    int command = (ast -> sentenceNode -> sentence.sentenceType == DIRECTION_SENTENCE)?
+            ast -> sentenceNode -> sentence.sentence.opcode :
+            ast -> sentenceNode -> sentence.sentence.guidance;
+
+    printf("***\t%2d\tLabel=%8s\tsenType=%3s\tcmd=%2d", counter, label,
+           senType, command);
+    printArgRec(ast -> sentenceNode -> argListHead);
+    puts("\t***");
+
+    counter++;
+}
+
+void printAstList(ast_list_t *astList)
+{
+    ast_list_node_t *currAstNode = astList -> head;
+    puts("\n*************************PRINTING AST*************************\n");
+
+    while (currAstNode != NULL)
+    {
+        printAst(currAstNode -> ast);
+        currAstNode = currAstNode -> next;
+    }
+
+    puts("\n*************************FINISH PRINT AST*************************");
 }

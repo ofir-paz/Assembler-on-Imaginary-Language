@@ -8,6 +8,7 @@
 /* ---Include header files--- */
 #include <string.h>
 #include <stddef.h>
+#include <stdlib.h>
 #include "../new-data-types/boolean.h"
 #include "../NameTable/NameTable.h"
 #include "../encoding/assembler_ast.h"
@@ -184,15 +185,16 @@ opcodes_t getOpcode(const char *word)
  *
  * @return  register_t  The register value if the word is a valid register, otherwise NO_REGISTER.
  */
-register_t getRegister(const char *word)
+reg_t getRegister(const char *word)
 {
-    register_t aRegister = NO_REGISTER; /* Register to return, assume word is not a register. */
+    reg_t aRegister = NO_REGISTER; /* Register to return, assume word is not a register. */
 
     /* Finding the register based on the assumption of what a register is in the lang. */
     if (strlen(word) == REG_LEN)
         if (word[ZERO_INDEX] == AT && word[ONE_INDEX] == CHAR_r)
-            if (between(word[TWO_INDEX], FIRST_REGISTER, LAST_REGISTER) == TRUE)
-                aRegister = (register_t) word[TWO_INDEX];
+            if (between(word[TWO_INDEX] - CHAR_ZERO, FIRST_REGISTER, LAST_REGISTER)
+                == TRUE)
+                aRegister = (reg_t) (word[TWO_INDEX] - CHAR_ZERO);
 
     return aRegister;
 }
@@ -209,10 +211,11 @@ char *getCommandStringFromLine(const char *line, boolean isLabelDef)
 {
     char *commandName = NULL; /* Will hold the specific command name. */
     int endIndexOfLabelDef = (isLabelDef == TRUE)?
-                             nextSpecificCharIndex(line, ZERO_INDEX, COLON) : ZERO_INDEX;
+                             nextSpecificCharIndex(line, ZERO_INDEX, COLON) :
+                             MINUS_ONE_INDEX;
 
-    /* Find the command name. */
-    findWord(line + endIndexOfLabelDef, &commandName, FIRST_WORD);
+    /* Find the command name from after the end of the end index of label. */
+    findWord(line + endIndexOfLabelDef + 1, &commandName, FIRST_WORD);
 
     return commandName;
 }
@@ -349,8 +352,15 @@ int getStartIndexOfArguments(const char *line, boolean isLabel)
  */
 void findArg(const char *line, char **arg, int argumentNum, boolean isLabel)
 {
+    char *fullArg = NULL;
     int skip = getStartIndexOfArguments(line, isLabel);
-    findTokenFromStr(line + skip, arg, argumentNum, COMMA_DELIM);
+
+    /* Separating by comma. */
+    findTokenFromStr(line + skip, &fullArg, argumentNum, COMMA_DELIM);
+    /* Clearing the empty space. */
+    findWord(fullArg, arg, FIRST_WORD);
+
+    (void) free_ptr(POINTER(fullArg));
 }
 
 /*
@@ -358,7 +368,7 @@ void findArg(const char *line, char **arg, int argumentNum, boolean isLabel)
  * assumes the given string represents a valid argument !!
  *
  * @param   *arg        The given argument in string type.
- * @param   *dataType   Pointer for the found data type.
+ * @param   *dataType   Pointer for the argument data.
  */
 void getArgDataTypeFromString(char *arg, data_type_t *dataType)
 {
@@ -368,6 +378,48 @@ void getArgDataTypeFromString(char *arg, data_type_t *dataType)
         *dataType = REG;
     else /* Otherwise, string. */
         *dataType = STRING;
+}
+
+/*
+ * Gets the data of the given argument (in string type)
+ * assumes the given string represents a valid argument !!
+ *
+ * @param   *arg        The given argument in string type.
+ * @param   *argData    Pointer for the argument data.
+ */
+void getArgDataFromString(const char *arg, data_t *argData)
+{
+    switch (argData -> dataType) /* Setting the data based on the type. */
+    {
+        case INT:
+            argData -> data.num = atoi(arg); /* Integer */
+            break;
+        case STRING:
+            argData -> data.string = my_strdup(arg); /* String */
+            break;
+        case REG:
+            argData -> data.reg = getRegister(arg); /* Register */
+            break;
+    }
+}
+
+/*
+ * Gets the argument data from a given line string.
+ *
+ * @param   *line           The line string to get the data from.
+ * @param   argumentNum     The number of argument to get the data off.
+ * @param   isLabel         Flag indicating if the line has a label definition.
+ * @param   *argData        Pointer to store the found data.
+ */
+void getArgDataFromLine(const char *line, int argumentNum, boolean isLabel, data_t *argData)
+{
+    char *arg; /* Will hold the argument in string type. */
+    findArg(line, &arg, argumentNum, isLabel); /* Find the string containing the argument. */
+
+    getArgDataTypeFromString(arg, &(argData -> dataType)); /* Get the data type. */
+    getArgDataFromString(arg, argData); /* Get the data. */
+
+    (void) free_ptr(POINTER(arg)); /* Free unnecessary variable. */
 }
 
 /*

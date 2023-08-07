@@ -7,7 +7,6 @@
 
 /* ---Include header files--- */
 #include "../new-data-types/boolean.h"
-#include "../transitions/TransitionNumber.h"
 /* -------------------------- */
 
 /* ---Macros--- */

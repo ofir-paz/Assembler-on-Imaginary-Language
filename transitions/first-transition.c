@@ -11,13 +11,13 @@
 #include "../NameTable/NameTable.h"
 #include "../new-data-types/process_result.h"
 #include "../encoding/assembler_ast.h"
-#include "../errors/error_types/error_types.h"
 #include "../general-enums/programFinals.h"
 #include "../general-enums/assemblerFinals.h"
 #include "../FileHandling/readFromFile.h"
-#include "../errors/errors.h"
-#include "../util/memoryUtil.h"
+#include "../errors/FirstTransitionErrors/FirstTransitionErrors.h"
 #include "../encoding/encoding.h"
+#include "../util/memoryUtil.h"
+#include "../util/stringsUtil.h"
 #include "first_transition_util.h"
 /* -------------------------- */
 
@@ -90,8 +90,9 @@ process_result firstFileTraverse(const char *file_name, NameTable *labelsMap[],
     }
     (void) free_ptr(POINTER(line)); /* Free the last line. */
 
-    /* Separate instructions and data */
-    updateDataLabels(labelsMap[NORMAL], IC - START_OF_PROGRAM_IN_MEM);
+    if (wasError == FALSE)
+        /* Separate instructions and data */
+        updateDataLabels(labelsMap[NORMAL], IC - START_OF_PROGRAM_IN_MEM);
 
     return (wasError == FALSE)? SUCCESS : FAILURE;
 }
@@ -126,6 +127,8 @@ ast_t *firstAssemblerAlgo(const char *file_name, const char *line, int lineNumbe
 
     if (lineError == NO_ERROR)
         updateCounters(lineAst, IC, DC);
+    else
+        *wasError = TRUE;
 
     return lineAst;
 }
@@ -175,8 +178,8 @@ Error addToOtherTable(ast_t *lineAst, NameTable *labelsMap[], label_type_t table
     arg_node_t *currArg = getArgList(lineAst);
     while (currArg != NULL)
     {
-        addLabelToOtherTable(getArgData(currArg).data.string, labelsMap, table,
-                             &lineError);
+        addLabelToOtherTable(my_strdup(getArgData(currArg).data.string),
+                             labelsMap, table, &lineError);
         currArg = getNextNode(currArg);
     }
 

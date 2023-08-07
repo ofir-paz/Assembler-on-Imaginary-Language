@@ -6,14 +6,12 @@
  * */
 
 /* ---Include header files--- */
-#include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
 #include "error_types/error_types.h"
 #include "../new-data-types/boolean.h"
 #include "../general-enums/indexes.h"
 #include "../general-enums/neededKeys.h"
-#include "../general_help_methods.h"
 #include "../diagnoses/diagnose_line.h"
 #include "../diagnoses/diagnose_util.h"
 /* -------------------------- */
@@ -30,7 +28,7 @@ boolean isCommaAfterCmd(const char *command)
 {
     /* Getting the index of the comma in command, will be the index
      * of null terminator of there is no comma. */
-    int nextComma = nextCommaIndex(command, ZERO_INDEX);
+    int nextComma = nextSpecificCharIndex(command, ZERO_INDEX, COMMA);
 
     /* Returning TRUE if the char in index nextComma of command is a comma,
      * otherwise FALSE. */
@@ -73,7 +71,7 @@ Error checkCommandError(const char *command)
  * the parameter in line numbered paramNum with type pType and the index
  * of the next param is valid (comma-wise)
  * Returns NO_ERROR if it's valid, otherwise the specific error that occurs. */
-Error checkCommaError(const char *line, param_num paramNum)//, paramtype pType)
+Error checkCommaError(const char *line, word_number paramNum)//, paramtype pType)
 {
     Error error = NO_ERROR; /* Value to return, we assume there is no error. */
 
@@ -148,43 +146,43 @@ boolean isFloat(const char *str, int start, int end)
     return isFloat;
 }
 
-/* Checks if float param number paramNum in const char *line is valid.
- * Returns NO_ERROR if it is, otherwise the specific error caught. */
-Error checkParamFloatError(const char *line, param_num paramNum)
-{
-    Error error = NO_ERROR; /* Assuming there is no error. */
-    int start = findParamIndex(line, paramNum); /* Start index of parameter in line. */
-
-    int end = nextEmptyCommaIndex(line, start); /* End will be the next comma or empty space. */
-
-    if (isParamExist(line, start)) /* Checking if the param exist */
-    {
-        /* Adding 1 to start if the user decided to pick a sign for the float */
-        if (isPlusOrMinus(*(line + start)))
-            start++;
-
-        /* Checks if the error is that the user entered only the sign of the float */
-        if (isOnlySign(line, start - 1, end) == TRUE)
-            error = 1;//ONLY_SIGN;
-
-        /* Check if the param is a comma */
-        else if (isCurrCharComma(line, start) == TRUE)
-            error = 1;//COMMA_AFTER_CMD;
-
-        /* Checks if the error is that the user didn't input a number */
-        else if (isFloat(line, start, end) == FALSE)
-            error = 1;//NOT_A_FLOAT;
-
-        /* Checks if the error is invalid amount of dots in the number */
-        else if (countDots(line, start, end) > LEGAL_DOTS_IN_FLOAT)
-            error = 1;//TOO_MANY_DOTS;
-
-    }
-    else /* The parameter doesn't exist */
-        error = 1;//NO_FLOAT_PARAM;
-
-    return error;
-}
+///* Checks if float param number paramNum in const char *line is valid.
+// * Returns NO_ERROR if it is, otherwise the specific error caught. */
+//Error checkParamFloatError(const char *line, word_number paramNum)
+//{
+//    Error error = NO_ERROR; /* Assuming there is no error. */
+//    int start = findParamIndex(line, paramNum); /* Start index of parameter in line. */
+//
+//    int end = nextEmptyCommaIndex(line, start); /* End will be the next comma or empty space. */
+//
+//    if (isParamExist(line, start)) /* Checking if the param exist */
+//    {
+//        /* Adding 1 to start if the user decided to pick a sign for the float */
+//        if (isPlusOrMinus(*(line + start)))
+//            start++;
+//
+//        /* Checks if the error is that the user entered only the sign of the float */
+//        if (isOnlySign(line, start - 1, end) == TRUE)
+//            error = 1;//ONLY_SIGN;
+//
+//        /* Check if the param is a comma */
+//        else if (isCurrCharComma(line, start) == TRUE)
+//            error = 1;//COMMA_AFTER_CMD;
+//
+//        /* Checks if the error is that the user didn't input a number */
+//        else if (isFloat(line, start, end) == FALSE)
+//            error = 1;//NOT_A_FLOAT;
+//
+//        /* Checks if the error is invalid amount of dots in the number */
+//        else if (countDots(line, start, end) > LEGAL_DOTS_IN_FLOAT)
+//            error = 1;//TOO_MANY_DOTS;
+//
+//    }
+//    else /* The parameter doesn't exist */
+//        error = 1;//NO_FLOAT_PARAM;
+//
+//    return error;
+//}
 
 /* Returns TRUE if the char in const char *line after int index is empty
  * (space; tab; enter; null), otherwise FALSE. */
@@ -230,35 +228,35 @@ boolean isCapitalLetter(char letter)
     return (toupper(letter) == letter)? TRUE : FALSE;
 }
 
-/* Checks for errors in the char param numbered paramNum of const char *line.
- * Returns NO_ERROR if there is no error, otherwise the specific error caught. */
-Error checkParamCharError(const char *line, param_num paramNum)
-{
-    Error error = NO_ERROR; /* Assuming there is no error. */
-
-    int index = findParamIndex(line, paramNum); /* Index of parameter in line. */
-
-    /* Checking if the param exist */
-    if (isParamExist(line, index))
-    {
-        char param = *(line + index);
-
-        if (isCurrCharComma(line, index) == TRUE) /* Check if the param is a comma */
-            error = 1;//COMMA_AFTER_CMD;
-        else if (isNextEmpty(line, index) == FALSE) /* Checks if the param is not one char */
-            error = 1;//NOT_ONE_CHAR;
-        else if (isLetter(param) == FALSE) /* Checks if the param is not a letter */
-            error = 1;//NOT_LETTER;
-        else if (isCapitalLetter(param) == FALSE) /* Checks if the param is not a capital letter */
-            error = 1;//NOT_CAPITAL;
-        else
-            error = NO_ERROR;
-    }
-    else
-        error = 1;//NO_CHAR_PARAM;
-
-    return error;
-}
+///* Checks for errors in the char param numbered paramNum of const char *line.
+// * Returns NO_ERROR if there is no error, otherwise the specific error caught. */
+//Error checkParamCharError(const char *line, word_number paramNum)
+//{
+//    Error error = NO_ERROR; /* Assuming there is no error. */
+//
+//    int index = findParamIndex(line, paramNum); /* Index of parameter in line. */
+//
+//    /* Checking if the param exist */
+//    if (isParamExist(line, index))
+//    {
+//        char param = *(line + index);
+//
+//        if (isCurrCharComma(line, index) == TRUE) /* Check if the param is a comma */
+//            error = 1;//COMMA_AFTER_CMD;
+//        else if (isNextEmpty(line, index) == FALSE) /* Checks if the param is not one char */
+//            error = 1;//NOT_ONE_CHAR;
+//        else if (isLetter(param) == FALSE) /* Checks if the param is not a letter */
+//            error = 1;//NOT_LETTER;
+//        else if (isCapitalLetter(param) == FALSE) /* Checks if the param is not a capital letter */
+//            error = 1;//NOT_CAPITAL;
+//        else
+//            error = NO_ERROR;
+//    }
+//    else
+//        error = 1;//NO_CHAR_PARAM;
+//
+//    return error;
+//}
 
 /*
  * Checks for extraneous text error in the given line starting from the specified index.

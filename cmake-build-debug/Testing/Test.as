@@ -9,7 +9,11 @@ LOOP:   jmp     L1
         m1
 L1:     inc     K
         bne     LOOP
-END:    stop
+;END:    stop
 STR:    .string "abcdef"
 LENGTH: .data   6,-9,15
 K:      .data   22
+
+; entry and extern testing:
+.entry ent1 , ent2   ,  ent3
+.extern ext1    ,ext2,  ext3

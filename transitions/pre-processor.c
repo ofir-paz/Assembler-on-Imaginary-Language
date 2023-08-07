@@ -60,7 +60,7 @@ process_result pre_process(const char *file_name)
 
     /* Create the .am file */
     writeToFile(file_name, AFTER_MACRO,
-                (char *) getDataByName(amFile, AFTER_MACRO));
+                getDataByName(amFile, AFTER_MACRO) -> string);
 
     /* Free unnecessary variable */
     deleteTable(&amFile);
@@ -222,7 +222,7 @@ void addToTablesIfNeededInPreProc(const char *line, char *macro_name, boolean wa
     {
         char *macro = getMacroIfCalling(line, macro_table);
         (void) addStringToData(amFile, AFTER_MACRO,
-                               getDataByName(macro_table, macro));
+                               getDataByName(macro_table, macro) -> string);
         (void) free_ptr(POINTER(macro)); /* Free unnecessary variable. */
     }
 

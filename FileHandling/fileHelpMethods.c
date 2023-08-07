@@ -7,12 +7,14 @@
 
 /* ---Include header files--- */
 #include <stdio.h>
-#include <stdlib.h>
+#include <string.h>
 #include "../errors/system_errors.h"
-#include "../general_help_methods.h"
+#include "../util/memoryUtil.h"
+#include "../util/stringsUtil.h"
 /* -------------------------- */
 
 /* ---Finals--- */
+#define BUFFER 256
 #define ZERO_CODE 0
 /* ------------ */
 
@@ -28,12 +30,18 @@
 FILE *openFile(const char *file_name, const char *fileType, const char *modeType)
 {
     static FILE *file = NULL; /* Will be the file to open */
+    static char currFileName[BUFFER];
+    static char currModeType[BUFFER];
     char *fileToOpen = connectTwoStrings(file_name, fileType); /* Full file name */
 
-    if (file == NULL || sameStrings(modeType, "w") == TRUE) /* If file was not opened */
+    /* If we open a different file or open the same one but in different type */
+    if (sameStrings(currFileName, fileToOpen) == FALSE  ||
+        sameStrings(currModeType, modeType) == FALSE)
     {
         file = fopen(fileToOpen, modeType); /* Open the file */
         handle_file_open_errors(file); /* Will handle errors with opening file */
+        (void) strcpy(currFileName, fileToOpen);
+        (void) strcpy(currModeType, modeType);
     }
 
     (void) free_ptr(POINTER(fileToOpen)); /* Freeing unnecessary string */
