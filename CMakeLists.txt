@@ -20,7 +20,6 @@ add_executable(mmn_14 main.c new-data-types/boolean.h
         FileHandling/fileHelpMethods.h errors/error_types/SystemError.h
         errors/error_types/SyntaxError.h errors/error_types/LogicalError.h
         NameTable/NameTable.c encoding/encoding.c encoding/encoding.h
-        encoding/encoding-help-methods.c encoding/encoding-help-methods.h
         errors/error_types/ImgSystemError.h diagnoses/diagnose_util.c
         diagnoses/diagnose_util.h new-data-types/word_number.h NameTable/NameTable.h
         general-enums/programFinals.h
@@ -32,4 +31,6 @@ add_executable(mmn_14 main.c new-data-types/boolean.h
         encoding/encoding-finals/registers.h transitions/first_transition_util.c
         transitions/first_transition_util.h util/memoryUtil.c util/memoryUtil.h
         util/stringsUtil.c util/stringsUtil.h general-enums/assemblerFinals.h util/numberUtil.c
-        util/numberUtil.h encoding/encoding-finals/label_types.h errors/FirstTransitionErrors/FirstTransitionErrors.c errors/FirstTransitionErrors/FirstTransitionErrors.h transitions/second_transition.c transitions/second_transition.h)
+        util/numberUtil.h encoding/encoding-finals/label_types.h errors/FirstTransitionErrors/FirstTransitionErrors.c errors/FirstTransitionErrors/FirstTransitionErrors.h transitions/second_transition.c transitions/second_transition.h
+        encoding/encodingUtil.c
+        encoding/encodingUtil.h)
