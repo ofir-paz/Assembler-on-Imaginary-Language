@@ -1,14 +1,14 @@
 /*
  * @author Ofir Paz
- * @version (09/08/2023)
+ * @version (08/08/2023)
  *
  * Header file for the encodingUtil.c file.
  */
 
-#ifndef MMN_14_ENCODINGUTIL_H
-#define MMN_14_ENCODINGUTIL_H
+#ifndef MMN_14_WORDHANDLING_H
+#define MMN_14_WORDHANDLING_H
 
 /* ---------------Prototypes--------------- */
 /* ---------------------------------------- */
 
-#endif /* MMN_14_ENCODINGUTIL_H */
+#endif /* MMN_14_WORDHANDLING_H */

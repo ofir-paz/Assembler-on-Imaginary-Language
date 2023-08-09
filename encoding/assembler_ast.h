@@ -15,6 +15,7 @@
  * the ast needs those finals as well. */
 #include "encoding-finals/encoding_finals.h"
 
+enum {_IC, _DC};
 typedef enum {INT, STRING, REG} data_type_t;
 
 /* This is an argument data type. represents an argument and it's data. */
@@ -60,6 +61,16 @@ ast_t *creatAst(void );
  * @return  0 if the node was successfully added to the list, or -1 if the given list is empty.
  */
 int addAstToList(ast_list_t *astList, ast_t **ast);
+
+/*
+ * Gets a pointer to a specific counter.
+ *
+ * @param   *astList    The AST list that holds the counters.
+ * @param   counter     Value indicating the required counter (0 for IC, 1 for DC).
+ *
+ * @return  pointer to the specific counter.
+ */
+int *getCounterPointer(ast_list_t *astList, int counter);
 
 /*
  * Adds a label name to the AST.
@@ -146,9 +157,9 @@ data_t getArgData(arg_node_t *argNode);
 /*
  * Gets the addressing method for the given argument.
  *
- * @param   *argNode    The given argument to check its addressing method.
+ * @param   *argNode    The given argument to retrieve its addressing method.
  *
- * @return  The addressing method for the given argument.
+ * @return  The addressing method of the given argument.
  */
 addressing_method_t getArgAddressingMethod(arg_node_t *argNode);
 

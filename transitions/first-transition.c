@@ -15,7 +15,6 @@
 #include "../general-enums/assemblerFinals.h"
 #include "../FileHandling/readFromFile.h"
 #include "../errors/FirstTransitionErrors/FirstTransitionErrors.h"
-#include "../encoding/encoding.h"
 #include "../util/memoryUtil.h"
 #include "../util/stringsUtil.h"
 #include "first_transition_util.h"
@@ -29,9 +28,6 @@
 /* ------------ */
 
 /* ---Finals--- */
-/* The address of the first instruction in the memory.
- * Cannot be zero, will produce errors if set to !! */
-#define START_OF_PROGRAM_IN_MEM 100
 #define AFTER_MACRO ".am" /* File end of after pre-processor type file */
 /* ------------ */
 
@@ -77,13 +73,15 @@ process_result firstFileTraverse(const char *file_name, NameTable *labelsMap[],
                                  ast_list_t *astList)
 {
     boolean wasError = FALSE;
-    int IC = START_OF_PROGRAM_IN_MEM, DC = START_OF_PROGRAM_IN_MEM;
+    int *IC = getCounterPointer(astList, _IC);
+    int *DC = getCounterPointer(astList, _DC);
+    *IC = *DC = PROGRAM_MEM_START;
     char *line = NULL; /* This will hold the current line */
 
     /* Read the file line-by-line and handle it. */
     while (readNextLineFromFile(file_name, AFTER_MACRO, &line) != EOF)
     {
-        ast_t *lineAst = handleLineInFirstTrans(file_name, line, labelsMap, &IC, &DC, &wasError);
+        ast_t *lineAst = handleLineInFirstTrans(file_name, line, labelsMap, IC, DC, &wasError);
         if (wasError == FALSE) /* Add the ast to the list if there was no error. */
             (void) addAstToList(astList, &lineAst);
         (void) free_ptr(POINTER(line)); /* Next line */
@@ -92,7 +90,7 @@ process_result firstFileTraverse(const char *file_name, NameTable *labelsMap[],
 
     if (wasError == FALSE)
         /* Separate instructions and data */
-        updateDataLabels(labelsMap[NORMAL], IC - START_OF_PROGRAM_IN_MEM);
+        updateDataLabels(labelsMap[NORMAL], *IC - PROGRAM_MEM_START);
 
     return (wasError == FALSE)? SUCCESS : FAILURE;
 }

@@ -32,5 +32,7 @@ add_executable(mmn_14 main.c new-data-types/boolean.h
         transitions/first_transition_util.h util/memoryUtil.c util/memoryUtil.h
         util/stringsUtil.c util/stringsUtil.h general-enums/assemblerFinals.h util/numberUtil.c
         util/numberUtil.h encoding/encoding-finals/label_types.h errors/FirstTransitionErrors/FirstTransitionErrors.c errors/FirstTransitionErrors/FirstTransitionErrors.h transitions/second_transition.c transitions/second_transition.h
+        encoding/wordHandling.c
+        encoding/wordHandling.h
         encoding/encodingUtil.c
         encoding/encodingUtil.h)

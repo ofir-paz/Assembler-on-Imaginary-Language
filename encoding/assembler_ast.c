@@ -17,6 +17,8 @@
 /* ------------ */
 
 /* ---Finals--- */
+#define COUNTERS_AMOUNT 2
+#define ZERO_INITIALIZE 0
 #define SUCCESS_CODE 0
 #define INVALID_GIVEN_PARAM_CODE (-1)
 #define UNKNOWN_NUMBER 0
@@ -26,6 +28,7 @@
 
 /* ---------------Abstract syntax tree--------------- */
 
+enum {IC, DC};
 typedef enum {INT, STRING, REG} data_type_t;
 
 /* This is an argument data type. represents an argument and it's data. */
@@ -75,6 +78,7 @@ typedef struct
 {
     ast_list_node_t *head;
     ast_list_node_t *tail;
+    int counters[COUNTERS_AMOUNT];
 } ast_list_t;
 
 /* -------------------------------------------------- */
@@ -94,8 +98,12 @@ ast_list_t *createAstList(void )
 {
     /* Creating the list. */
     ast_list_t *newAstList = (ast_list_t *) allocate_space(sizeof(ast_list_t));
-    newAstList -> head = NULL; /* Resetting it. */
-    newAstList -> tail = NULL; /* Resetting it. */
+    /* Initializing it. */
+    newAstList -> head = NULL;
+    newAstList -> tail = NULL;
+    newAstList -> counters[IC] = ZERO_INITIALIZE;
+    newAstList -> counters[DC] = ZERO_INITIALIZE;
+
     return newAstList;
 }
 
@@ -221,6 +229,19 @@ int addAstToList(ast_list_t *astList, ast_t **ast)
     }
 
     return returnCode;
+}
+
+/*
+ * Gets a pointer to a specific counter.
+ *
+ * @param   *astList    The AST list that holds the counters.
+ * @param   counter     Value indicating the required counter (0 for IC, 1 for DC).
+ *
+ * @return  pointer to the specific counter.
+ */
+int *getCounterPointer(ast_list_t *astList, int counter)
+{
+    return astList -> counters + counter;
 }
 
 /*
@@ -367,28 +388,13 @@ data_t getArgData(arg_node_t *argNode)
 /*
  * Gets the addressing method for the given argument.
  *
- * @param   *argNode    The given argument to check its addressing method.
+ * @param   *argNode    The given argument to retrieve its addressing method.
  *
- * @return  The addressing method for the given argument.
+ * @return  The addressing method of the given argument.
  */
 addressing_method_t getArgAddressingMethod(arg_node_t *argNode)
 {
-    addressing_method_t addressingMethod; /* Value to return. */
-
-    switch (argNode -> argData -> dataType)
-    {
-        case INT: /* Instant value. */
-            addressingMethod = INSTANT;
-            break;
-        case STRING: /* Label name. */
-            addressingMethod = DIRECT;
-            break;
-        case REG: /* Register. */
-            addressingMethod = DIRECT_REGISTER;
-            break;
-    }
-
-    return addressingMethod;
+    return argNode -> addressingMethod;
 }
 
 /*
@@ -642,7 +648,7 @@ void printAstList(ast_list_t *astList)
 {
     ast_list_node_t *currAstNode = astList -> head;
     puts("\n*************************PRINTING AST*************************\n");
-
+    printf("***\tIC=%4d\tDC=%4d\t***\n", astList -> counters[IC], astList -> counters[DC]);
     while (currAstNode != NULL)
     {
         printAst(currAstNode -> ast);
