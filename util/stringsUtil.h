@@ -77,6 +77,17 @@ int getIndexOfStrInArray(const char *arr[], int size, const char *str);
  */
 char *strcpyPart(const char *str, int start, int end);
 
+/*
+ * Creates a line from the special format:
+ * [word     ] (30) [tab] (1) [number] (as needed) [new line] (1)
+ * and appends it to the given pointer to string.
+ *
+ * @param   **pString   The pointer to the string to add the new line of special format to.
+ * @param   *str        Holds the word of the special format.
+ * @param   val         Holds the number of the special format.
+ */
+void addToStringInFormat(char **pString, const char *str, int val);
+
 /* ---------------------------------------- */
 
 #endif /* MMN_14_STRINGSUTIL_H */

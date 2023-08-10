@@ -11,7 +11,7 @@
 #include <stdlib.h>
 #include "../new-data-types/boolean.h"
 #include "../NameTable/NameTable.h"
-#include "../encoding/assembler_ast.h"
+#include "../assembler_ast/assembler_ast.h"
 #include "../general-enums/indexes.h"
 #include "../general-enums/neededKeys.h"
 #include "diagnose_line.h"

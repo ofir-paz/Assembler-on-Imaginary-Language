@@ -18,12 +18,11 @@
  * @param   *labelsMap[]    Array of tables to hold the different labels.
  * @param   *astList        List of ASTs (Abstract syntax trees) that were made in the
  *                          first transition.
- * @param   *memoryImage    The memory image of the assembly code.
  *
  * @return  SUCCESS on success, FAILURE on failure.
  */
 process_result second_transition(const char *file_name, NameTable *labelsMap[],
-                                ast_list_t *astList, MemoryImage *memoryImage);
+                                 ast_list_t *astList);
 
 /* ---------------------------------------- */
 

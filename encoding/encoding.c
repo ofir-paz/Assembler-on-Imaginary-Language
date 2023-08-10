@@ -33,12 +33,14 @@
  */
 
 /* ---Include header files--- */
-#include <stdlib.h>
+#include <string.h>
 #include "../new-data-types/boolean.h"
-#include "assembler_ast.h"
+#include "../assembler_ast/assembler_ast.h"
 #include "../NameTable/NameTable.h"
 #include "../general-enums/indexes.h"
 #include "../general-enums/assemblerFinals.h"
+#include "encodingDataStructures/MemoryImage.h"
+#include "encodingUtil.h"
 #include "../util/memoryUtil.h"
 /* -------------------------- */
 
@@ -47,149 +49,228 @@
 
 /* ---Finals--- */
 #define ZERO_BYTE 0
-#define BYTES_FOR_WORD 2
 #define FULL_1_BYTE 0xff
 #define BITS_IN_BYTE 8
 #define START_WORD_RANGE 0
 #define END_WORD_RANGE 11
-
-/* Ranges, as defined and explained in this file's description. */
-enum {OPCODE_LOW = 5, OPCODE_HIGH = 8, ARG_LOW = 2, ARG_HIGH = 11,
-        DEST_MTD_LOW = 2, DEST_MTD_HIGH = 4, SRC_MTD_LOW, SRC_MTD_HIGH,
-        DEST_REG_LOW = 2, DEST_REG_HIGH = 6, SRC_REG_LOW = 7, SRC_REG_HIGH = 11,
-        DIR_DATA_LOW = 2, DIR_DATA_HIGH = 11,
-        ARE_LOW = 0, ARE_HIGH = 1,
-        DATA_LOW = 0, DATA_HIGH = 11};
 /* ------------ */
-
-/* ---------------Memory Image--------------- */
-
-typedef unsigned char word_t[BYTES_FOR_WORD];
-
-/* Data structure to hold the memory image. 2 represents the number of real bytes */
-typedef struct
-{
-    word_t *instructions;
-    int currInstruction;
-    word_t *data;
-    int currData;
-} MemoryImage;
 
 /* ------------------------------------------ */
 
 /* ---------------Prototypes--------------- */
-void encodeDirection(ast_t *lineAst, MemoryImage *memoryImage, NameTable *normalLabels,
+void encodeInstruction(ast_t *lineAst, MemoryImage *memoryImage, NameTable *normalLabels,
                      NameTable *extLabels, char **extFileContents);
-void encodePartDir(word_t *instructions, int currWord, opcodes_t opcode);
-void encodeDirWithZeroArgs(word_t *instructions, int *currWord);
-void encodeDirWithOneArgs(word_t *instructions, int *currWord, arg_node_t *firstArg,
+void encodeDataNumber(ast_t *lineAst, MemoryImage *memoryImage);
+void encodeDataString(ast_t *lineAst, MemoryImage *memoryImage);
+void encodeInstructionWithZeroArgs(word_t *instructions, int *currWord);
+void encodeInstructionWithOneArgs(word_t *instructions, int *currWord, arg_node_t *argument,
                           NameTable *normalLabels, NameTable *extLabels, char **extFileContents);
-void encodeInstantArg(word_t word, int instantVal);
-void encodeDirectArg(word_t word, const char *directLabel, NameTable *normalLabels,
-                     NameTable *extLabels, char **extFileContents, int address);
-void encodeDirectRegisterArg(word_t word, register_t aRegister, boolean isDest);
-void encodeToWordARE(word_t word, encoding_type_t encodingType);
+void encodeInstructionWithTwoArgs(word_t *instructions, int *currWord, arg_node_t *firstArg,
+                          arg_node_t *secondArg, NameTable *normalLabels, NameTable *extLabels,
+                          char **extFileContents);
 /* ---------------------------------------- */
 
 /*
  * Create a new MemoryImage structure.
  *
- * @return  A pointer to the newly created MemoryImage structure.
+ * @return  Pointer to the newly created MemoryImage structure.
  */
 MemoryImage *createMemoryImage(int IC, int DC)
 {
     MemoryImage *newMemoryImage = (MemoryImage *) allocate_space(sizeof(MemoryImage));
 
     /* Allocating space for the instructions memory image. */
-    newMemoryImage -> instructions = (word_t *) allocate_space(IC * sizeof(word_t));
+    if(IC) newMemoryImage -> instructions = (word_t *) allocate_space(IC * sizeof(word_t));
+    else newMemoryImage -> instructions = NULL;
 
     /* Allocating space for the data memory image. */
-    newMemoryImage -> data = (word_t *) allocate_space(DC * sizeof(word_t));
+    if(DC) newMemoryImage -> data = (word_t *) allocate_space(DC * sizeof(word_t));
+    else newMemoryImage -> data = NULL;
 
     /* Resetting values. */
-    newMemoryImage -> currInstruction = newMemoryImage -> currData = PROGRAM_MEM_START;
+    newMemoryImage -> currWord[IC_] = PROGRAM_MEM_START;
+    newMemoryImage -> currWord[DC_] = PROGRAM_MEM_START;
 
     return newMemoryImage;
 }
 
+/*
+ * Encodes the given abstract syntax tree (AST) representing a line of assembly code
+ * into the specified memory image, considering normal and external labels, and
+ * external file contents.
+ * Adds content to external file if needed !
+ *
+ * @param   *lineAst            Abstract syntax tree (AST) representing the line of assembly code.
+ * @param   *memoryImage        The memory image where the encoded instructions/data will be stored.
+ * @param   *normalLabels       The normal labels table.
+ * @param   *extLabels          The external labels table.
+ * @param   **extFileContents   Pointer to the string of the external file content to output.
+ */
 void encodeLine(ast_t *lineAst, MemoryImage *memoryImage, NameTable *normalLabels,
                 NameTable *extLabels, char **extFileContents)
 {
     sentence_t astSentence = getSentence(lineAst);
-    if (astSentence.sentenceType == DIRECTION_SENTENCE)
-        encodeDirection(lineAst, memoryImage, normalLabels, extLabels, extFileContents);
 
-        /* lineAst.sentenceType == GUIDANCE_SENTENCE */
-    else if (astSentence.sentence.guidance == data)
-        encodeData(lineAst, memoryImage->data);
-    else if (astSentence.sentence.guidance == str)
-        encodeString(lineAst, memoryImage->data);
+    if (astSentence.sentenceType == DIRECTION_SENTENCE) /* Encode direction. */
+        encodeInstruction(lineAst, memoryImage, normalLabels, extLabels, extFileContents);
+
+    /* lineAst.sentenceType == GUIDANCE_SENTENCE */
+    else if (astSentence.sentence.guidance == data) /* Encode number data. */
+        encodeDataNumber(lineAst, memoryImage);
+    else if (astSentence.sentence.guidance == str) /* Encode string data. */
+        encodeDataString(lineAst, memoryImage);
 }
 
-void encodeDirection(ast_t *lineAst, MemoryImage *memoryImage, NameTable *normalLabels,
+/*
+ * Encodes the given abstract syntax tree (AST) representing an instruction
+ * into the specified memory image, considering normal and external labels, and
+ * external file contents.
+ * Adds content to external file if needed !
+ *
+ * @param   *lineAst            The abstract syntax tree (AST) representing the instruction.
+ * @param   *memoryImage        The memory image where the encoded instruction will be stored.
+ * @param   *normalLabels       The normal labels table.
+ * @param   *extLabels          The external labels table.
+ * @param   **extFileContents   Pointer to the string of the external file content to output.
+ */
+void encodeInstruction(ast_t *lineAst, MemoryImage *memoryImage, NameTable *normalLabels,
                      NameTable *extLabels, char **extFileContents)
 {
+    /* Save instruction data image and current address to encode instruction in. */
     word_t *instructions = memoryImage -> instructions;
-    int currWord = memoryImage -> currInstruction;
+    int *currWord = memoryImage -> currWord + IC_;
+
+    /* Save arguments (if there are). */
     arg_node_t *firstArg = getArgList(lineAst);
     arg_node_t *secondArg = (firstArg == NULL) ? NULL : getNextNode(firstArg);
 
-    encodePartDir(instructions, currWord, getSentence(lineAst).sentence.opcode);
+    encodePartDir(instructions, *currWord, getSentence(lineAst).sentence.opcode);
 
+    /* Encode instruction according to different cases of argument count. */
     if (firstArg == NULL)
-        encodeDirWithZeroArgs(instructions, &currWord);
+        encodeInstructionWithZeroArgs(instructions, currWord);
 
     else if (secondArg == NULL)
-        encodeDirWithOneArgs(instructions, &currWord, firstArg, normalLabels, extLabels,
-                             extFileContents);
+        encodeInstructionWithOneArgs(instructions, currWord, firstArg,
+                                     normalLabels, extLabels, extFileContents);
     else
-        encodeDirWithTwoArgs(instructions, &currWord, firstArg, secondArg, normalLabels,
-                             extLabels, extFileContents);
+        encodeInstructionWithTwoArgs(instructions, currWord, firstArg, secondArg, normalLabels,
+                                     extLabels, extFileContents);
 }
 
-void encodePartDir(word_t *instructions, int currWord, opcodes_t opcode)
+/*
+ * Encodes the given abstract syntax tree (AST) representing a .data guidance.
+ * into the specified memory image.
+ *
+ * @param   *lineAst        The abstract syntax tree (AST) representing the .data guidance.
+ * @param   *memoryImage    The memory image where the encoded data will be stored.
+ */
+void encodeDataNumber(ast_t *lineAst, MemoryImage *memoryImage)
 {
-    /* Encode opcode. */
-    setBitsInRangeToVal(instructions[currWord], OPCODE_LOW, OPCODE_HIGH,opcode);
-    /* Encode known A, R, E field (instruction is always absolute). */
-    encodeToWordARE(instructions[currWord], ABSOLUTE);
+    arg_node_t *currArgument = getArgList(lineAst);
+
+    while (currArgument != NULL) /* Go through all arguments and encode them. */
+    {
+        encodeDataVal(memoryImage -> data, memoryImage -> currWord[DC_],
+                      getArgData(currArgument).data.num); /* Encode the number. */
+        memoryImage -> currWord[DC_]++; /* Next word. */
+        currArgument = getNextNode(currArgument); /* Next argument. */
+    }
 }
 
-void encodeDirWithZeroArgs(word_t *instructions, int *currWord)
+/*
+ * Encodes the given abstract syntax tree (AST) representing a .string guidance
+ * into the specified memory image.
+ *
+ * @param   *lineAst        The abstract syntax tree (AST) representing the .string guidance.
+ * @param   *memoryImage    The memory image where the encoded data will be stored.
+ */
+void encodeDataString(ast_t *lineAst, MemoryImage *memoryImage)
+{
+    /* String to encode. */
+    char *dataString = getArgData(getArgList(lineAst)).data.string;
+    int i, stringLen = (int) strlen(dataString) - TWO_QUOTES; /* Loop variables. */
+
+    /* Add every char in the string to the data image (ignore the " "). */
+    for (i = ONE_INDEX; i < stringLen; i++, memoryImage -> currWord[DC_]++)
+        encodeDataVal(memoryImage -> data, memoryImage -> currWord[DC_], dataString[i]);
+
+    /* Add null terminator to end of string in data. */
+    encodeDataVal(memoryImage -> data, memoryImage -> currWord[DC_], ZERO_BYTE);
+}
+
+/*
+ * Encodes an instruction with zero arguments into the specified word.
+ *
+ * @param   *instructions   Array of words where the instruction will be encoded.
+ * @param   *currWord       Pointer to the current word index in the array (updated after encoding).
+ */
+void encodeInstructionWithZeroArgs(word_t *instructions, int *currWord)
 {
     /* Turn addressing methods for dest and src arguments to 0. */
-    setBitsInRangeToVal(instructions[*currWord],
-                        DEST_MTD_LOW, DEST_MTD_HIGH, ZERO_BYTE);
-    setBitsInRangeToVal(instructions[*currWord],
-                        SRC_MTD_LOW, SRC_MTD_HIGH, ZERO_BYTE);
+    encodeAddressingMethods(instructions[*currWord],
+                            ZERO_ADD_MTD, ZERO_ADD_MTD);
     (*currWord)++; /* Increase currWord by 1 since only 1 word is needed for decoding. */
 }
 
-void encodeDirWithOneArgs(word_t *instructions, int *currWord, arg_node_t *firstArg,
+/*
+ * Encodes an instruction with one argument into the specified array of words.
+ *
+ * @param   *instructions       Array of words where the instruction will be encoded.
+ * @param   *currWord           pointer to the current word index in the array
+ *                              (updated after encoding).
+ * @param   *argument           Argument node representing the argument of the instruction.
+ * @param   *normalLabels       Table of normal labels for reference.
+ * @param   *extLabels          Table of external labels for reference.
+ * @param   **extFileContents   Pointer to the string of the external file content to output.
+ */
+void encodeInstructionWithOneArgs(word_t *instructions, int *currWord, arg_node_t *argument,
                           NameTable *normalLabels, NameTable *extLabels, char **extFileContents)
 {
-    addressing_method_t arg1mtd = getArgAddressingMethod(firstArg);
-    setBitsInRangeToVal(instructions[*currWord], DEST_MTD_LOW, DEST_MTD_HIGH,
-                        arg1mtd);
-    setBitsInRangeToVal(instructions[*currWord], SRC_MTD_LOW, SRC_MTD_HIGH,
-                        ZERO_BYTE);
+    addressing_method_t destMtd = getArgAddressingMethod(argument);
+    encodeAddressingMethods(instructions[*currWord], destMtd, ZERO_ADD_MTD);
 
-    switch (arg1mtd)
+    (*currWord)++; /* Argument word */
+    encodeDirArgument(instructions[*currWord], *currWord, argument,
+                      TRUE, normalLabels, extLabels, extFileContents);
+
+    (*currWord)++; /* Next word */
+}
+
+/*
+ * Encodes an instruction with one argument into the specified array of words.
+ *
+ * @param   *instructions       Array of words where the instruction will be encoded.
+ * @param   *currWord           pointer to the current word index in the array
+ *                              (updated after encoding).
+ * @param   *firstArg           Argument node representing the first argument of the instruction.
+ * @param   *secondArg          Argument node representing the second argument of the instruction.
+ * @param   *normalLabels       Table of normal labels for reference.
+ * @param   *extLabels          Table of external labels for reference.
+ * @param   **extFileContents   pointer to the string of the external file content to output.
+ */
+void encodeInstructionWithTwoArgs(word_t *instructions, int *currWord, arg_node_t *firstArg,
+                          arg_node_t *secondArg, NameTable *normalLabels, NameTable *extLabels,
+                          char **extFileContents)
+{
+    /* Get addressing methods for both of the arguments and encode them into the first word. */
+    addressing_method_t destMtd = getArgAddressingMethod(firstArg);
+    addressing_method_t srcMtd = getArgAddressingMethod(secondArg);
+    encodeAddressingMethods(instructions[*currWord], destMtd, srcMtd);
+
+    (*currWord)++; /* First argument word. */
+
+    /* Special case where both of the arguments are registers, they can be encoded in one word. */
+    if (destMtd == DIRECT_REGISTER && srcMtd == DIRECT_REGISTER)
+        encodeDirectRegisterArg(instructions[*currWord], getArgData(firstArg).data.reg,
+                                getArgData(secondArg).data.reg);
+    else /* Encode each argument to a different word (dest first). */
     {
-        case INSTANT: /* Encode single instant value argument. */
-            encodeInstantArg(instructions[*currWord + 1],
-                             getArgData(firstArg).data.num);
-            break;
-        case DIRECT: /* Encode and add to ext file content (if needed) single label argument. */
-            encodeDirectArg(instructions[*currWord + 1],
-                            getArgData(firstArg).data.string,
-                            normalLabels, extLabels, extFileContents, *currWord + 1);
-            break;
-        case DIRECT_REGISTER: /* Encode single register argument. */
-            encodeDirectRegisterArg(instructions[*currWord + 1],
-                                    getArgData(firstArg).data.reg, TRUE);
-            break;
+        encodeDirArgument(instructions[*currWord], *currWord, firstArg,
+                          TRUE, normalLabels, extLabels, extFileContents);
+        (*currWord)++; /* Second argument word. */
+        encodeDirArgument(instructions[*currWord], *currWord, secondArg,
+                          FALSE, normalLabels, extLabels, extFileContents);
+        (*currWord)++; /* Next instruction. */
     }
-
-    (*currWord) += TWO_INDEX;
 }

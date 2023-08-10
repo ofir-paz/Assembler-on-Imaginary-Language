@@ -27,7 +27,7 @@ add_executable(mmn_14 main.c new-data-types/boolean.h
         errors/PreProcessorErrors/PreProcessorErrors.c
         errors/PreProcessorErrors/PreProcessorErrors.h diagnoses/assembler_lang_related_diagnoses.c
         diagnoses/assembler_lang_related_diagnoses.h encoding/encoding-finals/encoding_finals.h
-        encoding/encoding-finals/sentence_types.h encoding/assembler_ast.c encoding/assembler_ast.h
+        encoding/encoding-finals/sentence_types.h assembler_ast/assembler_ast.c assembler_ast/assembler_ast.h
         encoding/encoding-finals/registers.h transitions/first_transition_util.c
         transitions/first_transition_util.h util/memoryUtil.c util/memoryUtil.h
         util/stringsUtil.c util/stringsUtil.h general-enums/assemblerFinals.h util/numberUtil.c
@@ -35,4 +35,8 @@ add_executable(mmn_14 main.c new-data-types/boolean.h
         encoding/wordHandling.c
         encoding/wordHandling.h
         encoding/encodingUtil.c
-        encoding/encodingUtil.h)
+        encoding/encodingUtil.h
+        encoding/encoding-finals/ranges.h
+        encoding/encodingDataStructures/MemoryImage.h
+        encoding/encodingDataStructures/word.h
+)

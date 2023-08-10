@@ -13,9 +13,8 @@
 /* Encapsulation is not harmed when including those finals since the purpose
  * of the ast is to diagnose line of assembly code, and a user that needs to use
  * the ast needs those finals as well. */
-#include "encoding-finals/encoding_finals.h"
+#include "../encoding/encoding-finals/encoding_finals.h"
 
-enum {_IC, _DC};
 typedef enum {INT, STRING, REG} data_type_t;
 
 /* This is an argument data type. represents an argument and it's data. */
@@ -34,6 +33,7 @@ typedef struct
 
 /* ---Data types prototypes--- */
 typedef struct ast_list_t ast_list_t;
+typedef struct ast_list_node_t ast_list_node_t;
 typedef struct ast_t ast_t;
 typedef struct arg_node_t arg_node_t;
 /* --------------------------- */
@@ -98,7 +98,34 @@ void addSentenceToAst(ast_t *ast, int sentence, sentence_type_t sentenceType);
 void addArgumentToAst(ast_t *ast, data_t *argData);
 
 /*
- * Gets the label name from the given AST.
+ * Retrieves the head node of the given AST list.
+ *
+ * @param   *astList    Pointer to the AST list.
+ *
+ * @return  The head node of the AST list, or NULL if the list is empty.
+ */
+ast_list_node_t *getAstHead(ast_list_t *astList);
+
+/*
+ * Retrieves the next node in the given AST list.
+ *
+ * @param   *astListNode    Pointer to the current node.
+ *
+ * @return  The next node in the AST list, or NULL if the current node is the last.
+ */
+ast_list_node_t *getNextAstNode(ast_list_node_t *astListNode);
+
+/*
+ * Retrieves the AST from the given AST list node.
+ *
+ * @param   *astListNode    Pointer to the AST list node.
+ *
+ * @return  Pointer to the AST associated with the given node.
+ */
+ast_t *getAst(ast_list_node_t *astListNode);
+
+/*
+ * Gets a duplicate of the label name from the given AST.
  *
  * @param   *ast The ast to get the label name from.
  *

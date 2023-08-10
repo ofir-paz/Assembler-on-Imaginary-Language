@@ -9,7 +9,7 @@ LOOP:   jmp     L1
         m1
 L1:     inc     K
         bne     LOOP
-;END:    stop
+END:    stop    @r0
 STR:    .string "abcdef"
 LENGTH: .data   6,-9,15
 K:      .data   22

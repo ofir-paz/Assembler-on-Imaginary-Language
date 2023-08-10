@@ -8,7 +8,7 @@
 /* ---Include header files--- */
 #include "../error_types/error_types.h"
 #include "../../NameTable/NameTable.h"
-#include "../../encoding/assembler_ast.h"
+#include "../../assembler_ast/assembler_ast.h"
 /* -------------------------- */
 
 /* ---Macros--- */

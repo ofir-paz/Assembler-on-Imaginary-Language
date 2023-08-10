@@ -10,6 +10,9 @@
 
 #include "../new-data-types/boolean.h"
 
+#define remove_right_digit(num) ((num) /= 10)
+#define get_right_digit(num) ((num) % 10)
+
 /* ---------------Prototypes--------------- */
 
 /*
@@ -31,6 +34,15 @@ boolean between(int num, int low, int high);
  * @return TRUE if the given number is negative, otherwise FALSE.
  */
 boolean isNegative(int num);
+
+/*
+ * Counts the amount of digits in a given number.
+ *
+ * @param   num     The number to count its digits.
+ *
+ * @return  The number of digits in the given number.
+ */
+int getDigitCnt(int num);
 
 /* ---------------------------------------- */
 

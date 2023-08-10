@@ -14,6 +14,12 @@
  * Cannot be zero, will produce errors if set to !! */
 #define PROGRAM_MEM_START 100
 
+enum {IC_, DC_, COUNTERS_AMOUNT};
+
+#define TWO_QUOTES 2
+
+#define FIRST_LINE 1
+
 /* ------------------------------ */
 
 #endif /* MMN_14_ASSEMBLERFINALS_H */

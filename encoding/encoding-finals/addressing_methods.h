@@ -8,7 +8,7 @@
 #define MMN_14_ADDRESSING_METHODS_H
 
 /* Represents all the addressing methods. (NO_ADD_METHOD represents data type) */
-typedef enum {INSTANT = 1, DIRECT = 3, DIRECT_REGISTER = 5, NO_ADD_METHOD = -1}
+typedef enum {ZERO_ADD_MTD = 0, INSTANT = 1, DIRECT = 3, DIRECT_REGISTER = 5, NO_ADD_METHOD = -1}
     addressing_method_t;
 
 #endif /* MMN_14_ADDRESSING_METHODS_H */

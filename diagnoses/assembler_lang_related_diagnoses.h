@@ -11,7 +11,7 @@
 #include "../new-data-types/boolean.h"
 #include "../NameTable/NameTable.h"
 #include "../new-data-types/word_number.h"
-#include "../encoding/assembler_ast.h"
+#include "../assembler_ast/assembler_ast.h"
 
 /* ---------------Prototypes--------------- */
 

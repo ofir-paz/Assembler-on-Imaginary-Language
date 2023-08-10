@@ -8,7 +8,7 @@
 #include <stddef.h>
 #include "new-data-types/process_result.h"
 #include "NameTable/NameTable.h"
-#include "encoding/assembler_ast.h"
+#include "assembler_ast/assembler_ast.h"
 #include "encoding/encoding.h"
 #include "general-enums/assemblerFinals.h"
 #include "transitions/pre-processor.h"
@@ -27,14 +27,13 @@
 /* !!! DEBUGGING !!! */
 void printData(ast_list_t *astList, NameTable *labelsMap[]);
 
-void clearDataStructures(NameTable *labelsMap[], MemoryImage *memoryImage, ast_list_t **pAstList);
+void clearDataStructures(NameTable *labelsMap[], ast_list_t **pAstList);
 /* ---------------------------------------- */
 
 void assemble(const char *file_name)
 {
     process_result processResult = FAILURE;
     NameTable *labelsMap[TYPES_OF_LABELS] = {NULL};
-    MemoryImage *memoryImage = NULL;
     ast_list_t *astList = NULL;
 
     //if (handle_filename_error(file_name) == NO_ERROR)
@@ -42,17 +41,17 @@ void assemble(const char *file_name)
     processResult = pre_process(file_name);
     if (processResult == SUCCESS)
         processResult = first_transition(file_name, labelsMap, &astList);
-    //if (processResult == SUCCESS)
-        //processResult = second_transition(...);
+    if (processResult == SUCCESS)
+        processResult = second_transition(file_name, labelsMap, astList);
     // if (processResult == SUCCESS)
     //      handleOutPutFiles(...)
     //}
 
     printData(astList, labelsMap);
-    clearDataStructures(labelsMap, memoryImage, &astList);
+    clearDataStructures(labelsMap, &astList);
 }
 
-void clearDataStructures(NameTable *labelsMap[], MemoryImage *memoryImage, ast_list_t **pAstList)
+void clearDataStructures(NameTable *labelsMap[], ast_list_t **pAstList)
 {
     deleteTable(&(labelsMap[NORMAL]));
     deleteTable(&(labelsMap[ENTRY]));

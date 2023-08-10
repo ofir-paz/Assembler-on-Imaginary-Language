@@ -14,6 +14,7 @@
 #include "../general-enums/indexes.h"
 #include "../general-enums/neededKeys.h"
 #include "memoryUtil.h"
+#include "numberUtil.h"
 /* -------------------------- */
 
 /* ---Macros--- */
@@ -21,6 +22,9 @@
 
 /* ---Finals--- */
 #define SAME_STRINGS 0
+#define SIZE_FOR_NEW_LINE 1
+#define SIZE_FOR_TAB 1
+#define SIZE_FOR_STR 30
 /* ------------ */
 
 /* ---------------Prototypes--------------- */
@@ -173,4 +177,83 @@ char *strcpyPart(const char *str, int start, int end)
     (void) strncpy(part, str + start, len); /* Copying the part from str the part. */
 
     return part;
+}
+
+/*
+ * Gets a string containing the given value.
+ *
+ * @param   val     The number to make a string from.
+ *
+ * @return  The string containing the given value
+ */
+char *getStringFromVal(int val)
+{
+    int i; /* Loop variable. */
+    int digitCnt = getDigitCnt(val);
+
+    /* Create the string to return. */
+    char *valStr = (char *) allocate_space(digitCnt + SIZE_FOR_NULL);
+    valStr[digitCnt] = NULL_TERMINATOR; /* Add null terminator. */
+
+    /* Add numbers to string from the right. */
+    for (i = digitCnt - 1; i >= ZERO_INDEX; remove_right_digit(val), i++)
+        valStr[i] = get_right_digit(val) + CHAR_ZERO;
+
+    return valStr;
+}
+
+/*
+ * Creates a start of line from a given string for a special format:
+ * [word     ] (30) [tab] (1) [number] (as needed) [new line] (1)
+ *
+ * The start of line will be the [word    ] (30) [tab] (1) part of it,
+ * means a word, spaces to cover 30 characters and a tab key.
+ * assume the given string is of length of 30 or less (not NULL).
+ *
+ * @param   *str    The string to be the word in the format.
+ *
+ * @return  The first part of the format.
+ */
+char *createStartLineForFormat(const char *str)
+{
+    int i, len = (int) strlen(str); /* Loop variables. */
+
+    char *newLine = (char *) allocate_space(SIZE_FOR_STR + SIZE_FOR_TAB + SIZE_FOR_NULL);
+    newLine[SIZE_FOR_STR + SIZE_FOR_TAB] = NULL_TERMINATOR; /* Add null terminator. */
+
+    (void) strcpy(newLine, str); /* Copy the string to the new line. */
+
+    for (i = len; i < SIZE_FOR_STR; i++) /* Fill the rest with spaces */
+        newLine[i] = SPACE_KEY;
+
+    newLine[SIZE_FOR_STR] = TAB_KEY; /* Add a tab at the end. */
+
+    return newLine;
+}
+
+/*
+ * Creates a line from the special format:
+ * [word     ] (30) [tab] (1) [number] (as needed) [new line] (1)
+ * and appends it to the given pointer to string.
+ *
+ * @param   **pString   The pointer to the string to add the new line of special format to.
+ * @param   *str        Holds the word of the special format.
+ * @param   val         Holds the number of the special format.
+ */
+void addToStringInFormat(char **pString, const char *str, int val)
+{
+    /* Create helper strings. */
+    char *startLine = createStartLineForFormat(str);
+    char *valStr = getStringFromVal(val);
+    char *endLine = getDynamicString("\n");
+
+    /* Connect them the full line and add them. */
+    addTwoStrings(&valStr, endLine);
+    addTwoStrings(&startLine, valStr);
+    addTwoStrings(pString, startLine);
+
+    /* Free helper strings. */
+    (void) free_ptr(POINTER(endLine));
+    (void) free_ptr(POINTER(valStr));
+    (void) free_ptr(POINTER(startLine));
 }

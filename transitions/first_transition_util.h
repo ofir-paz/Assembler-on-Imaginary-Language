@@ -8,7 +8,7 @@
 #ifndef MMN_14_FIRST_TRANSITION_UTIL_H
 #define MMN_14_FIRST_TRANSITION_UTIL_H
 
-#include "../encoding/assembler_ast.h"
+#include "../assembler_ast/assembler_ast.h"
 
 /* ---------------Prototypes--------------- */
 

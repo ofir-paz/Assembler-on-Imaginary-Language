@@ -9,8 +9,9 @@
 #include <string.h>
 #include <stddef.h>
 #include "../NameTable/NameTable.h"
-#include "../encoding/assembler_ast.h"
+#include "../assembler_ast/assembler_ast.h"
 #include "../general-enums/programFinals.h"
+#include "../general-enums/assemblerFinals.h"
 #include "../errors/FirstTransitionErrors/FirstTransitionErrors.h"
 #include "../diagnoses/assembler_lang_related_diagnoses.h"
 #include "../util/memoryUtil.h"
@@ -25,7 +26,6 @@
 enum {ZERO_WORDS, ONE_WORDS, TWO_WORDS, THREE_WORDS};
 
 #define FIRST_ARGUMENT 1
-#define TWO_QUOTES 2
 /* ------------ */
 
 /* ---------------Prototypes--------------- */
@@ -39,11 +39,6 @@ void addLabelToTable(NameTable *labelMap, char *labelName, int address);
 int howManyWordsForInstruction(ast_t *lineAst);
 int howManyWordsForData(ast_t *lineAst);
 /* ---------------------------------------- */
-
-void updateDataLabels(NameTable *labels, int finalIC)
-{
-    (void) changeToPosAndAdd(labels, finalIC);
-}
 
 /*
  * Build an abstract syntax tree (AST) from the given line of assembly code.
@@ -219,4 +214,9 @@ int howManyWordsForData(ast_t *lineAst)
                 - TWO_QUOTES + SIZE_FOR_NULL;
 
     return amountOfWords;
+}
+
+void updateDataLabels(NameTable *labels, int finalIC)
+{
+    (void) changeToPosAndAdd(labels, finalIC);
 }

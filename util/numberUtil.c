@@ -10,9 +10,11 @@
 /* -------------------------- */
 
 /* ---Macros--- */
+#define remove_right_digit(num) ((num) /= 10)
 /* ------------ */
 
 /* ---Finals--- */
+#define ONE_DIGIT 1
 #define ZERO_NUMBER 0
 /* ------------ */
 
@@ -43,4 +45,21 @@ boolean between(int num, int low, int high)
 boolean isNegative(int num)
 {
     return (num < ZERO_NUMBER)? TRUE : FALSE;
+}
+
+/*
+ * Counts the amount of digits in a given number.
+ *
+ * @param   num     The number to count its digits.
+ *
+ * @return  The number of digits in the given number.
+ */
+int getDigitCnt(int num)
+{
+    int cnt; /* Counter to return. */
+
+    /* Add one to the counter for every digit. */
+    for (cnt = ONE_DIGIT; remove_right_digit(num); cnt++);
+
+    return cnt;
 }

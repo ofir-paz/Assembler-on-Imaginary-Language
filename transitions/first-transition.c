@@ -10,7 +10,7 @@
 #include <string.h>
 #include "../NameTable/NameTable.h"
 #include "../new-data-types/process_result.h"
-#include "../encoding/assembler_ast.h"
+#include "../assembler_ast/assembler_ast.h"
 #include "../general-enums/programFinals.h"
 #include "../general-enums/assemblerFinals.h"
 #include "../FileHandling/readFromFile.h"
@@ -73,8 +73,8 @@ process_result firstFileTraverse(const char *file_name, NameTable *labelsMap[],
                                  ast_list_t *astList)
 {
     boolean wasError = FALSE;
-    int *IC = getCounterPointer(astList, _IC);
-    int *DC = getCounterPointer(astList, _DC);
+    int *IC = getCounterPointer(astList, IC_);
+    int *DC = getCounterPointer(astList, DC_);
     *IC = *DC = PROGRAM_MEM_START;
     char *line = NULL; /* This will hold the current line */
 

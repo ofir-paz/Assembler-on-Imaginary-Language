@@ -8,7 +8,8 @@
 /* ---Include header files--- */
 #include <stddef.h>
 #include "../new-data-types/boolean.h"
-#include "encoding-finals/encoding_finals.h"
+#include "../encoding/encoding-finals/encoding_finals.h"
+#include "../general-enums/assemblerFinals.h"
 #include "../util/memoryUtil.h"
 #include "../util/stringsUtil.h"
 /* -------------------------- */
@@ -17,7 +18,6 @@
 /* ------------ */
 
 /* ---Finals--- */
-#define COUNTERS_AMOUNT 2
 #define ZERO_INITIALIZE 0
 #define SUCCESS_CODE 0
 #define INVALID_GIVEN_PARAM_CODE (-1)
@@ -28,7 +28,6 @@
 
 /* ---------------Abstract syntax tree--------------- */
 
-enum {IC, DC};
 typedef enum {INT, STRING, REG} data_type_t;
 
 /* This is an argument data type. represents an argument and it's data. */
@@ -101,8 +100,8 @@ ast_list_t *createAstList(void )
     /* Initializing it. */
     newAstList -> head = NULL;
     newAstList -> tail = NULL;
-    newAstList -> counters[IC] = ZERO_INITIALIZE;
-    newAstList -> counters[DC] = ZERO_INITIALIZE;
+    newAstList -> counters[IC_] = ZERO_INITIALIZE;
+    newAstList -> counters[DC_] = ZERO_INITIALIZE;
 
     return newAstList;
 }
@@ -297,7 +296,43 @@ void addArgumentToAst(ast_t *ast, data_t *argData)
 }
 
 /*
- * Gets the label name from the given AST.
+ * Retrieves the head node of the given AST list.
+ *
+ * @param   *astList    Pointer to the AST list.
+ *
+ * @return  The head node of the AST list, or NULL if the list is empty.
+ */
+ast_list_node_t *getAstHead(ast_list_t *astList)
+{
+    return astList -> head;
+}
+
+/*
+ * Retrieves the next node in the given AST list.
+ *
+ * @param   *astListNode    Pointer to the current node.
+ *
+ * @return  The next node in the AST list, or NULL if the current node is the last.
+ */
+ast_list_node_t *getNextAstNode(ast_list_node_t *astListNode)
+{
+    return astListNode -> next;
+}
+
+/*
+ * Retrieves the AST from the given AST list node.
+ *
+ * @param   *astListNode    Pointer to the AST list node.
+ *
+ * @return  Pointer to the AST associated with the given node.
+ */
+ast_t *getAst(ast_list_node_t *astListNode)
+{
+    return astListNode -> ast;
+}
+
+/*
+ * Gets a duplicate of the label name from the given AST.
  *
  * @param   *ast The ast to get the label name from.
  *
@@ -648,7 +683,7 @@ void printAstList(ast_list_t *astList)
 {
     ast_list_node_t *currAstNode = astList -> head;
     puts("\n*************************PRINTING AST*************************\n");
-    printf("***\tIC=%4d\tDC=%4d\t***\n", astList -> counters[IC], astList -> counters[DC]);
+    printf("***\tIC=%4d\tDC=%4d\t***\n", astList -> counters[IC_], astList -> counters[DC_]);
     while (currAstNode != NULL)
     {
         printAst(currAstNode -> ast);
