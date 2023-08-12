@@ -110,6 +110,16 @@ boolean isNameInTable(const NameTable *table, const char *name);
 int changeToPosAndAdd(NameTable *name_table, int add);
 
 /*
+ * Gets a string to represent the given name table with int data type.
+ * Assumes that each name in the name table is or less than 30 characters.
+ *
+ * @param   *nameTable  The name table to get a string representing it.
+ *
+ * @return  The string representing the name table.
+ */
+char *numbersNameTableToString(NameTable *nameTable);
+
+/*
  * Deletes the entire NameTable and frees the memory.
  *
  * @param   **table Pointer to the NameTable to delete.

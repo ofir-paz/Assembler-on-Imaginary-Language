@@ -14,12 +14,20 @@ typedef struct MemoryImage MemoryImage;
 /* ---------------Prototypes--------------- */
 
 /*
- * Create a new MemoryImage structure.
+ * Gets encoding information.
+ * Encoding information is the following string: {IC [tab] DC [new line]}.
  *
- * @return  A pointer to the newly created MemoryImage structure.
+ * @param   *memoryImage    The memory image with the encoding to get its information.
  */
 MemoryImage *createMemoryImage(int IC, int DC);
 
+/*
+ * Gets encoding information.
+ * Encoding information is the following string: {IC [tab] DC}.
+ *
+ * @param   *memoryImage    The memory image with the encoding to get its information.
+ */
+char *getEncodingInformation(MemoryImage *memoryImage);
 
 /*
  * Encodes the given abstract syntax tree (AST) representing a line of assembly code
@@ -35,6 +43,25 @@ MemoryImage *createMemoryImage(int IC, int DC);
  */
 void encodeLine(ast_t *lineAst, MemoryImage *memoryImage, NameTable *normalLabels,
                 NameTable *extLabels, char **extFileContents);
+
+/*
+ * Gets a string representing the encoded words of the memory image in Base64.
+ *
+ * @param   *memoryImage            The memory image that holds the words to get the
+ *                                  string representing them.
+ * @param   isWordsInstructions     Flag indicating if the words to get the string
+ *                                  from are instruction words or data words.
+ *
+ * @return  The string representing the specific encoded words of the memory image in Base64.
+ */
+char *getEncodedWords(MemoryImage *memoryImage, boolean isWordsInstructions);
+
+/*
+ * Clears the memory image.
+ *
+ * @param   **pMemoryImage  Pointer to the memory image to clear.
+ */
+void clearMemoryImage(MemoryImage **pMemoryImage);
 
 /* ---------------------------------------- */
 

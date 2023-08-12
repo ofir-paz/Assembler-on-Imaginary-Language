@@ -24,10 +24,11 @@
 #define SAME_STRINGS 0
 #define SIZE_FOR_NEW_LINE 1
 #define SIZE_FOR_TAB 1
-#define SIZE_FOR_STR 30
+#define SIZE_FOR_STR 31
 /* ------------ */
 
 /* ---------------Prototypes--------------- */
+char *my_strdup(const char *str);
 /* ---------------------------------------- */
 
 /*
@@ -36,11 +37,9 @@
  * @param   *str The string to recreate dynamically.
  * @return  The newly dynamically created string with the contents of str.
  */
-char *getDynamicString(char *str)
+char *getDynamicString(const char *str)
 {
-    char *dynamicString = (char *) allocate_space(strlen(str) + SIZE_FOR_NULL);
-    (void) strcpy(dynamicString, str);
-    return dynamicString;
+    return my_strdup(str);
 }
 
 /* Turns every char in the given param char *str to lower case.
@@ -105,8 +104,9 @@ void addTwoStrings(char **str1, const char *str2)
     {
         if (*str1 == NULL) /* Create new space if the string is NULL */
         {
+            /* *str1 = str2 (str1 was empty before) */
             *str1 = (char *) allocate_space(strlen(str2) + SIZE_FOR_NULL);
-            *str1 = strcpy(*str1, str2); /* *str1 = str2 (str1 was empty before) */
+            (void) strncpy(*str1, str2, strlen(str2) + SIZE_FOR_NULL);
         }
         else /* Add more space if the string already has some. */
         {
@@ -132,7 +132,7 @@ char *my_strdup(const char *str)
     {
         /* Duplicating the given string to a new one. */
         dup_str = (char *) allocate_space(strlen(str) + SIZE_FOR_NULL);
-        dup_str = strncpy(dup_str, str, strlen(str) + SIZE_FOR_NULL);
+        (void) strcpy(dup_str, str);
     }
 
     return dup_str;
@@ -196,7 +196,7 @@ char *getStringFromVal(int val)
     valStr[digitCnt] = NULL_TERMINATOR; /* Add null terminator. */
 
     /* Add numbers to string from the right. */
-    for (i = digitCnt - 1; i >= ZERO_INDEX; remove_right_digit(val), i++)
+    for (i = digitCnt - 1; i >= ZERO_INDEX; remove_right_digit(val), i--)
         valStr[i] = get_right_digit(val) + CHAR_ZERO;
 
     return valStr;
@@ -245,15 +245,13 @@ void addToStringInFormat(char **pString, const char *str, int val)
     /* Create helper strings. */
     char *startLine = createStartLineForFormat(str);
     char *valStr = getStringFromVal(val);
-    char *endLine = getDynamicString("\n");
 
-    /* Connect them the full line and add them. */
-    addTwoStrings(&valStr, endLine);
+    /* Connect them to a full line and add them. */
+    addTwoStrings(&valStr, "\n");
     addTwoStrings(&startLine, valStr);
     addTwoStrings(pString, startLine);
 
     /* Free helper strings. */
-    (void) free_ptr(POINTER(endLine));
     (void) free_ptr(POINTER(valStr));
     (void) free_ptr(POINTER(startLine));
 }

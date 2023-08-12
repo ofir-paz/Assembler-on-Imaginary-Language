@@ -34,8 +34,9 @@ void setBitsInRangeToVal(word_t word, int low, int high, int val);
  * Convert a word to a Base64 representation.
  *
  * @param   word    The word to be converted.
+ * @param   word64  The word to hold the Base64 converted word.
  */
-void convertWordToBase64(word_t word);
+void convertWordToBase64(const word_t word, word_t word64);
 
 /* ---------------------------------------- */
 

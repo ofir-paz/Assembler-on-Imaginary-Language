@@ -119,10 +119,13 @@ ast_t *firstAssemblerAlgo(const char *file_name, const char *line, int lineNumbe
 
     /* AST (abstract syntax tree) representing the line to return. */
     ast_t *lineAst = buildAstFromLine(line, &lineError);
+
+    //bad
     lineError = handle_FirstTransLine_Error(file_name, lineNumber, lineAst, lineError);
 
     addToTablesIfNeededInFirstTrans(lineAst, labelsMap, *IC, *DC, &lineError);
 
+    // change to handleLineErrorInFirstTrans
     if (lineError == NO_ERROR)
         updateCounters(lineAst, IC, DC);
     else

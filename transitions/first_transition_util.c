@@ -112,18 +112,16 @@ Error addArgumentsFromLineToAST(ast_t *lineAST, const char *line)
     int argumentNum = FIRST_ARGUMENT;
     boolean isLabelDef = isLabel(lineAST);
 
-    while ((foundError = checkSyntaxErrorInArgAndBetween(line, argumentNum,
+    if (isLastArg(line, ZERO_NUMBER, isLabel(lineAST)) == FALSE)
+        while ((foundError = checkSyntaxErrorInArgAndBetween(line, argumentNum,
                                                          isLabelDef)) == NO_ERROR)
-    {
-        data_t *argData = (data_t *) allocate_space(sizeof(data_t));
-        getArgDataFromLine(line, argumentNum, isLabel(lineAST), argData);
-        addArgumentToAst(lineAST, argData);
-        if (isLastArg(line, argumentNum, isLabel(lineAST)) == TRUE) break;
-        argumentNum++;
-    }
-
-    if (argumentNum == FIRST_ARGUMENT)
-        handleExceptionsAndWarningInFirstArg(lineAST, line, &foundError);
+        {
+            data_t *argData = (data_t *) allocate_space(sizeof(data_t));
+            getArgDataFromLine(line, argumentNum, isLabel(lineAST), argData);
+            addArgumentToAst(lineAST, argData);
+            if (isLastArg(line, argumentNum, isLabel(lineAST)) == TRUE) break;
+            argumentNum++;
+        }
 
     return foundError;
 }

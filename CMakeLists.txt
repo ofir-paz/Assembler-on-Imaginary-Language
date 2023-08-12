@@ -39,4 +39,6 @@ add_executable(mmn_14 main.c new-data-types/boolean.h
         encoding/encoding-finals/ranges.h
         encoding/encodingDataStructures/MemoryImage.h
         encoding/encodingDataStructures/word.h
+        errors/SecondTransitionErrors/SecondTransitionErrors.c
+        errors/SecondTransitionErrors/SecondTransitionErrors.h
 )

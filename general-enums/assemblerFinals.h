@@ -20,6 +20,8 @@ enum {IC_, DC_, COUNTERS_AMOUNT};
 
 #define FIRST_LINE 1
 
+#define MAX_LABEL_LEN 31
+
 /* ------------------------------ */
 
 #endif /* MMN_14_ASSEMBLERFINALS_H */

@@ -52,6 +52,8 @@ char *getMacroIfCalling(const char *line, NameTable *macro_table);
 process_result pre_process(const char *file_name)
 {
     process_result processResult; /* Value to return. */
+
+    //change this to char *
     NameTable *amFile = createNameTable(STRING_TYPE); /* Will hold the file to print */
     NameTable *macro_table = createNameTable(STRING_TYPE); /* Will hold the macros */
     (void) addNameToTable(amFile, getDynamicString(AFTER_MACRO));

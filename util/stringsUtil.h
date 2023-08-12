@@ -18,7 +18,7 @@
  * @param   *str The string to recreate dynamically.
  * @return  The newly dynamically created string with the contents of str.
  */
-char *getDynamicString(char *str);
+char *getDynamicString(const char *str);
 
 /* Turns every char in the given param char *str to lower case.
  * Returns the created lower case string */
@@ -76,6 +76,15 @@ int getIndexOfStrInArray(const char *arr[], int size, const char *str);
  * @return  The partial string: str[start...end] (null-terminated).
  */
 char *strcpyPart(const char *str, int start, int end);
+
+/*
+ * Gets a string containing the given value.
+ *
+ * @param   val     The number to make a string from.
+ *
+ * @return  The string containing the given value
+ */
+char *getStringFromVal(int val);
 
 /*
  * Creates a line from the special format:

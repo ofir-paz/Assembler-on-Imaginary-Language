@@ -300,6 +300,28 @@ int changeToPosAndAdd(NameTable *name_table, int add)
 }
 
 /*
+ * Gets a string to represent the given name table with int data type.
+ * Assumes that each name in the name table is or less than 30 characters.
+ *
+ * @param   *nameTable  The name table to get a string representing it.
+ *
+ * @return  The string representing the name table.
+ */
+char *numbersNameTableToString(NameTable *nameTable)
+{
+    char *nameTableStr = NULL; /* String to return. */
+    Node *currNode = nameTable -> head;
+
+    while (currNode != NULL) /* Add all nodes to the string. */
+    {
+        addToStringInFormat(&nameTableStr, currNode -> name, currNode -> data->num);
+        currNode = currNode -> next;
+    }
+
+    return nameTableStr;
+}
+
+/*
  * Deletes a given node.
  *
  * @param   *node           The node to delete.

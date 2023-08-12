@@ -23,7 +23,10 @@
  */
 void writeToFile(const char *file_name, const char *fileType, const char *text)
 {
-    FILE *fileToWriteTo = openFile(file_name, fileType, WRITE_MODE); /* Open the file */
-    fputs(text, fileToWriteTo); /* Printing to the file */
-    closeFile(&fileToWriteTo); /* Closing the file */
+    if (text != NULL) /* If we need to print anything. */
+    {
+        FILE *fileToWriteTo = openFile(file_name, fileType, WRITE_MODE); /* Open the file */
+        fputs(text, fileToWriteTo); /* Printing to the file */
+        closeFile(&fileToWriteTo); /* Closing the file */
+    }
 }

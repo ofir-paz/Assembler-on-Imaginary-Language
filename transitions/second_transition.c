@@ -8,27 +8,43 @@
 /* ---Include header files--- */
 #include <string.h>
 #include "../new-data-types/boolean.h"
-#include "../new-data-types/process_result.h"
 #include "../NameTable/NameTable.h"
+#include "../FileHandling/writeToFile.h"
+#include "../new-data-types/process_result.h"
 #include "../assembler_ast/assembler_ast.h"
 #include "../general-enums/assemblerFinals.h"
 #include "../encoding/encoding.h"
+#include "../errors/SecondTransitionErrors/SecondTransitionErrors.h"
+#include "../util/memoryUtil.h"
+#include "../util/stringsUtil.h"
 /* -------------------------- */
+
+#include "../errors/error_types/error_types.h"
 
 /* ---Macros--- */
 /* ------------ */
 
 /* ---Finals--- */
-
-enum {OBJECT_CONTENT, ENTRY_CONTENT, EXTERN_CONTENT, CONTENT_AMOUNT};
+#define OBJECT_END ".ob"
+#define ENT_END ".ent"
+#define EXT_END ".ext"
 /* ------------ */
 
 /* ---------------Prototypes--------------- */
 process_result secondFileTraverse(const char *file_name, ast_list_t *astList,
                                   NameTable *labelsMap[], MemoryImage *memoryImage,
                                   char **extFileContents);
-void createOutputFiles(const char *file_name, char *outputFileContents[],
-                       MemoryImage *memoryImage, NameTable *labelsMap[]);
+void handleLineInSecondTrans(const char *file_name, int currLine, ast_t *lineAst,
+                             NameTable *labelsMap[], MemoryImage *memoryImage,
+                             char **extFileContents, boolean *wasError);
+Error updateTablesIfNeededInSecondTrans(ast_t *lineAst, NameTable *normalLabels,
+                                        NameTable *entLabels);
+Error updateEntTable(NameTable *normalLabels, NameTable *entLabels, arg_node_t *entLabelArgNode);
+void createOutputFiles(const char *file_name, MemoryImage *memoryImage, NameTable *entLabels,
+                       char **extFileContents);
+void createObjectFile(const char *file_name, MemoryImage *memoryImage);
+void createEntryFile(const char *file_name, NameTable *entTable);
+void createExternFile(const char *file_name, char **extFileContents);
 /* ---------------------------------------- */
 
 /*
@@ -46,19 +62,19 @@ void createOutputFiles(const char *file_name, char *outputFileContents[],
 process_result second_transition(const char *file_name, NameTable *labelsMap[],
                                  ast_list_t *astList)
 {
-    char *outputFileContents[CONTENT_AMOUNT] = {NULL};
+    char *extFileContents = NULL;
     MemoryImage *memoryImage = createMemoryImage(
             *getCounterPointer(astList, IC_) - PROGRAM_MEM_START,
             *getCounterPointer(astList, DC_) - PROGRAM_MEM_START);
 
     process_result secondTransitionRes =
-            secondFileTraverse(file_name, astList, labelsMap, memoryImage,
-            outputFileContents + EXTERN_CONTENT);
+            secondFileTraverse(file_name, astList, labelsMap, memoryImage, &extFileContents);
 
-    //if (secondTransitionRes == SUCCESS)
-        //createOutputFiles(file_name, outputFileContents, memoryImage, labelsMap);
+    if (secondTransitionRes == SUCCESS)
+        createOutputFiles(file_name, memoryImage, labelsMap[ENTRY], &extFileContents);
 
-    //clearOutputFileContents(outputFileContents);
+    clearMemoryImage(&memoryImage);
+
     return secondTransitionRes;
 }
 
@@ -79,13 +95,10 @@ process_result secondFileTraverse(const char *file_name, ast_list_t *astList,
 
     while (currNode != NULL)
     {
-        ast_t *currAst = getAst(currNode);
+        ast_t *lineAst = getAst(currNode);
 
-        //handleSecondTransErrors(file_name, currLine, currAst,
-        //                        labelsMap[NORMAL], labelsMap[ENTRY], &wasError);
-        if (wasError == FALSE)
-            encodeLine(currAst, memoryImage, labelsMap[NORMAL],
-                       labelsMap[EXTERN], extFileContents);
+        handleLineInSecondTrans(file_name, currLine, lineAst, labelsMap, memoryImage,
+                                extFileContents, &wasError);
 
         currNode = getNextAstNode(currNode);
         currLine++;
@@ -94,8 +107,90 @@ process_result secondFileTraverse(const char *file_name, ast_list_t *astList,
     return (wasError == FALSE)? SUCCESS : FAILURE;
 }
 
-void createOutputFiles(const char *file_name, char *outputFileContents[],
-                       MemoryImage *memoryImage, NameTable *labelsMap[])
+void handleLineInSecondTrans(const char *file_name, int currLine, ast_t *lineAst,
+                             NameTable *labelsMap[], MemoryImage *memoryImage,
+                             char **extFileContents, boolean *wasError)
 {
+    Error lineError = updateTablesIfNeededInSecondTrans(lineAst,
+                                                        labelsMap[NORMAL], labelsMap[ENTRY]);
 
+    handleLineErrorInSecondTrans(file_name, currLine, lineError, wasError);
+
+    if (*wasError == FALSE)
+        encodeLine(lineAst, memoryImage, labelsMap[NORMAL], labelsMap[EXTERN], extFileContents);
+}
+
+Error updateTablesIfNeededInSecondTrans(ast_t *lineAst, NameTable *normalLabels,
+                                        NameTable *entLabels)
+{
+    Error lineError = NO_ERROR;
+
+    /* If need to update table. */
+    if (getSentence(lineAst).sentenceType == GUIDANCE_SENTENCE &&
+        getSentence(lineAst).sentence.guidance == ent)
+    {
+        arg_node_t *currEntLabel = getArgList(lineAst);
+
+        while (currEntLabel != NULL)
+        {
+            lineError = updateEntTable(normalLabels, entLabels, currEntLabel);
+            currEntLabel = getNextNode(currEntLabel);
+        }
+    }
+
+    return lineError;
+}
+
+Error updateEntTable(NameTable *normalLabels, NameTable *entLabels, arg_node_t *entLabelArgNode)
+{
+    char *entLabel = getArgData(entLabelArgNode).data.string;
+
+    Error lineError = checkEntryLabelErr(entLabel, normalLabels, entLabels);
+
+    if (lineError == NO_ERROR)
+        (void) setNumberInData(entLabels, entLabel,
+                               getDataByName(normalLabels, entLabel)->num);
+
+    return lineError;
+}
+
+void createOutputFiles(const char *file_name, MemoryImage *memoryImage, NameTable *entLabels,
+                       char **extFileContents)
+{
+    createObjectFile(file_name, memoryImage);
+    createEntryFile(file_name, entLabels);
+    createExternFile(file_name, extFileContents);
+}
+
+void createObjectFile(const char *file_name, MemoryImage *memoryImage)
+{
+    char *objectFileContents = getEncodingInformation(memoryImage);
+
+    char *instructionSection = getEncodedWords(memoryImage, TRUE);
+    char *dataSection = getEncodedWords(memoryImage, FALSE);
+
+    addTwoStrings(&objectFileContents, instructionSection);
+    addTwoStrings(&objectFileContents, dataSection);
+
+    writeToFile(file_name, OBJECT_END, objectFileContents);
+
+    (void) free_ptr(POINTER(objectFileContents));
+    (void) free_ptr(POINTER(instructionSection));
+    (void) free_ptr(POINTER(dataSection));
+}
+
+void createEntryFile(const char *file_name, NameTable *entTable)
+{
+    char *entryFileContents = numbersNameTableToString(entTable);
+
+    writeToFile(file_name, ENT_END, entryFileContents);
+
+    (void) free_ptr(POINTER(entryFileContents));
+}
+
+void createExternFile(const char *file_name, char **extFileContents)
+{
+    writeToFile(file_name, EXT_END, *extFileContents);
+
+    (void) free_ptr(POINTER(*extFileContents));
 }

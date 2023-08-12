@@ -33,15 +33,20 @@
  */
 
 /* ---Include header files--- */
+#include <stdio.h>
 #include <string.h>
 #include "../new-data-types/boolean.h"
 #include "../assembler_ast/assembler_ast.h"
 #include "../NameTable/NameTable.h"
+#include "../general-enums/programFinals.h"
+#include "../general-enums/neededKeys.h"
 #include "../general-enums/indexes.h"
 #include "../general-enums/assemblerFinals.h"
 #include "encodingDataStructures/MemoryImage.h"
 #include "encodingUtil.h"
+#include "wordHandling.h"
 #include "../util/memoryUtil.h"
+#include "../util/stringsUtil.h"
 /* -------------------------- */
 
 /* ---Macros--- */
@@ -53,6 +58,11 @@
 #define BITS_IN_BYTE 8
 #define START_WORD_RANGE 0
 #define END_WORD_RANGE 11
+#define CHARS_FOR_WORD 2
+#define SIZE_FOR_NEW_LINE 1
+#define FIRST_PART_OF_WORD 0
+#define SECOND_PART_OF_WORD 1
+#define BUFFER 82
 /* ------------ */
 
 /* ------------------------------------------ */
@@ -88,10 +98,25 @@ MemoryImage *createMemoryImage(int IC, int DC)
     else newMemoryImage -> data = NULL;
 
     /* Resetting values. */
-    newMemoryImage -> currWord[IC_] = PROGRAM_MEM_START;
-    newMemoryImage -> currWord[DC_] = PROGRAM_MEM_START;
+    newMemoryImage -> currWord[IC_] = ZERO_INDEX;
+    newMemoryImage -> currWord[DC_] = ZERO_INDEX;
 
     return newMemoryImage;
+}
+
+/*
+ * Gets encoding information.
+ * Encoding information is the following string: {IC [tab] DC [new line]}.
+ *
+ * @param   *memoryImage    The memory image with the encoding to get its information.
+ */
+char *getEncodingInformation(MemoryImage *memoryImage)
+{
+    /* Create info string, {IC [tab] DC} */
+    char info[BUFFER];
+    sprintf(info, "%d\t%d\n", memoryImage -> currWord[IC_], memoryImage -> currWord[DC_]);
+
+    return getDynamicString(info);
 }
 
 /*
@@ -231,7 +256,7 @@ void encodeInstructionWithOneArgs(word_t *instructions, int *currWord, arg_node_
     encodeAddressingMethods(instructions[*currWord], destMtd, ZERO_ADD_MTD);
 
     (*currWord)++; /* Argument word */
-    encodeDirArgument(instructions[*currWord], *currWord, argument,
+    encodeDirArgument(instructions[*currWord], *currWord + PROGRAM_MEM_START, argument,
                       TRUE, normalLabels, extLabels, extFileContents);
 
     (*currWord)++; /* Next word */
@@ -266,11 +291,57 @@ void encodeInstructionWithTwoArgs(word_t *instructions, int *currWord, arg_node_
                                 getArgData(secondArg).data.reg);
     else /* Encode each argument to a different word (dest first). */
     {
-        encodeDirArgument(instructions[*currWord], *currWord, firstArg,
+        encodeDirArgument(instructions[*currWord], *currWord + PROGRAM_MEM_START, firstArg,
                           TRUE, normalLabels, extLabels, extFileContents);
         (*currWord)++; /* Second argument word. */
-        encodeDirArgument(instructions[*currWord], *currWord, secondArg,
+        encodeDirArgument(instructions[*currWord], *currWord + PROGRAM_MEM_START, secondArg,
                           FALSE, normalLabels, extLabels, extFileContents);
         (*currWord)++; /* Next instruction. */
     }
+}
+
+/*
+ * Gets a string representing the encoded words of the memory image in Base64.
+ *
+ * @param   *memoryImage            The memory image that holds the words to get the
+ *                                  string representing them.
+ * @param   isWordsInstructions     Flag indicating if the words to get the string
+ *                                  from are instruction words or data words.
+ *
+ * @return  The string representing the specific encoded words of the memory image in Base64.
+ */
+char *getEncodedWords(MemoryImage *memoryImage, boolean isWordsInstructions)
+{
+    int i; /* Loop variable. */
+    word_t tmpWord; /* Temporary word to hold encoded Base64 words. */
+
+    int wordsCnt = (isWordsInstructions)? memoryImage -> currWord[IC_] :
+            memoryImage -> currWord[DC_]; /* How many words to encode. */
+    int size = (CHARS_FOR_WORD + SIZE_FOR_NEW_LINE) * wordsCnt; /* Size of the string. */
+
+    char *encoded64Words = (char *) allocate_space(size + SIZE_FOR_NULL);
+    encoded64Words[size] = NULL_TERMINATOR; /* String to return. */
+
+    /* Convert each word to Base64 and add a new line after it. */
+    for (i = ZERO_INDEX; i < size; i += (CHARS_FOR_WORD + SIZE_FOR_NEW_LINE))
+    {
+        convertWordToBase64(memoryImage -> instructions[i], tmpWord);
+        encoded64Words[i + FIRST_PART_OF_WORD] = (char) tmpWord[FIRST_PART_OF_WORD];
+        encoded64Words[i + SECOND_PART_OF_WORD] = (char) tmpWord[SECOND_PART_OF_WORD];
+        encoded64Words[i + CHARS_FOR_WORD] = ENTER_KEY;
+    }
+
+    return encoded64Words;
+}
+
+/*
+ * Clears the memory image.
+ *
+ * @param   **pMemoryImage  Pointer to the memory image to clear.
+ */
+void clearMemoryImage(MemoryImage **pMemoryImage)
+{
+    (void) free_ptr(POINTER((*pMemoryImage) -> instructions));
+    (void) free_ptr(POINTER((*pMemoryImage) -> data));
+    (void) free_ptr(POINTER(*pMemoryImage));
 }

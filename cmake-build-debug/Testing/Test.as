@@ -1,19 +1,21 @@
+;file ps.as
+
+mcro m1
+        sub     @r1, @r4
+        bne     L3
+endmcro
+.entry LENGTH
+.extern W
 MAIN:   mov     @r3 ,LENGTH
 LOOP:   jmp     L1
-        mcro m1
-                sub     @r1, @r4
-                bne     END
-        endmcro
         prn     -5
-        bne     LOOP
+        bne     W
         m1
 L1:     inc     K
-        bne     LOOP
-END:    stop    @r0
+.entry LOOP
+        jmp     W
+END:    stop
 STR:    .string "abcdef"
 LENGTH: .data   6,-9,15
 K:      .data   22
-
-; entry and extern testing:
-.entry ent1 , ent2   ,  ent3
-.extern ext1    ,ext2,  ext3
+.extern L3

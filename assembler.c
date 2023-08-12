@@ -9,8 +9,6 @@
 #include "new-data-types/process_result.h"
 #include "NameTable/NameTable.h"
 #include "assembler_ast/assembler_ast.h"
-#include "encoding/encoding.h"
-#include "general-enums/assemblerFinals.h"
 #include "transitions/pre-processor.h"
 #include "transitions/first-transition.h"
 #include "transitions/second_transition.h"
@@ -43,8 +41,6 @@ void assemble(const char *file_name)
         processResult = first_transition(file_name, labelsMap, &astList);
     if (processResult == SUCCESS)
         processResult = second_transition(file_name, labelsMap, astList);
-    // if (processResult == SUCCESS)
-    //      handleOutPutFiles(...)
     //}
 
     printData(astList, labelsMap);

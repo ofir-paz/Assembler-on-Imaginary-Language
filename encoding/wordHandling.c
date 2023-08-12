@@ -102,8 +102,9 @@ void setBitsInRangeToVal(word_t word, int low, int high, int val)
  * Convert a word to a Base64 representation.
  *
  * @param   word    The word to be converted.
+ * @param   word64  The word to hold the Base64 converted word.
  */
-void convertWordToBase64(word_t word)
+void convertWordToBase64(const word_t word, word_t word64)
 {
     /* Conversion is as such: base64Values[i] = i in Base64 */
     char base64Values[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
@@ -111,11 +112,11 @@ void convertWordToBase64(word_t word)
     /* Since a word in the assembly language requires a minimum
      * of two bytes to be represented, We take the first 6 bits of the
      * representation, and the last 6 bits of it and convert them. */
-    char firstChar = get_first_n_bits(word[FIRST_PART_OF_WORD], SIX_NUMBER);
-    char secondChar = get_last_n_bits(word[FIRST_PART_OF_WORD], TWO_NUMBER) >>
-            SIX_NUMBER | get_first_n_bits(word[SECOND_PART_OF_WORD], FOUR_NUMBER) << TWO_NUMBER;
+    unsigned char firstChar = get_first_n_bits(word[FIRST_PART_OF_WORD], SIX_NUMBER);
+    unsigned char secondChar = (get_last_n_bits(word[FIRST_PART_OF_WORD], TWO_NUMBER) >> SIX_NUMBER) |
+            (get_first_n_bits(word[SECOND_PART_OF_WORD], FOUR_NUMBER) << TWO_NUMBER);
 
     /* Assign them back to the word in their base 64 equivalents. */
-    word[FIRST_PART_OF_WORD] = base64Values[firstChar];
-    word[SECOND_PART_OF_WORD] = base64Values[secondChar];
+    word64[FIRST_PART_OF_WORD] = base64Values[firstChar];
+    word64[SECOND_PART_OF_WORD] = base64Values[secondChar];
 }
