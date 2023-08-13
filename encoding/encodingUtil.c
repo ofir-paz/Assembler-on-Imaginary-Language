@@ -37,7 +37,7 @@ void encodeToWordARE(word_t word, encoding_type_t encodingType);
 void encodePartDir(word_t *instructions, int currWord, opcodes_t opcode)
 {
     /* Encode opcode. */
-    setBitsInRangeToVal(instructions[currWord], OPCODE_LOW, OPCODE_HIGH,opcode);
+    setBitsInRangeToVal(instructions[currWord], OPCODE_LOW, OPCODE_HIGH, opcode);
     /* Encode known A, R, E field (instruction is always absolute). */
     encodeToWordARE(instructions[currWord], ABSOLUTE);
 }
@@ -52,7 +52,7 @@ void encodeInstantArg(word_t word, int instantVal)
 {
     /* instant value is independent of where the program will be loaded to the memory. */
     encodeToWordARE(word, ABSOLUTE);
-    setBitsInRangeToVal(word, DIR_DATA_LOW,DIR_DATA_HIGH, instantVal);
+    setBitsInRangeToVal(word, DIR_DATA_LOW, DIR_DATA_HIGH, instantVal);
 }
 
 /*
@@ -129,7 +129,7 @@ void encodeDirArgument(word_t word, int address, arg_node_t *argument, boolean i
             break;
         case DIRECT_REGISTER: /* Encode single register argument. */
             if (isDest == TRUE)
-                encodeDirectRegisterArg(word,getArgData(argument).data.reg,
+                encodeDirectRegisterArg(word, getArgData(argument).data.reg,
                                         ZERO_BYTE);
             else
                 encodeDirectRegisterArg(word, ZERO_BYTE,

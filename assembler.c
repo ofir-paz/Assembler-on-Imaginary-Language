@@ -43,7 +43,7 @@ void assemble(const char *file_name)
         processResult = second_transition(file_name, labelsMap, astList);
     //}
 
-    printData(astList, labelsMap);
+    //printData(astList, labelsMap);
     clearDataStructures(labelsMap, &astList);
 }
 

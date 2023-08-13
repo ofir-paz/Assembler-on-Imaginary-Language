@@ -63,6 +63,8 @@ char *getEncodedWords(MemoryImage *memoryImage, boolean isWordsInstructions);
  */
 void clearMemoryImage(MemoryImage **pMemoryImage);
 
+void printMemImage(MemoryImage *memoryImage);
+
 /* ---------------------------------------- */
 
 #endif /* MMN_14_ENCODING_H */

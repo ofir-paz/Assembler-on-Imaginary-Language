@@ -70,6 +70,8 @@ process_result second_transition(const char *file_name, NameTable *labelsMap[],
     process_result secondTransitionRes =
             secondFileTraverse(file_name, astList, labelsMap, memoryImage, &extFileContents);
 
+    printMemImage(memoryImage);
+
     if (secondTransitionRes == SUCCESS)
         createOutputFiles(file_name, memoryImage, labelsMap[ENTRY], &extFileContents);
 

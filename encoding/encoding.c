@@ -78,7 +78,11 @@ void encodeInstructionWithOneArgs(word_t *instructions, int *currWord, arg_node_
 void encodeInstructionWithTwoArgs(word_t *instructions, int *currWord, arg_node_t *firstArg,
                           arg_node_t *secondArg, NameTable *normalLabels, NameTable *extLabels,
                           char **extFileContents);
+
+
+void printWord(const word_t word);
 /* ---------------------------------------- */
+#include <stdlib.h>
 
 /*
  * Create a new MemoryImage structure.
@@ -90,11 +94,11 @@ MemoryImage *createMemoryImage(int IC, int DC)
     MemoryImage *newMemoryImage = (MemoryImage *) allocate_space(sizeof(MemoryImage));
 
     /* Allocating space for the instructions memory image. */
-    if(IC) newMemoryImage -> instructions = (word_t *) allocate_space(IC * sizeof(word_t));
+    if(IC) newMemoryImage -> instructions = (word_t *) calloc(IC , sizeof(word_t));
     else newMemoryImage -> instructions = NULL;
 
     /* Allocating space for the data memory image. */
-    if(DC) newMemoryImage -> data = (word_t *) allocate_space(DC * sizeof(word_t));
+    if(DC) newMemoryImage -> data = (word_t *) calloc(DC , sizeof(word_t));
     else newMemoryImage -> data = NULL;
 
     /* Resetting values. */
@@ -217,11 +221,12 @@ void encodeDataString(ast_t *lineAst, MemoryImage *memoryImage)
     int i, stringLen = (int) strlen(dataString) - TWO_QUOTES; /* Loop variables. */
 
     /* Add every char in the string to the data image (ignore the " "). */
-    for (i = ONE_INDEX; i < stringLen; i++, memoryImage -> currWord[DC_]++)
+    for (i = ONE_INDEX; i <= stringLen; i++, memoryImage -> currWord[DC_]++)
         encodeDataVal(memoryImage -> data, memoryImage -> currWord[DC_], dataString[i]);
 
     /* Add null terminator to end of string in data. */
     encodeDataVal(memoryImage -> data, memoryImage -> currWord[DC_], ZERO_BYTE);
+    memoryImage -> currWord[DC_]++;
 }
 
 /*
@@ -279,25 +284,25 @@ void encodeInstructionWithTwoArgs(word_t *instructions, int *currWord, arg_node_
                           char **extFileContents)
 {
     /* Get addressing methods for both of the arguments and encode them into the first word. */
-    addressing_method_t destMtd = getArgAddressingMethod(firstArg);
-    addressing_method_t srcMtd = getArgAddressingMethod(secondArg);
+    addressing_method_t srcMtd = getArgAddressingMethod(firstArg);
+    addressing_method_t destMtd = getArgAddressingMethod(secondArg);
     encodeAddressingMethods(instructions[*currWord], destMtd, srcMtd);
-
     (*currWord)++; /* First argument word. */
 
     /* Special case where both of the arguments are registers, they can be encoded in one word. */
     if (destMtd == DIRECT_REGISTER && srcMtd == DIRECT_REGISTER)
-        encodeDirectRegisterArg(instructions[*currWord], getArgData(firstArg).data.reg,
-                                getArgData(secondArg).data.reg);
+        encodeDirectRegisterArg(instructions[*currWord], getArgData(secondArg).data.reg,
+                                getArgData(firstArg).data.reg);
     else /* Encode each argument to a different word (dest first). */
     {
         encodeDirArgument(instructions[*currWord], *currWord + PROGRAM_MEM_START, firstArg,
-                          TRUE, normalLabels, extLabels, extFileContents);
+                          FALSE, normalLabels, extLabels, extFileContents);
         (*currWord)++; /* Second argument word. */
         encodeDirArgument(instructions[*currWord], *currWord + PROGRAM_MEM_START, secondArg,
-                          FALSE, normalLabels, extLabels, extFileContents);
-        (*currWord)++; /* Next instruction. */
+                          TRUE, normalLabels, extLabels, extFileContents);
     }
+    
+    (*currWord)++; /* Next instruction. */
 }
 
 /*
@@ -344,4 +349,55 @@ void clearMemoryImage(MemoryImage **pMemoryImage)
     (void) free_ptr(POINTER((*pMemoryImage) -> instructions));
     (void) free_ptr(POINTER((*pMemoryImage) -> data));
     (void) free_ptr(POINTER(*pMemoryImage));
+}
+
+// !!! -----DEBUGGING----- !!!
+
+void printWord(const word_t word)
+{
+    int i;
+    unsigned char mask = 1 << 3;
+
+    for (i = ZERO_INDEX; i < 4; i++)
+    {
+        if (word[SECOND_PART_OF_WORD] & mask)
+            putchar('1');
+        else
+            putchar('0');
+
+        mask >>= 1;
+    }
+    putchar(' ');
+    mask = 1 << 7;
+    for (i = ZERO_INDEX; i < 8; i++)
+    {
+        if (i == 4)
+            putchar(' ');
+        if (word[FIRST_PART_OF_WORD] & mask)
+            putchar('1');
+        else
+            putchar('0');
+
+        mask >>= 1;
+    }
+    putchar('\n');
+}
+
+void printMemImage(MemoryImage *memoryImage)
+{
+    int i;
+    puts("\n*************************PRINTING MEMORY IMAGE*************************\n");
+    puts("*** INSTRUCTION SEGMENT ***");
+
+    for (i = ZERO_INDEX; i < memoryImage -> currWord[IC_]; i++)
+        printWord(memoryImage -> instructions[i]);
+
+    puts("*** FINISH INSTRUCTIONS SEGMENT ***\n");
+    puts("*** DATA SEGMENT ***");
+
+    for (i = ZERO_INDEX; i < memoryImage -> currWord[DC_]; i++)
+        printWord(memoryImage -> data[i]);
+
+    puts("*** FINISH DATA SEGMENT ***\n");
+    puts("\n*************************FINISH PRINTING MEMORY IMAGE*************************\n");
 }

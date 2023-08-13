@@ -17,7 +17,6 @@
 
 /* Use when 1 <= n <= 8. */
 #define get_first_n_bits(byte, n) ((byte) & (FULL_1_BYTE >> (BITS_IN_BYTE - (n))))
-
 #define get_last_n_bits(byte, n) ((byte) & (FULL_1_BYTE << (BITS_IN_BYTE - (n))))
 
 /* Use when low and high are numbers. */
@@ -30,19 +29,20 @@
 #define set_bits_to_val(byte, low, high, val) (byte = \
     ((val) << (low)) | \
     (((low) > ZERO_INDEX)? get_first_n_bits(byte, low) : ZERO_BYTE) | \
-    (((high) < BITS_IN_BYTE - 1)? get_last_n_bits(byte, high) : ZERO_BYTE))
+    (((high) < BITS_IN_BYTE)?                     \
+        (get_first_n_bits((byte) >> (high), (BITS_IN_BYTE - (high))) << (high)) : ZERO_BYTE))
 
 /* ------------ */
 
 /* ---Finals--- */
-#define FIRST_BIT_ON 1
+#define FIRST_BIT_ON ((unsigned ) 1)
 #define FIRST_PART_OF_WORD 0
 #define SECOND_PART_OF_WORD 1
 #define SIX_NUMBER 6
 #define TWO_NUMBER 2
 #define FOUR_NUMBER 4
 #define ZERO_BYTE 0
-#define FULL_1_BYTE 0xff
+#define FULL_1_BYTE ((unsigned ) 0xff)
 #define BITS_IN_BYTE 8
 #define START_WORD_RANGE 0
 #define END_WORD_RANGE 11
@@ -59,12 +59,14 @@
  *
  * @return  TRUE if the value overflows, otherwise FALSE.
  */
-boolean isOverflow(int size, int val)
+boolean isOverflow(int size, unsigned long int val)
 {
-    int minValInSize = -(FIRST_BIT_ON << (size - 1));
-    int maxValInSize = ~(FIRST_BIT_ON << (size - 1));
+    boolean isOverFlow = (size >= sizeof(unsigned long int))? FALSE : TRUE;
 
-    return (minValInSize <= val && val <= maxValInSize)? TRUE : FALSE;
+    if (isOverFlow == TRUE && val <= ((unsigned long int) FIRST_BIT_ON << size) - 1)
+        isOverFlow = FALSE;
+
+    return isOverFlow;
 }
 
 /*
@@ -79,17 +81,17 @@ void setBitsInRangeToVal(word_t word, int low, int high, int val)
 {
     if (isValidWordRange(low, high) == TRUE && isOverflow(range(low, high), val) == FALSE)
     {
-        if (high <= BITS_IN_BYTE - 1) /* If the range is just in the first part. */
+        if (high < BITS_IN_BYTE) /* If the range is just in the first part. */
             set_bits_to_val(word[FIRST_PART_OF_WORD], low, high, val);
 
-        else if (low <= BITS_IN_BYTE - 1) /* If the range is split between the parts. */
+        else if (low < BITS_IN_BYTE) /* If the range is split between the parts. */
         {
             /* Set some of the bits at the end of the first part. */
             set_bits_to_val(word[FIRST_PART_OF_WORD], low, BITS_IN_BYTE - 1,
                             get_first_n_bits(val, BITS_IN_BYTE - low));
             /* Set the rest of the bits at the start of the second part. */
             set_bits_to_val(word[SECOND_PART_OF_WORD], ZERO_INDEX, high - BITS_IN_BYTE,
-                            get_last_n_bits(val, high - BITS_IN_BYTE));
+                            get_first_n_bits(val >> (BITS_IN_BYTE - low), high - BITS_IN_BYTE + 1));
         }
 
         else /* The range is just in the second part. */
