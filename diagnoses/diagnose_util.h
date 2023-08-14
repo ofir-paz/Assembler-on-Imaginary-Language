@@ -8,6 +8,7 @@
 #define MMN_22_HELP_METHODS_H
 
 #include "../new-data-types/boolean.h"
+#include "../new-data-types/word_number.h"
 
 /* ----------Prototypes---------- */
 
@@ -76,9 +77,30 @@ boolean isPlusOrMinus(char ch);
  * Return the amount of found dots. */
 int countDots(const char *str, int start, int end);
 
+/*
+ * Checks if a given char is an english letter.
+ *
+ * @param   ch  The char to check if it's a letter.
+ *
+ * @return  TRUE if ch is a letter, otherwise FALSE.
+ */
+boolean isLetter(char ch);
+
 /* Returns TRUE if the char in index int index of param const char *str
  * is a comma, otherwise FALSE. */
 boolean isCurrCharComma(const char *str, int index);
+
+/* Returns TRUE if the param char ch is a number, otherwise FALSE. */
+boolean isCharNumber(char ch);
+
+/*
+ * Checks if a given char is a legal character (letter or number).
+ *
+ * @param   ch  The given character to check if it's a legal character.
+ *
+ * @return  TRUE if ch is a legal character, otherwise FALSE.
+ */
+boolean isLegalChar(char ch);
 
 /* Returns TRUE if the char in index int index of param const char *str
  * is a number, otherwise FALSE. */

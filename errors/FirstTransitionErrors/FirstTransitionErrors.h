@@ -12,18 +12,15 @@
 
 /* ---------------Prototypes--------------- */
 
-Error handle_FirstTransLine_Error(const char *file_name, int lineNumber, ast_t *lineAst,
-                                  Error lineError);
+void handle_FirstTransLine_Error(const char *file_name, int lineNumber, Error lineError);
 
 Error checkLabelDefTableError(ast_t *lineAst, NameTable *normalTable, NameTable *extTable);
 
 Error checkErrorsInAstFirstTrans(ast_t *lineAst);
 
-Error checkSyntaxErrorInLabel(const char *line);
+SyntaxError checkSyntaxErrorInLabel(const char *line);
 
-Error checkSyntaxErrorInCommand(const char *line, boolean isLabelDef);
-
-void handleExceptionsAndWarningInFirstArg(ast_t *lineAST, const char *line, Error *foundError);
+SyntaxError checkSyntaxErrorInCommand(const char *line, boolean isLabelDef);
 
 Error checkSyntaxErrorInArgAndBetween(const char *line, int argumentNum, boolean isLabelDef);
 

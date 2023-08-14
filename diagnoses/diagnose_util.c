@@ -47,7 +47,7 @@ void findTokenFromStr(const char *str, char **token, word_number tokenNumber, co
         while (++i < tokenNumber && token != NULL);
 
         *token = my_strdup(tmpToken);
-        (void) free_ptr(POINTER(lineCopy));
+        (void) clear_ptr(lineCopy)
     }
 }
 
@@ -177,6 +177,18 @@ int countDots(const char *str, int start, int end)
     return cntDots; /* Returning the counter */
 }
 
+/*
+ * Checks if a given char is an english letter.
+ *
+ * @param   ch  The char to check if it's a letter.
+ *
+ * @return  TRUE if ch is a letter, otherwise FALSE.
+ */
+boolean isLetter(char ch)
+{
+    return ((CHAR_a <= ch && ch <= CHAR_z) || (CHAR_A <= ch && ch <= CHAR_Z))? TRUE : FALSE;
+}
+
 /* Returns TRUE if the char in index int index of param const char *str
  * is a comma, otherwise FALSE. */
 boolean isCurrCharComma(const char *str, int index)
@@ -200,6 +212,18 @@ boolean isCharNumber(char ch)
         isNum = TRUE; /* Assign the value to return to TRUE if so */
 
     return isNum;
+}
+
+/*
+ * Checks if a given char is a legal character (letter or number).
+ *
+ * @param   ch  The given character to check if it's a legal character.
+ *
+ * @return  TRUE if ch is a legal character, otherwise FALSE.
+ */
+boolean isLegalChar(char ch)
+{
+    return (isLetter(ch) || isCharNumber(ch))? TRUE : FALSE;
 }
 
 /* Returns TRUE if the char in index int index of param const char *str

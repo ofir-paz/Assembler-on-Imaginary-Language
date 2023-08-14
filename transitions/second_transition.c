@@ -176,9 +176,9 @@ void createObjectFile(const char *file_name, MemoryImage *memoryImage)
 
     writeToFile(file_name, OBJECT_END, objectFileContents);
 
-    (void) free_ptr(POINTER(objectFileContents));
-    (void) free_ptr(POINTER(instructionSection));
-    (void) free_ptr(POINTER(dataSection));
+    (void) clear_ptr(objectFileContents)
+    (void) clear_ptr(instructionSection)
+    (void) clear_ptr(dataSection)
 }
 
 void createEntryFile(const char *file_name, NameTable *entTable)
@@ -187,12 +187,12 @@ void createEntryFile(const char *file_name, NameTable *entTable)
 
     writeToFile(file_name, ENT_END, entryFileContents);
 
-    (void) free_ptr(POINTER(entryFileContents));
+    (void) clear_ptr(entryFileContents)
 }
 
 void createExternFile(const char *file_name, char **extFileContents)
 {
     writeToFile(file_name, EXT_END, *extFileContents);
 
-    (void) free_ptr(POINTER(*extFileContents));
+    (void) clear_ptr(*extFileContents)
 }

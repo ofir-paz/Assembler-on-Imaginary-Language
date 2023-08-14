@@ -29,16 +29,17 @@
 
 /* ----------Prototypes---------- */
 process_result traverse_before_macro_file(const char *file_name,
-                                          NameTable *amFile, NameTable *macro_table);
-Error handleLineInPreProc(const char *file_name, const char *line, char **macro_name,
-                          NameTable *amFile, NameTable *macro_table, boolean *wasError);
-Error preProcessorAssemblerAlgo(const char *file_name, const char *line, char **macro_name,
-                                NameTable *amFile, NameTable *macro_table,
-                                int lineCount, boolean *wasError);
+                                          char **amFileContents, NameTable *macro_table);
+Error handleLineInPreProc(const char *file_name, const char *line, int lineNumber,
+                          char **macro_name, char **amFileContents, NameTable *macro_table,
+                          boolean *wasError);
+Error preProcessorAssemblerAlgo(const char *file_name, const char *line, int lineNumber,
+                                char **macro_name, char **amFileContents, NameTable *macro_table,
+                                boolean *wasError);
 boolean isInMcroDef(const char *line, boolean wasInMacroDef);
 void getMacroName(const char *line, char **macro_name, boolean wasInMacroDef, boolean isInMacroDef);
 void addToTablesIfNeededInPreProc(const char *line, char *macro_name, boolean wasInMacroDef,
-                         boolean isInMacroDef, NameTable *amFile, NameTable *macro_table);
+                         boolean isInMacroDef,  char **amFileContents, NameTable *macro_table);
 char *getMacroIfCalling(const char *line, NameTable *macro_table);
 /* ------------------------------ */
 
@@ -47,25 +48,23 @@ char *getMacroIfCalling(const char *line, NameTable *macro_table);
  * the given file name.
  *
  * @param   *file_name The name of the file to process.
- * @return  The data structure holding the macros of the .as file.
+ *
+ * @return  SUCCESS (1) if there were no errors, otherwise FAILURE (0).
  */
 process_result pre_process(const char *file_name)
 {
     process_result processResult; /* Value to return. */
 
-    //change this to char *
-    NameTable *amFile = createNameTable(STRING_TYPE); /* Will hold the file to print */
+    char *amFileContents = NULL; /* Will hold the file to print */
     NameTable *macro_table = createNameTable(STRING_TYPE); /* Will hold the macros */
-    (void) addNameToTable(amFile, getDynamicString(AFTER_MACRO));
 
-    processResult = traverse_before_macro_file(file_name, amFile, macro_table);
+    processResult = traverse_before_macro_file(file_name, &amFileContents, macro_table);
 
     /* Create the .am file */
-    writeToFile(file_name, AFTER_MACRO,
-                getDataByName(amFile, AFTER_MACRO) -> string);
+    writeToFile(file_name, AFTER_MACRO, amFileContents);
 
     /* Free unnecessary variable */
-    deleteTable(&amFile);
+    clear_ptr(amFileContents)
     deleteTable(&macro_table);
 
     return processResult;
@@ -74,55 +73,79 @@ process_result pre_process(const char *file_name)
 /*
  * Traverses the file with the given file name and processes it.
  *
- * @param   *file_name The name of the file to process.
- * @param   *amFile The data structure to hold the contents of the .am file.
- * @param   *macro_table The data structure to hold the macros and their contents.
+ * @param   *file_name          The name of the file to process.
+ * @param   **amFileContents    Pointer to string that holds the contents of the .am file.
+ * @param   *macro_table        The data structure to hold the macros and their contents.
+ *
+ * @return  SUCCESS (1) if there were no errors, otherwise FAILURE (0).
  */
 process_result traverse_before_macro_file(const char *file_name,
-                                          NameTable *amFile, NameTable *macro_table)
+                                          char **amFileContents, NameTable *macro_table)
 {
+    boolean wasError = FALSE; /* Will indicate if there was an error. */
     char *line = NULL; /* This will hold the current line */
     char *macro_name = NULL; /* This will hold the current macro name we are working with. */
-    boolean wasError = FALSE;
+    ssize_t readCode; /* Will hold the current line's read code. */
+    int lineCount = ZERO_COUNT;
 
     /* Read the file line-by-line and handle it. */
-    while (readNextLineFromFile(file_name, BEFORE_MACRO, &line) != EOF)
+    while ((readCode = readNextLineFromFile(file_name, BEFORE_MACRO, &line)) != EOF)
     {
-        (void) handleLineInPreProc(file_name, line, &macro_name, amFile, macro_table, &wasError);
+        if (readCode == UNABLE_TO_OPEN_FILE) break;
 
-        (void) free_ptr(POINTER(line)); /* Next line */
+        lineCount++; /* Increasing line counter by 1 since we reached a new line */
+        (void) handleLineInPreProc(file_name, line, lineCount, &macro_name, amFileContents,
+                                   macro_table, &wasError);
+
+        (void) clear_ptr(line) /* Next line */
     }
 
-    (void) free_ptr(POINTER(line));
-    return (wasError == FALSE)? SUCCESS : FAILURE;
+    (void) clear_ptr(line)
+    return (wasError == FALSE && readCode != UNABLE_TO_OPEN_FILE)? SUCCESS : FAILURE;
 }
 
 /*
  * Handles the given line string in the pre-process.
  *
- * @param   *line Current line string.
- * @param   **macro_name Pointer to the current macro name.
- * @param   *amFile Data structure to hold the file to print.
- * @param   *macro_table Data structure to hold the macro names and contents.
+ * @param   *file_name          The name of the file to process.
+ * @param   *line               Current line string.
+ * @param   lineNumber          The index of the current line.
+ * @param   **macro_name        Pointer to the current macro name.
+ * @param   **amFileContents    Pointer to string that holds the contents of the .am file.
+ * @param   *macro_table        Data structure to hold the macro names and contents.
+ * @param   *wasError           Pointer to flag indicating if there was an error.
+ *
+ * @return  The error code of the found error in the line, or NO_ERROR (0) if there wasn't.
  */
-Error handleLineInPreProc(const char *file_name, const char *line, char **macro_name,
-                          NameTable *amFile, NameTable *macro_table, boolean *wasError)
+Error handleLineInPreProc(const char *file_name, const char *line, int lineNumber,
+                          char **macro_name, char **amFileContents, NameTable *macro_table,
+                          boolean *wasError)
 {
-    static int lineCount = ZERO_COUNT; /* Counter of line */
     Error lineError = NO_ERROR; /* Value to return. Represents the error in the line. */
 
-    lineCount++; /* Increasing line counter by 1 since we reached a new line */
-
     if (isSkipLine(line) == FALSE) /* Go to next line if we can skip this one */
-        lineError = preProcessorAssemblerAlgo(file_name, line, macro_name, amFile, macro_table,
-                                              lineCount, wasError);
+        lineError = preProcessorAssemblerAlgo(file_name, line, lineNumber, macro_name,
+                                              amFileContents, macro_table, wasError);
 
     return lineError;
 }
 
-Error preProcessorAssemblerAlgo(const char *file_name, const char *line, char **macro_name,
-                               NameTable *amFile, NameTable *macro_table,
-                               int lineCount, boolean *wasError)
+/*
+ * The pre-processor phase algorithm.
+ *
+ * @param   *file_name          The name of the file to process.
+ * @param   *line               Current line string.
+ * @param   lineNumber          The index of the current line.
+ * @param   **macro_name        Pointer to the current macro name.
+ * @param   **amFileContents    Pointer to string that holds the contents of the .am file.
+ * @param   *macro_table        Data structure to hold the macro names and contents.
+ * @param   *wasError           Pointer to flag indicating if there was an error.
+ *
+ * @return  The error code of the found error in the line, or NO_ERROR (0) if there wasn't.
+ */
+Error preProcessorAssemblerAlgo(const char *file_name, const char *line, int lineNumber,
+                                char **macro_name, char **amFileContents, NameTable *macro_table,
+                                boolean *wasError)
 {
     static boolean wasInMacroDef = FALSE; /* See if last line was in a mcro def. */
 
@@ -132,7 +155,7 @@ Error preProcessorAssemblerAlgo(const char *file_name, const char *line, char **
     boolean isInMacroDef = isInMcroDef(line, wasInMacroDef); /* Is curr line in mcro def */
     getMacroName(line, macro_name, wasInMacroDef, isInMacroDef); /* Get curr macro name */
 
-    lineError = handlePreProcessErrors(file_name, line,lineCount, *macro_name,
+    lineError = handlePreProcessErrors(file_name, line, lineNumber, *macro_name,
                                        wasInMacroDef, isInMacroDef);
     if (lineError != NO_ERROR)
         *wasError = TRUE;
@@ -140,12 +163,12 @@ Error preProcessorAssemblerAlgo(const char *file_name, const char *line, char **
     if (lineError == INVALID_MACRO_NAME_ERR) /* Address a specific error */
     {
         isInMacroDef = FALSE;
-        (void) free_ptr(POINTER(*macro_name));
+        (void) clear_ptr(*macro_name)
     }
 
     /* Will make the necessary actions. add to amFile, or macro_table */
     addToTablesIfNeededInPreProc(line, *macro_name, wasInMacroDef, isInMacroDef,
-                                 amFile, macro_table);
+                                 amFileContents, macro_table);
 
     wasInMacroDef = isInMacroDef;
     return lineError;
@@ -155,8 +178,9 @@ Error preProcessorAssemblerAlgo(const char *file_name, const char *line, char **
  * Checks if the given line is inside a macro definition -
  * (has "mcro" at the start or before "endmcro").
  *
- * @param   *line The line to check.
- * @param   wasInMacroDef Flag to indicate of there was already a "mcro" statement.
+ * @param   *line           The line to check.
+ * @param   wasInMacroDef   Flag to indicate of there was already a "mcro" statement.
+ *
  * @return  TRUE if line is inside a macro definition, otherwise FALSE.
  */
 boolean isInMcroDef(const char *line, boolean wasInMacroDef)
@@ -173,17 +197,17 @@ boolean isInMcroDef(const char *line, boolean wasInMacroDef)
         /* Did we exit a macro definition? */
         isInMacroDef = (sameStrings(firstWord, END_MACRO) == TRUE)? FALSE : TRUE;
 
-    (void) free_ptr(POINTER(firstWord)); /* Free unnecessary variable. */
+    (void) clear_ptr(firstWord) /* Free unnecessary variable. */
     return isInMacroDef;
 }
 
 /*
  * Gets the current macro name the program is working with.
  *
- * @param   *line The line to search for the macro name.
- * @param   **macro_name Pointer to the macro name (will be set to).
- * @param   wasInMacroDef Flag to indicate if the last line was in a macro definition.
- * @param   inMacroDef Flag to indicate if the current line is in a macro definition.
+ * @param   *line           The line to search for the macro name.
+ * @param   **macro_name    Pointer to the macro name (will be set to).
+ * @param   wasInMacroDef   Flag to indicate if the last line was in a macro definition.
+ * @param   inMacroDef      Flag to indicate if the current line is in a macro definition.
  */
 void getMacroName(const char *line, char **macro_name, boolean wasInMacroDef, boolean isInMacroDef)
 {
@@ -191,22 +215,22 @@ void getMacroName(const char *line, char **macro_name, boolean wasInMacroDef, bo
         findWord(line, macro_name, SECOND_WORD); /* Find the macro name */
     else if (isInMacroDef == FALSE) /* Check if the program doesn't handle macros right now. */
         *macro_name = NULL;
-    /* else -- wasInMacroDef == TRUE ** inMacroDef == TRUE -> nothing to do. */
+    /* else -- wasInMacroDef == TRUE && inMacroDef == TRUE -> nothing to do. */
 }
 
 /*
  * Adds content to the data structure if needed.
  * Will know if any addition is needed based on the given flags and line string.
  *
- * @param   *line The line string which the program is currently processing.
- * @param   *macro_name The macro name which is the program is currently working with.
- * @param   wasInMacroDef Flag to indicate if the last line was in a macro definition.
- * @param   inMacroDef Flag to indicate if the current line is in a macro definition.
- * @param   *amFile The data structure to hold the contents of the .am file.
- * @param   *macro_table The data structure to hold the macros and their contents.
+ * @param   *line               The line string which the program is currently processing.
+ * @param   *macro_name         The macro name which is the program is currently working with.
+ * @param   wasInMacroDef       Flag to indicate if the last line was in a macro definition.
+ * @param   inMacroDef          Flag to indicate if the current line is in a macro definition.
+ * @param   **amFileContents    Pointer to string that holds the contents of the .am file.
+ * @param   *macro_table        The data structure to hold the macros and their contents.
  */
 void addToTablesIfNeededInPreProc(const char *line, char *macro_name, boolean wasInMacroDef,
-                         boolean isInMacroDef, NameTable *amFile, NameTable *macro_table)
+                         boolean isInMacroDef, char **amFileContents, NameTable *macro_table)
 {
     /* Entered new macro definition, add the macro to the macro table. */
     if (isInNewMacroDef(wasInMacroDef, isInMacroDef) == TRUE)
@@ -223,17 +247,24 @@ void addToTablesIfNeededInPreProc(const char *line, char *macro_name, boolean wa
     else if (isCallingMacro(line, macro_table) == TRUE)
     {
         char *macro = getMacroIfCalling(line, macro_table);
-        (void) addStringToData(amFile, AFTER_MACRO,
-                               getDataByName(macro_table, macro) -> string);
-        (void) free_ptr(POINTER(macro)); /* Free unnecessary variable. */
+        addTwoStrings(amFileContents, getDataByName(macro_table, macro) -> string);
+        (void) clear_ptr(macro) /* Free unnecessary variable. */
     }
 
     /* Nothing special, Add the current line to .am file. */
     else
-        (void) addStringToData(amFile, AFTER_MACRO, line);
+        addTwoStrings(amFileContents, line);
 
 }
 
+/*
+ * Gets the called macro's name (if a macro is being called).
+ *
+ * @param   *line           The line that could have a macro call.
+ * @param   *macro_table    The data structure to hold the macros and their contents.
+ *
+ * @return  The called macro's name, or NULL if a macro is not being called.
+ */
 char *getMacroIfCalling(const char *line, NameTable *macro_table)
 {
     char *firstWord = NULL; /* Will hold first word in line. */

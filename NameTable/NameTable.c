@@ -187,7 +187,8 @@ int setNumberInData(NameTable *name_table, const char *name, int num)
         returnCode = NOT_MATCHING_DATA_CODE;
     else /* Set the number in the data */
     {
-        node -> data = (name_data_t *) allocate_space(sizeof(name_data_t));
+        if (node -> data == NULL) /* If we need to allocate space in the memory. */
+            node -> data = (name_data_t *) allocate_space(sizeof(name_data_t));
         node -> data -> num = num;
     }
 
@@ -331,13 +332,13 @@ void deleteNode(Node *node, dataType nodeDataType)
 {
     if (node != NULL) /* Check if it is already deleted. */
     {
-        (void) free_ptr(POINTER(node -> name));
+        (void) clear_ptr(node -> name)
 
-        if (nodeDataType == STRING_TYPE)
-            (void) free_ptr(POINTER(node -> data->string));
+        if (nodeDataType == STRING_TYPE && node -> data != NULL)
+            {(void) clear_ptr(node -> data -> string)}
 
-        (void) free_ptr(POINTER(node -> data));
-        (void) free_ptr(POINTER(node));
+        (void) clear_ptr(node -> data)
+        (void) clear_ptr(node)
     }
 }
 
@@ -357,7 +358,7 @@ void deleteTable(NameTable **table)
             deleteNode(curr, (*table) -> dataType);
             curr = next;
         }
-        (void) free_ptr(POINTER(*table));
+        (void) clear_ptr(*table)
     }
 }
 

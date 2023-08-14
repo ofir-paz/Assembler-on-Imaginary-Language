@@ -17,7 +17,7 @@ typedef enum
     /* Dynamic space allocation errors */
         NO_ALLOCATION_ERR,
     /* File handling related errors */
-        FILE_OPEN_ERR, FILE_CLOSE_ERR,
+        FILE_CLOSE_ERR,
     /* Amount of system errors. !! add new errors before this one !! */
         SYSTEM_ERROR_SIZE
 } SystemError;

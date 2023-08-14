@@ -213,7 +213,7 @@ int addAstToList(ast_list_t *astList, ast_t **ast)
 {
     int returnCode = INVALID_GIVEN_PARAM_CODE; /* Code to return, assume error. */
 
-    if (astList != NULL) /* If the parameter is valid. */
+    if (astList != NULL && ast != NULL && *ast != NULL) /* If the parameters are valid. */
     {
         ast_list_node_t *newAstListNode = createAstListNode(ast); /* Create a node for the ast. */
         if (astList -> head == NULL) /* If the list is empty. */
@@ -523,10 +523,10 @@ int deleteArgumentNode(arg_node_t **pArgNode)
     if (pArgNode != NULL && *pArgNode != NULL) /* If the parameter is valid */
     {
         if ((*pArgNode) -> argData -> dataType == STRING) /* If the argument has a string, */
-            (void) free_ptr(POINTER((*pArgNode) -> argData -> data.string)); /* Free it. */
+            {(void) clear_ptr((*pArgNode) -> argData -> data.string)} /* Free it. */
 
-        (void) free_ptr(POINTER((*pArgNode) -> argData)); /* Free the data of the arg. */
-        (void) free_ptr(POINTER(*pArgNode)); /* Free the argument node itself. */
+        (void) clear_ptr((*pArgNode) -> argData) /* Free the data of the arg. */
+        (void) clear_ptr(*pArgNode) /* Free the argument node itself. */
 
         returnCode = SUCCESS_CODE; /* Argument node deleted successfully. */
     }
@@ -574,10 +574,11 @@ int deleteAst(ast_t **pAst)
     if (pAst != NULL && *pAst != NULL) /* If the parameter is valid */
     {
         /* Deletes the arguments in the ast. */
-        (void) deleteArgumentList(&((*pAst) -> sentenceNode -> argListHead));
-        (void) free_ptr(POINTER((*pAst) -> sentenceNode)); /* Delete the sentence node. */
-        (void) free_ptr(POINTER((*pAst) -> label)); /* Delete the label name (if there is). */
-        (void) free_ptr(POINTER(*pAst)); /* Delete the ast itself. */
+        if ((*pAst) -> sentenceNode != NULL)
+            (void) deleteArgumentList(&((*pAst) -> sentenceNode -> argListHead));
+        (void) clear_ptr((*pAst) -> sentenceNode) /* Delete the sentence node. */
+        (void) clear_ptr((*pAst) -> label) /* Delete the label name (if there is). */
+        (void) clear_ptr(*pAst) /* Delete the ast itself. */
 
         returnCode = SUCCESS_CODE; /* ast deleted successfully. */
     }
@@ -599,7 +600,7 @@ int deleteAstListNode(ast_list_node_t **pAstListNode)
     if (pAstListNode != NULL && *pAstListNode != NULL) /* If the parameter is valid */
     {
         (void) deleteAst(&((*pAstListNode) -> ast)); /* Delete the ast in the node. */
-        (void) free_ptr(POINTER(*pAstListNode)); /* Delete the node itself. */
+        (void) clear_ptr(*pAstListNode) /* Delete the node itself. */
 
         returnCode = SUCCESS_CODE; /* node deleted successfully. */
     }
@@ -618,7 +619,8 @@ int deleteAstList(ast_list_t **pAstList)
 {
     int returnCode = INVALID_GIVEN_PARAM_CODE; /* Code to return, assume error. */
 
-    if (pAstList != NULL) /* If the parameter is valid */
+    /* If the parameter is valid */
+    if (pAstList != NULL && *pAstList != NULL && (*pAstList) -> head != NULL)
     {
         /* Helper nodes. */
         ast_list_node_t *curr = (*pAstList) -> head, *currDel = (*pAstList) -> head;
@@ -630,9 +632,10 @@ int deleteAstList(ast_list_t **pAstList)
             currDel = curr; /* Take the currDel node forward in the list. */
         }
 
-        (void) free_ptr(POINTER(*pAstList)); /* Free the list itself. */
         returnCode = SUCCESS_CODE; /* List deleted successfully. */
     }
+
+    (void) clear_ptr(*pAstList) /* Free the list itself. */
 
     return returnCode;
 }

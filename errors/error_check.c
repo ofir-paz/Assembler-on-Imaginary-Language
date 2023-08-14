@@ -210,18 +210,6 @@ boolean isNextEmpty(const char *line, int index)
     return isNextEmpty;
 }
 
-/* Returns TRUE if param char ch is a letter, otherwise FALSE */
-boolean isLetter(char ch)
-{
-    boolean isLetter = FALSE; /* Value to return */
-
-    /* Checks if ch is a letter */
-    if ((ch >= CHAR_A && ch <= CHAR_Z) || (ch >= CHAR_a && ch <= CHAR_z))
-        isLetter = TRUE; /* Assigns the value to return to TRUE if so */
-
-    return isLetter;
-}
-
 /* Returns TRUE if param char letter is a capital letter, otherwise FALSE. */
 boolean isCapitalLetter(char letter)
 {

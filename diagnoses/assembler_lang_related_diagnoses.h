@@ -99,6 +99,16 @@ char *getLabelFromLine(const char *line);
 reg_t getRegister(const char *word);
 
 /*
+ * Gets the start index of the command in the given assembly code line.
+ *
+ * @param   *line       The give line string holding the command.
+ * @param   isLabelDef  Flag indicating if the line has a label definition.
+ *
+ * @return  The start index of the command in the line.
+ */
+int getCommandStartIndex(const char *line, boolean isLabelDef);
+
+/*
  * Retrieves the command at the specified position in the line.
  *
  * @param   line            The input line to retrieve the word from.

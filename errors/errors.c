@@ -7,12 +7,7 @@
 
 /* ---Include header files--- */
 #include <stdio.h>
-#include <stdarg.h>
-#include "../new-data-types/boolean.h"
 #include "error_types/error_types.h"
-#include "PreProcessorErrors/PreProcessorErrors.h"
-#include "error_check.h"
-#include "error_handle.h"
 /* -------------------------- */
 
 /* ---Finals--- */
@@ -22,7 +17,6 @@
 #define ANSI_COLOR_BLUE     "\x1B[34m"
 #define ANSI_COLOR_RESET    "\x1b[0m"
 
-#define INPUT_ERROR_CODE (-1)
 /* ------------ */
 
 void print_assembler_ERR(Error error, const char *file_name, int lineNumber)
@@ -34,9 +28,20 @@ void print_assembler_ERR(Error error, const char *file_name, int lineNumber)
             };
     const char *syntaxErrorMSG[] =
             {
-                    "NO_ERROR",
-                    "Invalid macro name!! a macro name cannot be a saved word.",
-                    "Extraneous text in a macro definition line !!"
+                    /* Indicates no error. !! add new errors after this one !! */
+                "NO_ERROR",
+                    /* Macro related syntax errors */
+                "Invalid macro name! a macro name cannot be a saved word.",
+                "Extraneous text in a macro definition line !!",
+                    /* Label related syntax errors */
+                    "Expected label name !!",
+                    "Empty space between label and colon! Label and colon can't be seperated.",
+                    "Label starts with a number! It must start with a letter.",
+                    "Label starts with an illegal character! It must start with a letter.",
+                    "Label Contains illegal characters! It can include only letters and numbers.",
+                    "Label Is too long! Max label length is 31 characters long.",
+                    "Label Is a saved word! A label name cannot be a saved word."
+
             };
     const char *logicalErrorMSG[] =
             {
@@ -48,19 +53,7 @@ void print_assembler_ERR(Error error, const char *file_name, int lineNumber)
     /* Printing the errors. */
     fprintf(stderr, ANSI_COLOR_RED "\nERROR: " ANSI_COLOR_RESET "%s\n",
             errorMSG[(error / MAX_ERRORS_IN_ENUM) - 1][error % MAX_ERRORS_IN_ENUM]);
+
     fprintf(stderr, ANSI_COLOR_BLUE "In file: " ANSI_COLOR_RESET "%s, "
                     ANSI_COLOR_BLUE "On line: " ANSI_COLOR_RESET "%d\n", file_name, lineNumber);
-}
-
-Error handle_lineTooLong_error(const char *line, int lineIndex)
-{
-    Error error = NO_ERROR;
-
-    if (isLineTooLong(line) == TRUE)
-    {
-        handle_lineTooLong_ERR(lineIndex);
-        error = 1;//LINE_TOO_LONG_ERR;
-    }
-
-    return error;
 }

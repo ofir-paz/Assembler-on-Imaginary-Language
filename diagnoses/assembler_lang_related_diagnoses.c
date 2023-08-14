@@ -93,7 +93,7 @@ boolean isCallingMacro(const char *line, NameTable *macro_table)
     /* Check if a macro has been called. */
     isCallingMacro = isNameInTable(macro_table, firstWord);
 
-    (void) free_ptr(POINTER(firstWord)); /* Free unnecessary variable. */
+    (void) clear_ptr(firstWord) /* Free unnecessary variable. */
     return isCallingMacro;
 }
 
@@ -200,6 +200,23 @@ reg_t getRegister(const char *word)
 }
 
 /*
+ * Gets the start index of the command in the given assembly code line.
+ *
+ * @param   *line       The give line string holding the command.
+ * @param   isLabelDef  Flag indicating if the line has a label definition.
+ *
+ * @return  The start index of the command in the line.
+ */
+int getCommandStartIndex(const char *line, boolean isLabelDef)
+{
+    int endIndexOfLabelDef = (isLabelDef == TRUE)?
+                             nextSpecificCharIndex(line, ZERO_INDEX, COLON) :
+                             MINUS_ONE_INDEX;
+
+    return endIndexOfLabelDef + 1;
+}
+
+/*
  * Gets the command from a given line string in a string type.
  *
  * @param   *line           The given line string.
@@ -210,12 +227,9 @@ reg_t getRegister(const char *word)
 char *getCommandStringFromLine(const char *line, boolean isLabelDef)
 {
     char *commandName = NULL; /* Will hold the specific command name. */
-    int endIndexOfLabelDef = (isLabelDef == TRUE)?
-                             nextSpecificCharIndex(line, ZERO_INDEX, COLON) :
-                             MINUS_ONE_INDEX;
 
     /* Find the command name from after the end of the end index of label. */
-    findWord(line + endIndexOfLabelDef + 1, &commandName, FIRST_WORD);
+    findWord(line + getCommandStartIndex(line, isLabelDef), &commandName, FIRST_WORD);
 
     return commandName;
 }
@@ -237,7 +251,7 @@ int getCommandFromLine(const char *line, boolean isLabelDef)
     if ((command = getGuidance(commandName)) == NO_GUIDANCE) /* Get the command */
         command = getOpcode(commandName);
 
-    free_ptr(POINTER(commandName)); /* Free unnecessary variable. */
+    (void) clear_ptr(commandName) /* Free unnecessary variable. */
     return command;
 }
 
@@ -262,7 +276,7 @@ sentence_type_t getSentenceTypeOfLine(const char *line, boolean isLabelDef)
     else /* The command is invalid. */
         sentenceType = NO_SENTENCE_TYPE;
 
-    free_ptr(POINTER(commandName)); /* Free unnecessary variable. */
+    (void) clear_ptr(commandName) /* Free unnecessary variable. */
     return sentenceType;
 }
 
@@ -295,7 +309,7 @@ boolean isSavedWordInLine(const char *line, word_number wordNumber)
 
     isSavedWordInLine = isSavedWord(word); /* Check if it's a saved word. */
 
-    (void) free_ptr(POINTER(word)); /* Free unnecessary variable. */
+    (void) clear_ptr(word) /* Free unnecessary variable. */
     return isSavedWordInLine;
 }
 
@@ -311,10 +325,10 @@ boolean isSavedWordInLine(const char *line, word_number wordNumber)
  */
 boolean isColonInLineForLabel(const char *line)
 {
-    int firstColonIndex = nextSpecificCharIndex(line, ZERO_INDEX, COLON);
+    int firstColonIndex = nextSpecificCharIndex(line, MINUS_ONE_INDEX, COLON);
     int secondWordIndex = findStartIndexOfWord(line, SECOND_WORD);
 
-    /* Return TRUE if the colon is before or at the start of the second word (if it exist). */
+    /* Return TRUE if the colon is before or at the start of the second word (if it exists). */
     return (firstColonIndex <= secondWordIndex &&
             line[firstColonIndex] == COLON)? TRUE : FALSE;
 }
@@ -360,7 +374,7 @@ void findArg(const char *line, char **arg, int argumentNum, boolean isLabel)
     /* Clearing the empty space. */
     findWord(fullArg, arg, FIRST_WORD);
 
-    (void) free_ptr(POINTER(fullArg));
+    (void) clear_ptr(fullArg)
 }
 
 /*
@@ -419,7 +433,7 @@ void getArgDataFromLine(const char *line, int argumentNum, boolean isLabel, data
     getArgDataTypeFromString(arg, &(argData -> dataType)); /* Get the data type. */
     getArgDataFromString(arg, argData); /* Get the data. */
 
-    (void) free_ptr(POINTER(arg)); /* Free unnecessary variable. */
+    (void) clear_ptr(arg) /* Free unnecessary variable. */
 }
 
 /*

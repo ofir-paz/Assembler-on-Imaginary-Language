@@ -14,19 +14,18 @@
 
 /* ---------------Prototypes--------------- */
 
-/* Handles no allocation error.
- * param void *ptr is the pointer to check if it has allocated space
- * Returns nothing. */
+/*
+ * Handles no allocation error.
+ *
+ * @param   *ptr     The pointer to check if it has allocated space.
+ */
 void handle_allocation_error(void *ptr);
 
-/* Handles error with opening a file.
- * param const FILE *file is the stream to check if it has been opened
- * Returns nothing. */
-void handle_file_open_errors(const FILE *file);
-
-/* Handles error with closing a file.
- * param int code is the return code of fclose() func.
- * Returns nothing. */
+/*
+ * Handles error with closing a file.
+ *
+ * @param   code    The return code of fclose() func.
+ */
 void handle_file_close_errors(int code);
 
 /* ---------------------------------------- */

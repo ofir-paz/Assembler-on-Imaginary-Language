@@ -15,7 +15,8 @@
  * the given file name.
  *
  * @param   *file_name The name of the file to process.
- * @return  The data structure holding the macros of the .as file.
+ *
+ * @return  SUCCESS (1) if there were no errors, otherwise FAILURE (0).
  */
 process_result pre_process(const char *file_name);
 

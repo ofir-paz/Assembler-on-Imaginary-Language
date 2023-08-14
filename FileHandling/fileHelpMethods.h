@@ -14,11 +14,11 @@
 
 /*
  * Opens a file.
- * Terminates the program on error!
  *
  * @param   *file_name The name of the file to open.
  * @param   *fileType The type of the file to open.
  * @param   *modeType The mode to open the file with.
+ *
  * @return  Pointer to the opened file.
  */
 FILE *openFile(const char *file_name, const char *fileType, const char *modeType);

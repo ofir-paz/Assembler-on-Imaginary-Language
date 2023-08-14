@@ -252,6 +252,6 @@ void addToStringInFormat(char **pString, const char *str, int val)
     addTwoStrings(pString, startLine);
 
     /* Free helper strings. */
-    (void) free_ptr(POINTER(valStr));
-    (void) free_ptr(POINTER(startLine));
+    (void) clear_ptr(valStr)
+    (void) clear_ptr(startLine)
 }

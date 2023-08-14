@@ -34,12 +34,11 @@
 /* ---------------Prototypes--------------- */
 process_result firstFileTraverse(const char *file_name, NameTable *labelsMap[],
                                  ast_list_t *astList);
-ast_t *handleLineInFirstTrans(const char *file_name, const char *line, NameTable *labelsMap[],
-                              int *IC, int *DC, boolean *wasError);
+boolean handleLineInFirstTrans(const char *file_name, const char *line, int lineNumber,
+                               ast_list_t *astList, NameTable *labelsMap[], int *IC, int *DC);
 ast_t *firstAssemblerAlgo(const char *file_name, const char *line, int lineNumber,
-                          NameTable *labelsMap[], int *IC, int *DC, boolean *wasError);
-void addToTablesIfNeededInFirstTrans(ast_t *lineAst, NameTable *labelsMap[], int IC, int DC,
-                                    Error *lineError);
+                          NameTable *labelsMap[], int *IC, int *DC);
+Error addToTablesIfNeededInFirstTrans(ast_t *lineAst, NameTable *labelsMap[], int IC, int DC);
 Error addToNormalTable(ast_t *lineAst, NameTable *normalTable, NameTable *extTable, int IC, int DC);
 Error addToOtherTable(ast_t *lineAst, NameTable *labelsMap[], label_type_t table);
 /* ---------------------------------------- */
@@ -73,26 +72,30 @@ process_result firstFileTraverse(const char *file_name, NameTable *labelsMap[],
                                  ast_list_t *astList)
 {
     boolean wasError = FALSE;
-    int *IC = getCounterPointer(astList, IC_);
-    int *DC = getCounterPointer(astList, DC_);
-    *IC = *DC = PROGRAM_MEM_START;
+    int *IC = getCounterPointer(astList, IC_), *DC = getCounterPointer(astList, DC_);
     char *line = NULL; /* This will hold the current line */
+    ssize_t readCode; /* Will hold the current line's read code. */
+    int lineCount = ZERO_COUNT;
 
+    *IC = *DC = PROGRAM_MEM_START;
     /* Read the file line-by-line and handle it. */
-    while (readNextLineFromFile(file_name, AFTER_MACRO, &line) != EOF)
+    while ((readCode = readNextLineFromFile(file_name, AFTER_MACRO, &line)) != EOF)
     {
-        ast_t *lineAst = handleLineInFirstTrans(file_name, line, labelsMap, IC, DC, &wasError);
-        if (wasError == FALSE) /* Add the ast to the list if there was no error. */
-            (void) addAstToList(astList, &lineAst);
-        (void) free_ptr(POINTER(line)); /* Next line */
+        if (readCode == UNABLE_TO_OPEN_FILE) break;
+
+        lineCount++;
+        boolean wasErrorInLine = handleLineInFirstTrans(file_name, line, lineCount,
+                                                        astList, labelsMap, IC, DC);
+        (void) clear_ptr(line) /* Next line */
+
+        if (wasErrorInLine == TRUE) wasError = TRUE;
     }
-    (void) free_ptr(POINTER(line)); /* Free the last line. */
+    (void) clear_ptr(line) /* Free the last line. */
 
-    if (wasError == FALSE)
-        /* Separate instructions and data */
-        updateDataLabels(labelsMap[NORMAL], *IC - PROGRAM_MEM_START);
+    /* Separate instructions and data */
+    updateDataLabels(labelsMap[NORMAL], *IC - PROGRAM_MEM_START);
 
-    return (wasError == FALSE)? SUCCESS : FAILURE;
+    return (wasError == FALSE && readCode != UNABLE_TO_OPEN_FILE)? SUCCESS : FAILURE;
 }
 
 /*
@@ -103,33 +106,30 @@ process_result firstFileTraverse(const char *file_name, NameTable *labelsMap[],
  * @param   *amFile Data structure to hold the file to print.
  * @param   *macro_table Data structure to hold the macro names and contents.
  */
-ast_t *handleLineInFirstTrans(const char *file_name, const char *line, NameTable *labelsMap[],
-                              int *IC, int *DC, boolean *wasError)
+boolean handleLineInFirstTrans(const char *file_name, const char *line, int lineNumber,
+                               ast_list_t *astList, NameTable *labelsMap[], int *IC, int *DC)
 {
-    static int lineCount = ZERO_COUNT; /* Counter of line */
-    lineCount++;
+    ast_t *lineAst = firstAssemblerAlgo(file_name, line, lineNumber, labelsMap, IC, DC);
+    (void) addAstToList(astList, &lineAst); /* Add the ast to the list. */
 
-    return firstAssemblerAlgo(file_name, line, lineCount, labelsMap, IC, DC, wasError);
+    return (lineAst == NULL)? TRUE : FALSE;
 }
 
 ast_t *firstAssemblerAlgo(const char *file_name, const char *line, int lineNumber,
-                          NameTable *labelsMap[], int *IC, int *DC, boolean *wasError)
+                          NameTable *labelsMap[], int *IC, int *DC)
 {
     Error lineError; /* Represents the error in the line (if there is). */
 
     /* AST (abstract syntax tree) representing the line to return. */
     ast_t *lineAst = buildAstFromLine(line, &lineError);
 
-    //bad
-    lineError = handle_FirstTransLine_Error(file_name, lineNumber, lineAst, lineError);
+    if (lineAst != NULL) /* If the tree was built (there were no errors in the line itself) */
+        lineError = addToTablesIfNeededInFirstTrans(lineAst, labelsMap, *IC, *DC);
 
-    addToTablesIfNeededInFirstTrans(lineAst, labelsMap, *IC, *DC, &lineError);
-
-    // change to handleLineErrorInFirstTrans
     if (lineError == NO_ERROR)
         updateCounters(lineAst, IC, DC);
     else
-        *wasError = TRUE;
+        handle_FirstTransLine_Error(file_name, lineNumber, lineError);
 
     return lineAst;
 }
@@ -145,16 +145,19 @@ ast_t *firstAssemblerAlgo(const char *file_name, const char *line, int lineNumbe
  * @param   *amFile The data structure to hold the contents of the .am file.
  * @param   *macro_table The data structure to hold the macros and their contents.
  */
-void addToTablesIfNeededInFirstTrans(ast_t *lineAst, NameTable *labelsMap[], int IC, int DC,
-                                      Error *lineError)
+Error addToTablesIfNeededInFirstTrans(ast_t *lineAst, NameTable *labelsMap[], int IC, int DC)
 {
+    Error lineError = NO_ERROR;
+
     label_type_t labelType = getLabelTypeForTable(lineAst);
 
     if (labelType == NORMAL)
-            *lineError = addToNormalTable(lineAst, labelsMap[NORMAL],
+            lineError = addToNormalTable(lineAst, labelsMap[NORMAL],
                                           labelsMap[EXTERN], IC, DC);
     else if (labelType == ENTRY || labelType == EXTERN)
-            *lineError = addToOtherTable(lineAst, labelsMap, labelType);
+            lineError = addToOtherTable(lineAst, labelsMap, labelType);
+
+    return lineError;
 }
 
 Error addToNormalTable(ast_t *lineAst, NameTable *normalTable, NameTable *extTable, int IC, int DC)

@@ -17,7 +17,6 @@
 
 /* Use when 1 <= n <= 8. */
 #define get_first_n_bits(byte, n) ((byte) & (FULL_1_BYTE >> (BITS_IN_BYTE - (n))))
-#define get_last_n_bits(byte, n) ((byte) & (FULL_1_BYTE << (BITS_IN_BYTE - (n))))
 
 /* Use when low and high are numbers. */
 #define isValidWordRange(low, high)\
@@ -114,8 +113,10 @@ void convertWordToBase64(const word_t word, word_t word64)
     /* Since a word in the assembly language requires a minimum
      * of two bytes to be represented, We take the first 6 bits of the
      * representation, and the last 6 bits of it and convert them. */
+
     unsigned char firstChar = get_first_n_bits(word[FIRST_PART_OF_WORD], SIX_NUMBER);
-    unsigned char secondChar = (get_last_n_bits(word[FIRST_PART_OF_WORD], TWO_NUMBER) >> SIX_NUMBER) |
+    unsigned char secondChar =
+            (get_first_n_bits(word[FIRST_PART_OF_WORD] >> SIX_NUMBER, TWO_NUMBER)) |
             (get_first_n_bits(word[SECOND_PART_OF_WORD], FOUR_NUMBER) << TWO_NUMBER);
 
     /* Assign them back to the word in their base 64 equivalents. */

@@ -25,7 +25,6 @@ void system_error(SystemError sysErr)
                     /* Dynamic space allocation errors */
             "ERR: Not enough space in the memory !",
                     /* File handling related errors */
-            "ERR: error with opening a file !",
             "ERR: error with closing a file !"
             };
 
@@ -33,27 +32,22 @@ void system_error(SystemError sysErr)
     exit(EXIT_FAILURE); /* Terminating the program */
 }
 
-/* Handles no allocation error.
- * param void *ptr is the pointer to check if it has allocated space
- * Returns nothing. */
+/*
+ * Handles no allocation error.
+ *
+ * @param   *ptr     The pointer to check if it has allocated space.
+ */
 void handle_allocation_error(void *ptr)
 {
     if (ptr == NULL) /* == NULL, means the space is not allocated */
         system_error(NO_ALLOCATION_ERR);
 }
 
-/* Handles error with opening a file.
- * param const FILE *file is the stream to check if it has been opened
- * Returns nothing. */
-void handle_file_open_errors(const FILE *file)
-{
-    if (file == NULL)
-        system_error(FILE_OPEN_ERR);
-}
-
-/* Handles error with closing a file.
- * param int code is the return code of fclose() func.
- * Returns nothing. */
+/*
+ * Handles error with closing a file.
+ *
+ * @param   code    The return code of fclose() func.
+ */
 void handle_file_close_errors(int code)
 {
     if (code == EOF) /* EOF (-1) is error return code of fclose() */

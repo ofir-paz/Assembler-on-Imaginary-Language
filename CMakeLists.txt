@@ -4,7 +4,7 @@ project(mmn_14 C)
 set(CMAKE_C_STANDARD 90)
 
 add_executable(mmn_14 main.c new-data-types/boolean.h
-        errors/error_check.c errors/error_handle.c
+        errors/error_check.c
         transitions/pre-processor.c  transitions/pre-processor.h FileHandling/readFromFile.c
         FileHandling/readFromFile.h
         FileHandling/writeToFile.c FileHandling/writeToFile.h encoding/encoding-finals/opcodes.h
@@ -41,4 +41,6 @@ add_executable(mmn_14 main.c new-data-types/boolean.h
         encoding/encodingDataStructures/word.h
         errors/SecondTransitionErrors/SecondTransitionErrors.c
         errors/SecondTransitionErrors/SecondTransitionErrors.h
+        errors/FirstTransitionErrors/FirstTransitionSpecificErrorCheck.c
+        errors/FirstTransitionErrors/FirstTransitionSpecificErrorCheck.h
 )

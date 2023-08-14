@@ -20,11 +20,11 @@
 
 /*
  * Opens a file.
- * Terminates the program on error!
  *
  * @param   *file_name The name of the file to open.
  * @param   *fileType The type of the file to open.
  * @param   *modeType The mode to open the file with.
+ *
  * @return  Pointer to the opened file.
  */
 FILE *openFile(const char *file_name, const char *fileType, const char *modeType)
@@ -39,12 +39,14 @@ FILE *openFile(const char *file_name, const char *fileType, const char *modeType
         sameStrings(currModeType, modeType) == FALSE)
     {
         file = fopen(fileToOpen, modeType); /* Open the file */
-        handle_file_open_errors(file); /* Will handle errors with opening file */
+        if (file == NULL)
+            printf("\nUnable to open file: \"%s\"\n", file_name);
+
         (void) strcpy(currFileName, fileToOpen);
         (void) strcpy(currModeType, modeType);
     }
 
-    (void) free_ptr(POINTER(fileToOpen)); /* Freeing unnecessary string */
+    (void) clear_ptr(fileToOpen) /* Freeing unnecessary string */
     return file;
 }
 

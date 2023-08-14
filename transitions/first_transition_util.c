@@ -89,7 +89,7 @@ Error addLabelFromLineToAST(ast_t *lineAST, const char *line)
     /* Add label (will do nothing if there was an error or there was no label). */
     addLabelToAst(lineAST, label);
 
-    (void) free_ptr(POINTER(label)); /* Free unnecessary variable. */
+    (void) clear_ptr(label) /* Free unnecessary variable. */
     return foundError;
 }
 

@@ -34,6 +34,7 @@
 
 /* ---Include header files--- */
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include "../new-data-types/boolean.h"
 #include "../assembler_ast/assembler_ast.h"
@@ -42,6 +43,7 @@
 #include "../general-enums/neededKeys.h"
 #include "../general-enums/indexes.h"
 #include "../general-enums/assemblerFinals.h"
+#include "../errors/system_errors.h"
 #include "encodingDataStructures/MemoryImage.h"
 #include "encodingUtil.h"
 #include "wordHandling.h"
@@ -82,7 +84,6 @@ void encodeInstructionWithTwoArgs(word_t *instructions, int *currWord, arg_node_
 
 void printWord(const word_t word);
 /* ---------------------------------------- */
-#include <stdlib.h>
 
 /*
  * Create a new MemoryImage structure.
@@ -94,11 +95,18 @@ MemoryImage *createMemoryImage(int IC, int DC)
     MemoryImage *newMemoryImage = (MemoryImage *) allocate_space(sizeof(MemoryImage));
 
     /* Allocating space for the instructions memory image. */
-    if(IC) newMemoryImage -> instructions = (word_t *) calloc(IC , sizeof(word_t));
+    if (IC > ZERO_COUNT) {
+        newMemoryImage -> instructions = (word_t *) calloc(IC, sizeof(word_t));
+        handle_allocation_error(newMemoryImage -> instructions);
+    }
+
     else newMemoryImage -> instructions = NULL;
 
     /* Allocating space for the data memory image. */
-    if(DC) newMemoryImage -> data = (word_t *) calloc(DC , sizeof(word_t));
+    if (DC > ZERO_COUNT) {
+        newMemoryImage -> data = (word_t *) calloc(DC, sizeof(word_t));
+        handle_allocation_error(newMemoryImage -> data);
+    }
     else newMemoryImage -> data = NULL;
 
     /* Resetting values. */
@@ -301,7 +309,7 @@ void encodeInstructionWithTwoArgs(word_t *instructions, int *currWord, arg_node_
         encodeDirArgument(instructions[*currWord], *currWord + PROGRAM_MEM_START, secondArg,
                           TRUE, normalLabels, extLabels, extFileContents);
     }
-    
+
     (*currWord)++; /* Next instruction. */
 }
 
@@ -317,12 +325,15 @@ void encodeInstructionWithTwoArgs(word_t *instructions, int *currWord, arg_node_
  */
 char *getEncodedWords(MemoryImage *memoryImage, boolean isWordsInstructions)
 {
-    int i; /* Loop variable. */
     word_t tmpWord; /* Temporary word to hold encoded Base64 words. */
+
+    int i; /* Loop variable. */
 
     int wordsCnt = (isWordsInstructions)? memoryImage -> currWord[IC_] :
             memoryImage -> currWord[DC_]; /* How many words to encode. */
     int size = (CHARS_FOR_WORD + SIZE_FOR_NEW_LINE) * wordsCnt; /* Size of the string. */
+    word_t *specificMemImage = (isWordsInstructions)? memoryImage -> instructions :
+            memoryImage -> data;
 
     char *encoded64Words = (char *) allocate_space(size + SIZE_FOR_NULL);
     encoded64Words[size] = NULL_TERMINATOR; /* String to return. */
@@ -330,9 +341,10 @@ char *getEncodedWords(MemoryImage *memoryImage, boolean isWordsInstructions)
     /* Convert each word to Base64 and add a new line after it. */
     for (i = ZERO_INDEX; i < size; i += (CHARS_FOR_WORD + SIZE_FOR_NEW_LINE))
     {
-        convertWordToBase64(memoryImage -> instructions[i], tmpWord);
-        encoded64Words[i + FIRST_PART_OF_WORD] = (char) tmpWord[FIRST_PART_OF_WORD];
-        encoded64Words[i + SECOND_PART_OF_WORD] = (char) tmpWord[SECOND_PART_OF_WORD];
+        convertWordToBase64(specificMemImage[i/3], tmpWord);
+        /* Since we are printing from right to left, we need to reverse the order. */
+        encoded64Words[i + SECOND_PART_OF_WORD] = (char) tmpWord[FIRST_PART_OF_WORD];
+        encoded64Words[i + FIRST_PART_OF_WORD] = (char) tmpWord[SECOND_PART_OF_WORD];
         encoded64Words[i + CHARS_FOR_WORD] = ENTER_KEY;
     }
 
@@ -346,9 +358,9 @@ char *getEncodedWords(MemoryImage *memoryImage, boolean isWordsInstructions)
  */
 void clearMemoryImage(MemoryImage **pMemoryImage)
 {
-    (void) free_ptr(POINTER((*pMemoryImage) -> instructions));
-    (void) free_ptr(POINTER((*pMemoryImage) -> data));
-    (void) free_ptr(POINTER(*pMemoryImage));
+    (void) clear_ptr((*pMemoryImage) -> instructions)
+    (void) clear_ptr((*pMemoryImage) -> data)
+    (void) clear_ptr(*pMemoryImage)
 }
 
 // !!! -----DEBUGGING----- !!!
