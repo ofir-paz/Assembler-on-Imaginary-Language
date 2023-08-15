@@ -8,6 +8,6 @@
 #define MMN_14_INDEXES_H
 
 /* indexes enums */
-enum indexes {MINUS_ONE_INDEX = (-1), ZERO_INDEX, ONE_INDEX, TWO_INDEX};
+enum indexes {MINUS_ONE_INDEX = (-1), ZERO_INDEX, ONE_INDEX, TWO_INDEX, THREE_INDEX};
 
 #endif /* MMN_14_INDEXES_H */

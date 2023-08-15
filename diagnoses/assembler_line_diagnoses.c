@@ -353,6 +353,30 @@ int getStartIndexOfArguments(const char *line, boolean isLabel)
 }
 
 /*
+ * Gets the index of the specified argument in the given line.
+ * Assumes the part of the line before the specific argument is syntax-valid.
+ *
+ * @param   *line           The line of assembly code to search for the argument.
+ * @param   argumentNum     The number of the argument to search for (starting from 1).
+ * @param   isLabel         Indicates whether the line has a label definition.
+ *
+ * @return  The index of the specified argument in the line, or index of null terminator
+ *          of the given line string if not found.
+ */
+int getArgumentIndex(const char *line, int argumentNum, boolean isLabel)
+{
+    int i; /* Loop variable. */
+    int currArgStartIndex = getStartIndexOfArguments(line, isLabel); /* First arg index. */
+
+    /* Move forward until currArgStartIndex is the start index of the specific argument. */
+    for (i = ONE_INDEX; i < argumentNum; i++)
+        currArgStartIndex = nextCharIndex(line,
+                                          nextSpecificCharIndex(line, currArgStartIndex, COMMA));
+
+    return currArgStartIndex;
+}
+
+/*
  * Find the specified argument in the given line.
  *
  * This function tokenizes the line using the delimiter "," and returns
@@ -388,7 +412,7 @@ void getArgDataTypeFromString(char *arg, data_type_t *dataType)
 {
     if (isPartOfNumber(arg, ZERO_INDEX) == TRUE) /* Is number */
         *dataType = INT;
-    else if (*arg == AT) /* Is register */
+    else if (arg[ZERO_INDEX] == AT) /* Is register */
         *dataType = REG;
     else /* Otherwise, string. */
         *dataType = STRING;

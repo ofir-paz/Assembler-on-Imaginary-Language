@@ -5,8 +5,8 @@
  * Header file for the assembler_lang_related_diagnoses.c file.
  */
 
-#ifndef MMN_14_ASSEMBLER_LANG_RELATED_DIAGNOSES_H
-#define MMN_14_ASSEMBLER_LANG_RELATED_DIAGNOSES_H
+#ifndef MMN_14_ASSEMBLER_LINE_DIAGNOSES_H
+#define MMN_14_ASSEMBLER_LINE_DIAGNOSES_H
 
 #include "../new-data-types/boolean.h"
 #include "../NameTable/NameTable.h"
@@ -86,6 +86,24 @@ boolean isMacroLine(boolean wasInMacroDef, boolean isInMacroDef);
 char *getLabelFromLine(const char *line);
 
 /*
+ * Gets the guidance word that is represented by the given string word.
+ *
+ * @param   word The given word.
+ * @return  The guidance word that is represented by the given string word, or NO_GUIDANCE (-1)
+ *          if word is not a guidance word.
+ */
+guidance_t getGuidance(const char *word);
+
+/*
+ * Gets the opcode that is represented by the given string word.
+ *
+ * @param   word The given word.
+ * @return  The opcode that is represented by the given string opcode, or NO_OPCODE (-1)
+ *          if word is not an opcode.
+ */
+opcodes_t getOpcode(const char *word);
+
+/*
  * Get the register value from the given word.
  *
  * This function checks if the given word represents a register and returns the register value.
@@ -160,6 +178,19 @@ boolean isSavedWordInLine(const char *line, word_number wordNumber);
 boolean isColonInLineForLabel(const char *line);
 
 /*
+ * Gets the index of the specified argument in the given line.
+ * Assumes the part of the line before the specific argument is syntax-valid.
+ *
+ * @param   *line           The line of assembly code to search for the argument.
+ * @param   argumentNum     The number of the argument to search for (starting from 1).
+ * @param   isLabel         Indicates whether the line has a label definition.
+ *
+ * @return  The index of the specified argument in the line, or index of null terminator
+ *          of the given line string if not found.
+ */
+int getArgumentIndex(const char *line, int argumentNum, boolean isLabel);
+
+/*
  * Find the specified argument in the given line.
  *
  * This function tokenizes the line using the delimiter "," and returns
@@ -196,4 +227,4 @@ boolean isLastArg(const char *line, int argumentNum, boolean isLabel);
 
 /* ---------------------------------------- */
 
-#endif /* MMN_14_ASSEMBLER_LANG_RELATED_DIAGNOSES_H */
+#endif /* MMN_14_ASSEMBLER_LINE_DIAGNOSES_H */

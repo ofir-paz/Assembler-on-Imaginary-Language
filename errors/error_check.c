@@ -22,19 +22,6 @@
 #define LEGAL_DOTS_IN_FLOAT 1
 /* ------------ */
 
-/* Checks for illegal comma after the function in param const char *command.
- * Returns TRUE if there is a comma after the command, otherwise FALSE. */
-boolean isCommaAfterCmd(const char *command)
-{
-    /* Getting the index of the comma in command, will be the index
-     * of null terminator of there is no comma. */
-    int nextComma = nextSpecificCharIndex(command, ZERO_INDEX, COMMA);
-
-    /* Returning TRUE if the char in index nextComma of command is a comma,
-     * otherwise FALSE. */
-    return isCurrCharComma(command, nextComma);
-}
-
 /* Checks if the next char in param const char *line from param int index
  * that is not empty (space/tab) is a comma.
  * Returns TRUE if the next char is a comma, otherwise FALSE. */
@@ -271,13 +258,4 @@ Error checkExtraneousTextError(const char *line, int indexOfLastToken)
         error = NO_ERROR;
 
     return error;
-}
-
-/* Checks if an input line is too long ( > 80).
- * param const char *line is the input line.
- * Returns TRUE if the line is too long, otherwise FALSE. */
-boolean isLineTooLong(const char *line)
-{
-    /* The only situation where a line is too long is when it doesn't end with '\n'. */
-    return (line[strlen(line) - 1] != ENTER_KEY)? TRUE : FALSE;
 }

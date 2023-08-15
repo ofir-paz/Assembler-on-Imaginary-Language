@@ -6,19 +6,22 @@
  */
 
 /* ---Include header files--- */
+#include <string.h>
 #include "../../new-data-types/boolean.h"
 #include "../../new-data-types/word_number.h"
+#include "../../general-enums/neededKeys.h"
 #include "../error_types/error_types.h"
 #include "../errors.h"
 #include "../error_check.h"
 #include "../../diagnoses/diagnose_util.h"
-#include "../../diagnoses/assembler_lang_related_diagnoses.h"
+#include "../../diagnoses/assembler_line_diagnoses.h"
 /* -------------------------- */
 
 /* ---Macros--- */
 /* ------------ */
 
 /* ---Finals--- */
+#define MAX_LINE_LEN 80
 /* ------------ */
 
 /* ---------------Prototypes--------------- */
@@ -54,7 +57,9 @@ Error getSyntaxPreProcessERR(const char *line, const char *macro_name,
 
     /* ---Error diagnoses process--- */
 
-    if (isInvalidMacroNameERR(macro_name, wasInMacroDef, isInMacroDef) == TRUE)
+    if (isLineTooLong(line))
+        error = LINE_OVERFLOW_ERR;
+    else if (isInvalidMacroNameERR(macro_name, wasInMacroDef, isInMacroDef) == TRUE)
         error = INVALID_MACRO_NAME_ERR;
     else if (isExtraneousTextInMacroLineERR(line, wasInMacroDef, isInMacroDef) == TRUE)
         error = EXTRANEOUS_TEXT_IN_MACRO_LINE_ERR;
@@ -62,6 +67,14 @@ Error getSyntaxPreProcessERR(const char *line, const char *macro_name,
     /* ----------------------------- */
 
     return error;
+}
+
+/* Checks if an input line is too long ( > 80).
+ * param const char *line is the input line.
+ * Returns TRUE if the line is too long, otherwise FALSE. */
+boolean isLineTooLong(const char *line)
+{
+    return (strlen(line) > MAX_LINE_LEN && line[MAX_LINE_LEN] != ENTER_KEY)? TRUE : FALSE;
 }
 
 boolean isInvalidMacroNameERR(const char *macro_name, boolean wasInMacroDef, boolean isInMacroDef)

@@ -13,7 +13,7 @@
 #include "../general-enums/programFinals.h"
 #include "../general-enums/assemblerFinals.h"
 #include "../errors/FirstTransitionErrors/FirstTransitionErrors.h"
-#include "../diagnoses/assembler_lang_related_diagnoses.h"
+#include "../diagnoses/assembler_line_diagnoses.h"
 #include "../util/memoryUtil.h"
 /* -------------------------- */
 
@@ -113,8 +113,8 @@ Error addArgumentsFromLineToAST(ast_t *lineAST, const char *line)
     boolean isLabelDef = isLabel(lineAST);
 
     if (isLastArg(line, ZERO_NUMBER, isLabel(lineAST)) == FALSE)
-        while ((foundError = checkSyntaxErrorInArgAndBetween(line, argumentNum,
-                                                         isLabelDef)) == NO_ERROR)
+        while ((foundError =
+                checkSyntaxErrorInArgAndBetween(line, argumentNum, isLabelDef)) == NO_ERROR)
         {
             data_t *argData = (data_t *) allocate_space(sizeof(data_t));
             getArgDataFromLine(line, argumentNum, isLabel(lineAST), argData);

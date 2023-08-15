@@ -9,6 +9,7 @@
 
 typedef enum {NO_OPCODE = -1,
               mov, cmp, add, sub, not, clr, lea, inc, dec, jmp, bne, red, prn, jsr, rts, stop,
+              OPCODE_AMOUNT
               } opcodes_t;
 
 #endif /* MMN_14_OPCODES_H */

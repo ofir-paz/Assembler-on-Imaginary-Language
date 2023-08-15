@@ -25,8 +25,8 @@ add_executable(mmn_14 main.c new-data-types/boolean.h
         general-enums/programFinals.h
         errors/error_types/error_constant.h errors/error_types/error_types.h
         errors/PreProcessorErrors/PreProcessorErrors.c
-        errors/PreProcessorErrors/PreProcessorErrors.h diagnoses/assembler_lang_related_diagnoses.c
-        diagnoses/assembler_lang_related_diagnoses.h encoding/encoding-finals/encoding_finals.h
+        errors/PreProcessorErrors/PreProcessorErrors.h diagnoses/assembler_line_diagnoses.c
+        diagnoses/assembler_line_diagnoses.h encoding/encoding-finals/encoding_finals.h
         encoding/encoding-finals/sentence_types.h assembler_ast/assembler_ast.c assembler_ast/assembler_ast.h
         encoding/encoding-finals/registers.h transitions/first_transition_util.c
         transitions/first_transition_util.h util/memoryUtil.c util/memoryUtil.h
@@ -43,4 +43,6 @@ add_executable(mmn_14 main.c new-data-types/boolean.h
         errors/SecondTransitionErrors/SecondTransitionErrors.h
         errors/FirstTransitionErrors/FirstTransitionSpecificErrorCheck.c
         errors/FirstTransitionErrors/FirstTransitionSpecificErrorCheck.h
+        diagnoses/assembler_diagnoses.c
+        diagnoses/assembler_diagnoses.h
 )

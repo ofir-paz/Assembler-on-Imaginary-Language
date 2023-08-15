@@ -21,13 +21,14 @@ typedef enum
         LABEL_START_WITH_ILLEGAL_CHAR_ERR, LABEL_CONTAINS_ILLEGAL_CHAR_ERR,
         LABEL_TOO_LONG_ERR, LABEL_IS_SAVED_WORD_ERR,
     /* Command syntax errors */
-        OP_NAME_TOO_SHORT_ERR, OP_NAME_TOO_LONG_ERR, OP_NAME_INVALID_CHARS_ERR,
-        WRONG_CASE_OP_ERR, UNDEFINED_OP_ERR,
+        EXPECTED_OP_GUI_ERR, COMMA_AFTER_COMMAND_ERR,
+    /* Guidance syntax errors. */
+        EXPECTED_GUIDANCE_ERR, MULT_DOTS_IN_GUIDANCE_ERR, WRONG_CASE_GUIDANCE_ERR,
+        UNKNOWN_GUIDANCE_ERR,
+    /* Operation syntax errors. */
+        MISSING_GUIDANCE_DOT_ERR, WRONG_CASE_OPERATION_ERR, UNKNOWN_OPERATION_ERR,
     /* Comma syntax errors */
         COMMA_AFTER_OP_ERR, NO_COMMA_ERR, CONSEC_COMMAS_ERR,
-    /* Operand syntax errors */
-        NO_FIRST_PARAM_ERR, NO_SECOND_PARAM_ERR, ONLY_SIGN_ERR, ONLY_AT_ERR,
-        CAPITAL_R_AFTER_AT_ERR, NO_REGISTER_AFTER_AT_ERR,
     /* Extraneous text errors */
         EXTRANEOUS_COMMA_ERR, EXTRANEOUS_TXT_ERR,
     /* Amount of syntax errors. !! add new errors before this one !! */

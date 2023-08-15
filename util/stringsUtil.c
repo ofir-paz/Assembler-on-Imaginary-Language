@@ -46,14 +46,14 @@ char *getDynamicString(const char *str)
  * Returns the created lower case string */
 char *strToLowerCase(const char *str)
 {
-    int i; /* Loop variable */
+    int i, len = (int) strlen(str); /* Loop variables */
 
     /* Assigning space in the memory for the new string */
-    char *lowerCase_str = (char *) allocate_space(strlen(str) + SIZE_FOR_NULL);
+    char *lowerCase_str = (char *) allocate_space(len + SIZE_FOR_NULL);
 
-    lowerCase_str[strlen(str)] = NULL_TERMINATOR; /* Adding null terminator */
+    lowerCase_str[len] = NULL_TERMINATOR; /* Adding null terminator */
 
-    for (i = ZERO_INDEX; i < strlen(str); i++) /* Loop to go through all the chars in str */
+    for (i = ZERO_INDEX; i < len; i++) /* Loop to go through all the chars in str */
         lowerCase_str[i] = (char) tolower(str[i]); /* Assigns the curr char as lower case */
 
     return lowerCase_str;

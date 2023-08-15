@@ -11,6 +11,7 @@
 #include "../general-enums/indexes.h"
 #include "../general-enums/neededKeys.h"
 #include "../util/memoryUtil.h"
+#include "../util/numberUtil.h"
 #include "../util/stringsUtil.h"
 /* -------------- */
 
@@ -186,7 +187,7 @@ int countDots(const char *str, int start, int end)
  */
 boolean isLetter(char ch)
 {
-    return ((CHAR_a <= ch && ch <= CHAR_z) || (CHAR_A <= ch && ch <= CHAR_Z))? TRUE : FALSE;
+    return (between(ch, CHAR_a, CHAR_z) || between(ch, CHAR_A, CHAR_Z))? TRUE : FALSE;
 }
 
 /* Returns TRUE if the char in index int index of param const char *str
@@ -205,13 +206,7 @@ boolean isCurrCharComma(const char *str, int index)
 /* Returns TRUE if the param char ch is a number, otherwise FALSE. */
 boolean isCharNumber(char ch)
 {
-    boolean isNum = FALSE; /* We assume the current char is not a number */
-
-    /* Checks if the index is an index of str and if the char is a number */
-    if (ch >= CHAR_ZERO && ch <= CHAR_NINE)
-        isNum = TRUE; /* Assign the value to return to TRUE if so */
-
-    return isNum;
+    return between(ch, CHAR_ZERO, CHAR_NINE);
 }
 
 /*
@@ -254,7 +249,7 @@ boolean isPartOfNumber(const char *str, int index)
     if (isIndexInStr(str, index) == TRUE) {
         char ch = str[index];
         /* Check if ch is an element of a number */
-        if (ch == PLUS || ch == MINUS || isCharNumber(ch))
+        if (isPlusOrMinus(ch) || isCharNumber(ch))
             isPartOfNumber = TRUE; /* Assign value to return to TRUE if so */
     }
 
