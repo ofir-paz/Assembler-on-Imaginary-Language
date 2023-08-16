@@ -13,7 +13,6 @@
 #include "../../general-enums/indexes.h"
 #include "../../general-enums/neededKeys.h"
 #include "../../general-enums/assemblerFinals.h"
-#include "../assembler_errors.h"
 #include "FirstTransitionSyntaxErrorCheckUtil.h"
 #include "../../diagnoses/diagnose_line.h"
 #include "../../diagnoses/assembler_line_diagnoses.h"
@@ -39,16 +38,6 @@ SyntaxError checkSyntaxErrorInStringArg(const char *argument);
 SyntaxError checkSyntaxErrorInDirectArg(const char *argument);
 SyntaxError checkSyntaxErrorBetweenArgs(const char *emptyAfterArgLine, area_status_t areaStatus);
 /* ---------------------------------------- */
-
-Error checkLabelDefTableError(ast_t *lineAst, NameTable *normalTable, NameTable *extTable)
-{
-    return NO_ERROR;
-}
-
-Error checkErrorsInAstFirstTrans(ast_t *lineAst)
-{
-    return NO_ERROR;
-}
 
 /*
  * Checks for syntax errors in label definition.
@@ -146,7 +135,7 @@ SyntaxError checkSyntaxErrorInGuidance(const char *guidanceLine)
     else if (isDifferentCaseGuidance(guidanceLine))
         guidanceError = WRONG_CASE_GUIDANCE_ERR;
     else
-        guidanceError = UNKNOWN_GUIDANCE_ERR;
+        guidanceError = UNDEFINED_GUIDANCE_ERR;
 
     return guidanceError;
 }
@@ -172,7 +161,7 @@ SyntaxError checkSyntaxErrorInOperation(const char *operationLine)
     else if (isDifferentCaseOperation(operationLine))
         operationSyntaxError = WRONG_CASE_OPERATION_ERR;
     else
-        operationSyntaxError = UNKNOWN_OPERATION_ERR;
+        operationSyntaxError = UNDEFINED_OPERATION_ERR;
 
     /* Now if the operation itself is valid, check for extraneous text. */
     if (operationSyntaxError == NO_ERROR)
@@ -289,6 +278,9 @@ SyntaxError checkSyntaxErrorInInstantArg(const char *argument)
 
     else if (isPlusOrMinus(argument[ONE_INDEX]))
         instantArgError = MULTIPLE_SIGNS_IN_VALUE_ERR;
+
+    else if (isStrFloat(argument))
+        instantArgError = INSTANT_VALUE_IS_FLOAT_ERR;
 
     else if (isStrInteger(argument) == FALSE)
         instantArgError = INSTANT_VALUE_IS_ILLEGAL_NUMBER_ERR;

@@ -12,7 +12,6 @@
 #include "../../general-enums/neededKeys.h"
 #include "../error_types/error_types.h"
 #include "../assembler_errors.h"
-#include "../error_check.h"
 #include "../../diagnoses/diagnose_util.h"
 #include "../../diagnoses/assembler_line_diagnoses.h"
 /* -------------------------- */
@@ -45,7 +44,7 @@ Error handlePreProcessErrors(const char *file_name, const char *line, int lineNu
     /* ----------------------------- */
 
     if (error != NO_ERROR) /* Print error if there is */
-        print_assembler_ERR(error, file_name, lineNumber);
+        handle_assembler_error(file_name, lineNumber, error);
 
     return error; /* Return error */
 }
@@ -57,10 +56,9 @@ Error getSyntaxPreProcessERR(const char *line, const char *macro_name,
 
     /* ---Error diagnoses process--- */
 
-    if (isLineTooLong(line))
-        error = LINE_OVERFLOW_ERR;
-    else if (isInvalidMacroNameERR(macro_name, wasInMacroDef, isInMacroDef) == TRUE)
+    if (isInvalidMacroNameERR(macro_name, wasInMacroDef, isInMacroDef) == TRUE)
         error = INVALID_MACRO_NAME_ERR;
+
     else if (isExtraneousTextInMacroLineERR(line, wasInMacroDef, isInMacroDef) == TRUE)
         error = EXTRANEOUS_TEXT_IN_MACRO_LINE_ERR;
 
@@ -85,15 +83,15 @@ boolean isInvalidMacroNameERR(const char *macro_name, boolean wasInMacroDef, boo
 boolean isExtraneousTextInMacroLineERR(const char *line,
                                        boolean wasInMacroDef, boolean isInMacroDef)
 {
-    Error extraneousTextInMacroLine = NO_ERROR; /* Will help to determine value to return. */
+    Error isExtraTxt = FALSE; /* Value to return. */
 
     if (isMacroLine(wasInMacroDef, isInMacroDef) == TRUE)
     {
         word_number lastWord = (isInNewMacroDef(wasInMacroDef, isInMacroDef) == TRUE)?
                 SECOND_WORD : FIRST_WORD;
-        extraneousTextInMacroLine = checkExtraneousTextError(
-                line, findStartIndexOfWord(line, lastWord));
+        if (line[findStartIndexOfWord(line, lastWord + 1)] != NULL_TERMINATOR)
+            isExtraTxt = TRUE;
     }
 
-    return (extraneousTextInMacroLine != NO_ERROR)? TRUE : FALSE;
+    return isExtraTxt;
 }

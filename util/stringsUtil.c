@@ -162,9 +162,9 @@ int getIndexOfStrInArray(const char *arr[], int size, const char *str)
  *
  * @param   str     The given string to copy the part from.
  * @param   start   The start index of the part.
- * @param   end     The end index of the part.
+ * @param   end     The end index of the part (not including end).
  *
- * @return  The partial string: str[start...end] (null-terminated).
+ * @return  The partial string: str[start...end - 1] (null-terminated).
  */
 char *strcpyPart(const char *str, int start, int end)
 {

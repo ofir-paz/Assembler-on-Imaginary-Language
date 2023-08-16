@@ -14,7 +14,9 @@
 #include "../general-enums/programFinals.h"
 #include "../general-enums/assemblerFinals.h"
 #include "../FileHandling/readFromFile.h"
-#include "../errors/FirstTransitionErrors/FirstTransitionSyntaxErrors.h"
+#include "../errors/error_types/error_types.h"
+#include "../errors/FirstTransitionErrors/FirstTransitionLogicalAndImgSystemErrors.h"
+#include "../errors/assembler_errors.h"
 #include "../util/memoryUtil.h"
 #include "../util/stringsUtil.h"
 #include "first_transition_util.h"
@@ -129,7 +131,7 @@ ast_t *firstAssemblerAlgo(const char *file_name, const char *line, int lineNumbe
     if (lineError == NO_ERROR)
         updateCounters(lineAst, IC, DC);
     else
-        handle_FirstTransLine_Error(file_name, lineNumber, lineError);
+        handle_assembler_error(file_name, lineNumber, lineError);
 
     return lineAst;
 }

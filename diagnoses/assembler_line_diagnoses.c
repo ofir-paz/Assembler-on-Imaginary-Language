@@ -227,10 +227,14 @@ int getCommandStartIndex(const char *line, boolean isLabelDef)
 char *getCommandStringFromLine(const char *line, boolean isLabelDef)
 {
     char *commandName = NULL; /* Will hold the specific command name. */
+    char *wordOfCommand = NULL; /* Will hold the word that the command is in (due to commas). */
 
     /* Find the command name from after the end of the end index of label. */
-    findWord(line + getCommandStartIndex(line, isLabelDef), &commandName, FIRST_WORD);
+    findWord(line + getCommandStartIndex(line, isLabelDef), &wordOfCommand, FIRST_WORD);
+    commandName = strcpyPart(wordOfCommand, ZERO_INDEX,
+                             nextSpecificCharIndex(wordOfCommand, MINUS_ONE_INDEX, COMMA));
 
+    (void) clear_ptr(wordOfCommand)
     return commandName;
 }
 

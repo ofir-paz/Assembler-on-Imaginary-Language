@@ -14,10 +14,13 @@ typedef enum
 {
     /* Indicates no error. !! add new errors after this one !! */
         IMG_SYSTEM_ERR_START = start_of_error(1),
+
     /* Memory limitations errors */
-        MEMORY_OVERFLOW_ERR, LINE_OVERFLOW_ERR, NUMBER_TOO_BIG_ERR,
+        LINE_OVERFLOW_ERR, MEMORY_OVERFLOW_ERR, NUMBER_TOO_BIG_ERR,
+
     /* CPU limitations errors */
-        UNDEFINED_REGISTER_ERR, NOT_WHOLE_NUMBER,
+        NOT_WHOLE_NUMBER,
+
     /* Amount of imaginary system errors. !! add new errors before this one !! */
         IMG_SYSTEM_ERROR_SIZE
 } ImgSystemError;

@@ -123,7 +123,10 @@ Error handleLineInPreProc(const char *file_name, const char *line, int lineNumbe
 {
     Error lineError = NO_ERROR; /* Value to return. Represents the error in the line. */
 
-    if (isSkipLine(line) == FALSE) /* Go to next line if we can skip this one */
+    if (isLineTooLong(line) == TRUE)
+        lineError = LINE_OVERFLOW_ERR;
+
+    else if (isSkipLine(line) == FALSE) /* Go to next line if we can skip this one */
         lineError = preProcessorAssemblerAlgo(file_name, line, lineNumber, macro_name,
                                               amFileContents, macro_table, wasError);
 

@@ -73,8 +73,37 @@ boolean isStrInteger(const char *str)
 
     while (isCharNumber(str[currIndex++])); /* Go to the first char that is not a number. */
 
-    /* Return TRUE if the first char is '\0', otherwise FALSE. */
+    /* Return TRUE if we reached '\0', otherwise FALSE. */
     return (str[currIndex] == NULL_TERMINATOR)? TRUE : FALSE;
+}
+
+/*
+ * Checks if the given string represents a valid floating-point number.
+ *
+ * @param   *str    The string to check for floating-point representation.
+ *
+ * @return  TRUE if the given string represents a valid floating-point number, otherwise FALSE.
+ */
+boolean isStrFloat(const char *str)
+{
+    int currIndex = (isPlusOrMinus(str[ZERO_INDEX]))? ONE_INDEX : ZERO_INDEX;
+    boolean wasDot = FALSE;
+
+    /* While curr char is a number or there has been less than one dot. */
+    while (isCharNumber(str[currIndex]))
+    {
+        if (str[currIndex] == DOT)
+        {
+            if (wasDot) /* If found a second dot, not a float. */
+                break;
+            else
+                wasDot = TRUE;
+        }
+        currIndex++; /* Go to next char. */
+    }
+
+    /* Return TRUE if we reached '\0' and found a dot, otherwise FALSE. */
+    return (str[currIndex] == NULL_TERMINATOR && wasDot)? TRUE : FALSE;
 }
 
 /*

@@ -211,10 +211,33 @@ boolean isDirectArgContainsIllegalChars(const char *directArg);
 
 /* ---------------DIFFERENT AREA SYNTAX ERRORS--------------- */
 
+/*
+ * Checks for a syntax error in the given area after the last argument.
+ *
+ * @param   *area   The area to check for a syntax error.
+ *
+ * @return  The area syntax error found after the last argument, or NO_ERROR if there isn't.
+ */
 SyntaxError checkLastArgSyntaxError(const char *area);
 
+/*
+ * Checks for a syntax error in the area given area that could be after the last
+ * argument, or between arguments.
+ *
+ * @param   *area   The area to check for a syntax error in.
+ *
+ * @return  The area syntax error found after the last argument or between arguments,
+ *          or NO_ERROR if there isn't.
+ */
 SyntaxError checkAreaOrLastArgSyntaxError(const char *area);
 
+/*
+ * Checks for a syntax error in the given area between arguments.
+ *
+ * @param   *area   The area to check for a syntax error in.
+ *
+ * @return  The area syntax error found between arguments, or NO_ERROR if there isn't.
+ */
 SyntaxError checkAreaArgSyntaxError(const char *area);
 
 /* ---------------END OF DIFFERENT AREA SYNTAX ERRORS--------------- */

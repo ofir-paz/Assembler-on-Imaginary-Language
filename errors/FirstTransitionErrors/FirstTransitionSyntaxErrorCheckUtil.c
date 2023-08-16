@@ -318,7 +318,7 @@ boolean isDifferentCaseOperation(const char *operationLine)
  */
 boolean isExtraneousTextAfterOperation(const char *operationLine)
 {
-    boolean isExtraneousTextAfterOperation = FALSE;
+    boolean isExtraneousTextAfterOperation = FALSE; /* Value to return. */
     opcodes_t opcode = getCommandFromLine(operationLine, FALSE);
 
     /* Check for the extraneous text. */
@@ -362,15 +362,23 @@ boolean isDirectArgContainsIllegalChars(const char *directArg)
 
 /* ---------------DIFFERENT AREA SYNTAX ERRORS--------------- */
 
+/*
+ * Checks for a syntax error in the given area after the last argument.
+ *
+ * @param   *area   The area to check for a syntax error.
+ *
+ * @return  The area syntax error found after the last argument, or NO_ERROR if there isn't.
+ */
 SyntaxError checkLastArgSyntaxError(const char *area)
 {
-    SyntaxError lastArgAreaSyntaxError;
+    SyntaxError lastArgAreaSyntaxError; /* Syntax error to return. */
     int firstCharIndex = nextCharIndex(area, MINUS_ONE_INDEX);
 
     /* If the last argument was the last one. */
     if (area[firstCharIndex] == NULL_TERMINATOR)
         lastArgAreaSyntaxError = NO_ERROR;
 
+    /* Find the specific syntax error. */
     else if (area[firstCharIndex] == COMMA)
         lastArgAreaSyntaxError = EXTRANEOUS_COMMA_ERR;
 
@@ -380,17 +388,27 @@ SyntaxError checkLastArgSyntaxError(const char *area)
     return lastArgAreaSyntaxError;
 }
 
+/*
+ * Checks for a syntax error in the area given area that could be after the last
+ * argument, or between arguments.
+ *
+ * @param   *area   The area to check for a syntax error in.
+ *
+ * @return  The area syntax error found after the last argument or between arguments,
+ *          or NO_ERROR if there isn't.
+ */
 SyntaxError checkAreaOrLastArgSyntaxError(const char *area)
 {
-    SyntaxError areaOrLastArgSyntaxError;
-    int chI1 = nextCharIndex(area, MINUS_ONE_INDEX);
-    int chI2 = nextCharIndex(area, chI1);
+    SyntaxError areaOrLastArgSyntaxError; /* Syntax error to return. */
+    int chI1 = nextCharIndex(area, MINUS_ONE_INDEX); /* Index of first character in the area. */
+    int chI2 = nextCharIndex(area, chI1); /* Index of second character in the area. */
 
     /* If the last argument was the last one (it can be). */
     if ((area[chI1] == COMMA && area[chI2] != NULL_TERMINATOR && area[chI2] != COMMA) ||
         area[chI1] == NULL_TERMINATOR)
         areaOrLastArgSyntaxError = NO_ERROR;
 
+    /* There is an error, find the specific one. */
     else if (area[chI1] != COMMA)
         areaOrLastArgSyntaxError = EXPECTED_COMMA_OR_EXTRANEOUS_TEXT_ERR;
 
@@ -408,11 +426,19 @@ SyntaxError checkAreaOrLastArgSyntaxError(const char *area)
     return areaOrLastArgSyntaxError;
 }
 
+/*
+ * Checks for a syntax error in the given area between arguments.
+ *
+ * @param   *area   The area to check for a syntax error in.
+ *
+ * @return  The area syntax error found between arguments, or NO_ERROR if there isn't.
+ */
 SyntaxError checkAreaArgSyntaxError(const char *area)
 {
-    SyntaxError areaSyntaxError = NO_ERROR;
-    int chI1 = nextCharIndex(area, MINUS_ONE_INDEX);
+    SyntaxError areaSyntaxError = NO_ERROR; /* Syntax error to return. */
+    int chI1 = nextCharIndex(area, MINUS_ONE_INDEX); /* Index of first character in the area. */
 
+    /* Check for a specific error if there is. */
     if (area[chI1] == NULL_TERMINATOR)
         areaSyntaxError = EXPECTED_COMMA_AND_ARGUMENT_ERR;
 

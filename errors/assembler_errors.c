@@ -38,27 +38,83 @@ void handle_assembler_error(const char *file_name, int lineNumber, Error lineErr
 void print_assembler_ERR(Error error, const char *file_name, int lineNumber)
 {
     /* Arrays to hold all the different error messages. */
-    const char *imgSystemErrorMSG[] =
+    const char *imgSystemErrorMSG[IMG_SYSTEM_ERROR_SIZE - IMG_SYSTEM_ERR_START] =
             {
                 "NO_ERROR",
+                "Line overflow error! a line must be 80 or less characters long."
             };
-    const char *syntaxErrorMSG[] =
+
+    const char *syntaxErrorMSG[SYNTAX_ERROR_SIZE - SYNTAX_ERR_START] =
             {
                     /* Indicates no error. !! add new errors after this one !! */
                 "NO_ERROR",
                     /* Macro related syntax errors */
                 "Invalid macro name! a macro name cannot be a saved word.",
                 "Extraneous text in a macro definition line !!",
-                    /* Label related syntax errors */
-                    "Expected label name !!",
-                    "Empty space between label and colon! Label and colon can't be seperated.",
-                    "Label starts with a number! It must start with a letter.",
-                    "Label starts with an illegal character! It must start with a letter.",
-                    "Label Contains illegal characters! It can include only letters and numbers.",
-                    "Label Is too long! Max label length is 31 characters long.",
-                    "Label Is a saved word! A label name cannot be a saved word."
 
+                    /* Label related syntax errors */
+                "Expected label name !!",
+                "Empty space between label and colon! Label and colon can't be seperated.",
+                "Label starts with a number! It must start with a letter.",
+                "Label starts with an illegal character! It must start with a letter.",
+                "Label Contains illegal characters! It can include only letters and numbers.",
+                "Label Is too long! Max label length is 31 characters long.",
+                "Label Is a saved word! A label name cannot be a saved word.",
+                "Multiple consecutive colons after label name! Label definition needs one colon.",
+                "Unneeded comma after label definition!",
+
+                    /* Command syntax errors */
+                "Expected command (operation or guidance)!",
+                "Unneeded comma after command!",
+
+                    /* Guidance syntax errors. */
+                "Expected guidance after dot!",
+                "Multiple consecutive dots in guidance!",
+                "Guidance name is wrong case (try to use lower case letters)!",
+                "Undefined guidance!",
+
+                    /* Operation syntax errors. */
+                "Expected dot before guidance!",
+                "Operation is wrong case (try to use lower case letters)!",
+                "Undefined operation!",
+
+                    /* General argument errors. */
+                "Expected comma and argument!",
+                "Expected comma!",
+                "Expected argument!",
+                "Multiple consecutive commas!",
+
+                    /* String argument syntax errors. */
+                "Expected open quotes in string argument!",
+                "Expected closing quotes in string argument!",
+
+                    /* Instant value argument syntax errors. */
+                "Number is only a sign!",
+                "Multiple consecutive signs in number argument!",
+                "Number is not an integer! This machine supports only integers.",
+                "Supposed value is an illegal number!",
+
+                    /* Label argument syntax errors. */
+                "Supposed label argument is too long! Max label name length is 31.",
+                "Illegal characters in supposed label argument!",
+
+                    /* Register argument syntax errors.*/
+                "Expected register argument!",
+                "Multiple consecutive ats ('@') !",
+                "Expected register letter! Register letter is the letter 'r'.",
+                "Capital register letter! Try to use 'r' instead of 'R'.",
+                "Wrong register letter! The only register letter is 'r'.",
+                "Expected register number!",
+                "Illegal register number! Register numbers range from 0 to 7.",
+                "Extraneous text after register argument! Try to remove text after @rx",
+
+                    /* Extraneous text errors */
+                "Extraneous comma!",
+                "Extraneous text!",
+                "Expected comma (or might be extraneous text)!",
+                "Expected argument after last comma (or might be extraneous comma)!"
             };
+
     const char *logicalErrorMSG[] =
             {
                     "NO_ERROR",

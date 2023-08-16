@@ -12,7 +12,9 @@
 #include "../assembler_ast/assembler_ast.h"
 #include "../general-enums/programFinals.h"
 #include "../general-enums/assemblerFinals.h"
+#include "../errors/error_types/error_types.h"
 #include "../errors/FirstTransitionErrors/FirstTransitionSyntaxErrors.h"
+#include "../errors/FirstTransitionErrors/FirstTransitionLogicalAndImgSystemErrors.h"
 #include "../diagnoses/assembler_line_diagnoses.h"
 #include "../util/memoryUtil.h"
 /* -------------------------- */

@@ -62,6 +62,15 @@ boolean isSkipLine(const char *line);
 boolean isStrInteger(const char *str);
 
 /*
+ * Checks if the given string represents a valid floating-point number.
+ *
+ * @param   *str    The string to check for floating-point representation.
+ *
+ * @return  TRUE if the given string represents a valid floating-point number, otherwise FALSE.
+ */
+boolean isStrFloat(const char *str);
+
+/*
  * Checks if there is a char that is not a comma or empty space after
  * a given index in the given line.
  *
