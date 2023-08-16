@@ -14,7 +14,7 @@
 #include "../general-enums/programFinals.h"
 #include "../general-enums/assemblerFinals.h"
 #include "../FileHandling/readFromFile.h"
-#include "../errors/FirstTransitionErrors/FirstTransitionErrors.h"
+#include "../errors/FirstTransitionErrors/FirstTransitionSyntaxErrors.h"
 #include "../util/memoryUtil.h"
 #include "../util/stringsUtil.h"
 #include "first_transition_util.h"

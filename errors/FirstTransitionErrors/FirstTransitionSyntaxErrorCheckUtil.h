@@ -5,8 +5,8 @@
  * Header file for the FirstTransitionSpecificErrorCheck.c file.
  */
 
-#ifndef MMN_14_FIRSTTRANSITIONSPECIFICERRORCHECK_H
-#define MMN_14_FIRSTTRANSITIONSPECIFICERRORCHECK_H
+#ifndef MMN_14_FIRSTTRANSITIONSYNTAXERRORCHECKUTIL_H
+#define MMN_14_FIRSTTRANSITIONSYNTAXERRORCHECKUTIL_H
 
 /* ---------------Prototypes--------------- */
 
@@ -179,9 +179,47 @@ boolean isGuidanceButMissingDot(const char *operationLine);
  */
 boolean isDifferentCaseOperation(const char *operationLine);
 
+/*
+ * Checks if there is extraneous text after the operation in the given line.
+ * Extraneous text after an operation can only be if the operation does not accept arguments.
+ * Assumes the given line string starts with an operation.
+ *
+ * @param   *operationLine  The line of assembly code to check for extraneous text
+ *                          after the operation.
+ *
+ * @return  TRUE if there is extraneous text after the operation in the given line,
+ *          otherwise FALSE.
+ */
+boolean isExtraneousTextAfterOperation(const char *operationLine);
+
 /* ---------------END OF OPERATION SYNTAX ERRORS--------------- */
+
+
+/* ---------------ARGUMENT SYNTAX ERRORS--------------- */
+
+/*
+ * Checks if the given direct argument contains any illegal characters.
+ *
+ * @param   *directArg  The direct argument (in string type) to check for illegal chars in it.
+ *
+ * @return  TRUE if the direct argument contains illegal characters, otherwise FALSE.
+ */
+boolean isDirectArgContainsIllegalChars(const char *directArg);
+
+/* ---------------END OF ARGUMENT SYNTAX ERRORS--------------- */
+
+
+/* ---------------DIFFERENT AREA SYNTAX ERRORS--------------- */
+
+SyntaxError checkLastArgSyntaxError(const char *area);
+
+SyntaxError checkAreaOrLastArgSyntaxError(const char *area);
+
+SyntaxError checkAreaArgSyntaxError(const char *area);
+
+/* ---------------END OF DIFFERENT AREA SYNTAX ERRORS--------------- */
 
 
 /* ---------------------------------------- */
 
-#endif /* MMN_14_FIRSTTRANSITIONSPECIFICERRORCHECK_H */
+#endif /* MMN_14_FIRSTTRANSITIONSYNTAXERRORCHECKUTIL_H */

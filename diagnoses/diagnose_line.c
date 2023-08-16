@@ -58,3 +58,42 @@ boolean isSkipLine(const char *line)
 {
     return (isEmptyLine(line) || isCommentLine(line) == TRUE)? TRUE : FALSE;
 }
+
+/*
+ * Checks if the given string represents a valid integer.
+ * Note: the integer can start with a plus or minus sign.
+ *
+ * @param   *str    The string to check for integer representation.
+ *
+ * @return  TRUE if the given string represents a valid integer, otherwise FALSE.
+ */
+boolean isStrInteger(const char *str)
+{
+    int currIndex = (isPlusOrMinus(str[ZERO_INDEX]))? ONE_INDEX : ZERO_INDEX;
+
+    while (isCharNumber(str[currIndex++])); /* Go to the first char that is not a number. */
+
+    /* Return TRUE if the first char is '\0', otherwise FALSE. */
+    return (str[currIndex] == NULL_TERMINATOR)? TRUE : FALSE;
+}
+
+/*
+ * Checks if there is a char that is not a comma or empty space after
+ * a given index in the given line.
+ *
+ * @param   *line       The line to check for a char after the comma(s).
+ * @param   commaIndex  The starting index to check for chars after it.
+ *
+ * @return  TRUE if there is a char after the given index that is not a comma or empty space,
+ *          otherwise FALSE.
+ */
+boolean isCharAfterCommas(const char *line, int commaIndex)
+{
+    int currChar = commaIndex;
+
+    /* While the chars are commas and we haven't reached end of line. */
+    while (line[currChar] != NULL_TERMINATOR && line[currChar] == COMMA)
+        currChar = nextCharIndex(line, currChar); /* Go to next char */
+
+    return (line[currChar] != NULL_TERMINATOR)? TRUE : FALSE;
+}

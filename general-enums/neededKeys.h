@@ -12,7 +12,7 @@ enum neededKeys {
         PLUS = '+', MINUS = '-',
         CHAR_ZERO = '0', CHAR_NINE = '9',
         SPACE_KEY = ' ', TAB_KEY = '\t', ENTER_KEY = '\n',
-        COLON = ':', SEMICOLON = ';', COMMA = ',', DOT = '.', AT = '@',
+        QUOTES = '\"', COLON = ':', SEMICOLON = ';', COMMA = ',', DOT = '.', AT = '@',
         NULL_TERMINATOR = '\0'};
 
 #endif /* MMN_22_NEEDEDKEYS_H */

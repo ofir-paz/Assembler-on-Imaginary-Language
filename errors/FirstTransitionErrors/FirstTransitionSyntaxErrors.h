@@ -5,8 +5,8 @@
  * Header file for the FirstTransitionErrors.c file.
  */
 
-#ifndef MMN_14_FIRSTTRANSITIONERRORS_H
-#define MMN_14_FIRSTTRANSITIONERRORS_H
+#ifndef MMN_14_FIRSTTRANSITIONSYNTAXERRORS_H
+#define MMN_14_FIRSTTRANSITIONSYNTAXERRORS_H
 
 #include "../error_types/error_types.h"
 
@@ -22,7 +22,8 @@ SyntaxError checkSyntaxErrorInLabel(const char *line);
 
 SyntaxError checkSyntaxErrorInCommand(const char *line, boolean isLabelDef);
 
-Error checkSyntaxErrorInArgAndBetween(const char *line, int argumentNum, boolean isLabelDef);
+SyntaxError checkSyntaxErrorInArgAndBetween(const char *line, int argumentNum, boolean isLabelDef,
+                                            opcodes_t opcode, boolean isStrGuidance);
 
 Error getLogicalErrorInAddToEntryTable(const char *label, NameTable *entLabels,
                                        NameTable *extLabels);
@@ -31,4 +32,4 @@ Error getLogicalErrorInAddToExternTable(const char *label, NameTable *labelsMap[
 
 /* ---------------------------------------- */
 
-#endif /* MMN_14_FIRSTTRANSITIONERRORS_H */
+#endif /* MMN_14_FIRSTTRANSITIONSYNTAXERRORS_H */

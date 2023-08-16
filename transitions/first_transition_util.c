@@ -12,7 +12,7 @@
 #include "../assembler_ast/assembler_ast.h"
 #include "../general-enums/programFinals.h"
 #include "../general-enums/assemblerFinals.h"
-#include "../errors/FirstTransitionErrors/FirstTransitionErrors.h"
+#include "../errors/FirstTransitionErrors/FirstTransitionSyntaxErrors.h"
 #include "../diagnoses/assembler_line_diagnoses.h"
 #include "../util/memoryUtil.h"
 /* -------------------------- */
@@ -111,10 +111,12 @@ Error addArgumentsFromLineToAST(ast_t *lineAST, const char *line)
     Error foundError = NO_ERROR; /* Error to return, assume success. */
     int argumentNum = FIRST_ARGUMENT;
     boolean isLabelDef = isLabel(lineAST);
+    opcodes_t opcode = getOpcodeFromAST(lineAST);
+    boolean isStrGuidance = (getGuidanceFromAST(lineAST) == str)? TRUE : FALSE;
 
     if (isLastArg(line, ZERO_NUMBER, isLabel(lineAST)) == FALSE)
-        while ((foundError =
-                checkSyntaxErrorInArgAndBetween(line, argumentNum, isLabelDef)) == NO_ERROR)
+        while ((foundError = checkSyntaxErrorInArgAndBetween(
+                line, argumentNum, isLabelDef, opcode, isStrGuidance)) == NO_ERROR)
         {
             data_t *argData = (data_t *) allocate_space(sizeof(data_t));
             getArgDataFromLine(line, argumentNum, isLabel(lineAST), argData);

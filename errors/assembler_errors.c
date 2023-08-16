@@ -19,6 +19,22 @@
 
 /* ------------ */
 
+/* ---------------Prototypes--------------- */
+void print_assembler_ERR(Error error, const char *file_name, int lineNumber);
+/* ---------------------------------------- */
+
+/*
+ * Handles an assembler error.
+ *
+ * @param   *file_name      The name of the file where the error occurred.
+ * @param   lineNumber      The line number where the error occurred.
+ * @param   lineError       The specific error that occurred.
+ */
+void handle_assembler_error(const char *file_name, int lineNumber, Error lineError)
+{
+    print_assembler_ERR(lineError, file_name, lineNumber);
+}
+
 void print_assembler_ERR(Error error, const char *file_name, int lineNumber)
 {
     /* Arrays to hold all the different error messages. */
@@ -54,6 +70,6 @@ void print_assembler_ERR(Error error, const char *file_name, int lineNumber)
     fprintf(stderr, ANSI_COLOR_RED "\nERROR: " ANSI_COLOR_RESET "%s\n",
             errorMSG[(error / MAX_ERRORS_IN_ENUM) - 1][error % MAX_ERRORS_IN_ENUM]);
 
-    fprintf(stderr, ANSI_COLOR_BLUE "In file: " ANSI_COLOR_RESET "%s, "
+    fprintf(stderr, ANSI_COLOR_BLUE "In file: " ANSI_COLOR_RESET "\"%s\", "
                     ANSI_COLOR_BLUE "On line: " ANSI_COLOR_RESET "%d\n", file_name, lineNumber);
 }

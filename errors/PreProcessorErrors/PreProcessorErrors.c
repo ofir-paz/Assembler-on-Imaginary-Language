@@ -11,7 +11,7 @@
 #include "../../new-data-types/word_number.h"
 #include "../../general-enums/neededKeys.h"
 #include "../error_types/error_types.h"
-#include "../errors.h"
+#include "../assembler_errors.h"
 #include "../error_check.h"
 #include "../../diagnoses/diagnose_util.h"
 #include "../../diagnoses/assembler_line_diagnoses.h"

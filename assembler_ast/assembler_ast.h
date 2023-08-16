@@ -155,6 +155,24 @@ label_type_t getLabelTypeForTable(ast_t *ast);
 sentence_t getSentence(ast_t *ast);
 
 /*
+ * Gets the opcode from the Abstract Syntax Tree (AST).
+ *
+ * @param   *ast    The Abstract Syntax Tree to extract the opcode from.
+ *
+ * @return  The opcode extracted from the given AST.
+ */
+opcodes_t getOpcodeFromAST(ast_t *ast);
+
+/*
+ * Gets the guidance from the Abstract Syntax Tree (AST).
+ *
+ * @param   *ast    The Abstract Syntax Tree to extract the guidance from.
+ *
+ * @return  The guidance extracted from the given AST.
+ */
+guidance_t getGuidanceFromAST(ast_t *ast);
+
+/*
  * Gets the argument list from the given AST.
  *
  * @param   *ast    The ast to get the argument list from.

@@ -51,6 +51,28 @@ char getCharParamFromLine(const char *line, word_number paramNum);
  * Return TRUE if the line needs to be skipped, otherwise FALSE. */
 boolean isSkipLine(const char *line);
 
+/*
+ * Checks if the given string represents a valid integer.
+ * Note: the integer can start with a plus or minus sign.
+ *
+ * @param   *str    The string to check for integer representation.
+ *
+ * @return  TRUE if the given string represents a valid integer, otherwise FALSE.
+ */
+boolean isStrInteger(const char *str);
+
+/*
+ * Checks if there is a char that is not a comma or empty space after
+ * a given index in the given line.
+ *
+ * @param   *line       The line to check for a char after the comma(s).
+ * @param   commaIndex  The starting index to check for chars after it.
+ *
+ * @return  TRUE if there is a char after the given index that is not a comma or empty space,
+ *          otherwise FALSE.
+ */
+boolean isCharAfterCommas(const char *line, int commaIndex);
+
 /* ------------------------------ */
 
 #endif /* MMN_22_DIAGNOSE_INPUT_H */

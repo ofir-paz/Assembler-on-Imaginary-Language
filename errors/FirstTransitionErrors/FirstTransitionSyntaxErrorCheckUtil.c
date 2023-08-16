@@ -11,8 +11,9 @@
 #include "../../new-data-types/word_number.h"
 #include "../../general-enums/neededKeys.h"
 #include "../../general-enums/indexes.h"
-#include "../../diagnoses/assembler_line_diagnoses.h"
 #include "../../diagnoses/diagnose_line.h"
+#include "../../diagnoses/assembler_line_diagnoses.h"
+#include "../../diagnoses/assembler_diagnoses.h"
 #include "../../diagnoses/diagnose_util.h"
 #include "../../general-enums/assemblerFinals.h"
 #include "../../util/memoryUtil.h"
@@ -91,18 +92,18 @@ boolean isLabelStartWithIllegalChar(const char *labelLine)
  */
 boolean isLabelContainsIllegalChar(const char *labelLine)
 {
-    boolean isLabelIContainsIllegalChar = FALSE; /* Value to return, assume no error. */
+    boolean isLabelContainsIllegalChar = FALSE; /* Value to return, assume no error. */
     int i = ZERO_INDEX; /* Loop variable. */
 
     /* While we haven't reached the end of the label definition and didn't find an illegal char. */
-    while (labelLine[i] != COLON && isLabelIContainsIllegalChar == FALSE)
+    while (labelLine[i] != COLON && isLabelContainsIllegalChar == FALSE)
     {
         if (isLegalChar(labelLine[i]) == FALSE)
-            isLabelIContainsIllegalChar = TRUE;
+            isLabelContainsIllegalChar = TRUE;
         i++;
     }
 
-    return isLabelIContainsIllegalChar;
+    return isLabelContainsIllegalChar;
 }
 
 /*
@@ -270,6 +271,7 @@ boolean isGuidanceButMissingDot(const char *operationLine)
 
     findWord(operationLine, &guidanceNoDot, FIRST_WORD);
 
+    /* Connect a dot to see if it's matching a guidance. */
     guidance = connectTwoStrings(".", guidanceNoDot);
 
     if (getGuidance(guidance) != NO_GUIDANCE) /* Check if it's a guidance but was missing a dot. */
@@ -303,4 +305,127 @@ boolean isDifferentCaseOperation(const char *operationLine)
     return isDifferentCaseOperation;
 }
 
+/*
+ * Checks if there is extraneous text after the operation in the given line.
+ * Extraneous text after an operation can only be if the operation does not accept arguments.
+ * Assumes the given line string starts with an operation.
+ *
+ * @param   *operationLine  The line of assembly code to check for extraneous text
+ *                          after the operation.
+ *
+ * @return  TRUE if there is extraneous text after the operation in the given line,
+ *          otherwise FALSE.
+ */
+boolean isExtraneousTextAfterOperation(const char *operationLine)
+{
+    boolean isExtraneousTextAfterOperation = FALSE;
+    opcodes_t opcode = getCommandFromLine(operationLine, FALSE);
+
+    /* Check for the extraneous text. */
+    if (getOpGroup(opcode) == ZERO_ARGS)
+        if (operationLine[nextWordIndex(operationLine, ZERO_INDEX)] != NULL_TERMINATOR)
+            isExtraneousTextAfterOperation = TRUE;
+
+    return isExtraneousTextAfterOperation;
+}
+
 /* ---------------END OF OPERATION SYNTAX ERRORS--------------- */
+
+
+/* ---------------ARGUMENT SYNTAX ERRORS--------------- */
+
+/*
+ * Checks if the given direct argument contains any illegal characters.
+ *
+ * @param   *directArg  The direct argument (in string type) to check for illegal chars in it.
+ *
+ * @return  TRUE if the direct argument contains illegal characters, otherwise FALSE.
+ */
+boolean isDirectArgContainsIllegalChars(const char *directArg)
+{
+    boolean isDirectArgContainsIllegalChars = FALSE; /* Value to return, assume no error. */
+    int i = ZERO_INDEX; /* Loop variable. */
+
+    /* While we haven't reached the end of the direct arg and didn't find an illegal char. */
+    while (directArg[i] != NULL_TERMINATOR && isDirectArgContainsIllegalChars == FALSE)
+    {
+        if (isLegalChar(directArg[i]) == FALSE)
+            isDirectArgContainsIllegalChars = TRUE;
+        i++;
+    }
+
+    return isDirectArgContainsIllegalChars;
+}
+
+/* ---------------END OF ARGUMENT SYNTAX ERRORS--------------- */
+
+
+/* ---------------DIFFERENT AREA SYNTAX ERRORS--------------- */
+
+SyntaxError checkLastArgSyntaxError(const char *area)
+{
+    SyntaxError lastArgAreaSyntaxError;
+    int firstCharIndex = nextCharIndex(area, MINUS_ONE_INDEX);
+
+    /* If the last argument was the last one. */
+    if (area[firstCharIndex] == NULL_TERMINATOR)
+        lastArgAreaSyntaxError = NO_ERROR;
+
+    else if (area[firstCharIndex] == COMMA)
+        lastArgAreaSyntaxError = EXTRANEOUS_COMMA_ERR;
+
+    else
+        lastArgAreaSyntaxError = EXTRANEOUS_TXT_ERR;
+
+    return lastArgAreaSyntaxError;
+}
+
+SyntaxError checkAreaOrLastArgSyntaxError(const char *area)
+{
+    SyntaxError areaOrLastArgSyntaxError;
+    int chI1 = nextCharIndex(area, MINUS_ONE_INDEX);
+    int chI2 = nextCharIndex(area, chI1);
+
+    /* If the last argument was the last one (it can be). */
+    if ((area[chI1] == COMMA && area[chI2] != NULL_TERMINATOR && area[chI2] != COMMA) ||
+        area[chI1] == NULL_TERMINATOR)
+        areaOrLastArgSyntaxError = NO_ERROR;
+
+    else if (area[chI1] != COMMA)
+        areaOrLastArgSyntaxError = EXPECTED_COMMA_OR_EXTRANEOUS_TEXT_ERR;
+
+    /* area[chI1] == COMMA */
+    else if (area[chI2] == NULL_TERMINATOR)
+        areaOrLastArgSyntaxError = EXPECTED_ARG_OR_EXTRANEOUS_COMMA_ERR;
+
+    /* area[chI2] == COMMA */
+    else if (isCharAfterCommas(area, chI2) == TRUE)
+        areaOrLastArgSyntaxError = MULTIPLE_CONS_COMMAS_ERR;
+
+    else
+        areaOrLastArgSyntaxError = EXTRANEOUS_COMMA_ERR;
+
+    return areaOrLastArgSyntaxError;
+}
+
+SyntaxError checkAreaArgSyntaxError(const char *area)
+{
+    SyntaxError areaSyntaxError = NO_ERROR;
+    int chI1 = nextCharIndex(area, MINUS_ONE_INDEX);
+
+    if (area[chI1] == NULL_TERMINATOR)
+        areaSyntaxError = EXPECTED_COMMA_AND_ARGUMENT_ERR;
+
+    else if (area[chI1] != COMMA)
+        areaSyntaxError = EXPECTED_COMMA_ERR;
+
+    else if (isCharAfterCommas(area, chI1) == FALSE)
+        areaSyntaxError = EXPECTED_ARGUMENT_ERR;
+
+    else if (area[nextCharIndex(area, chI1)] == COMMA)
+        areaSyntaxError = MULTIPLE_CONS_COMMAS_ERR;
+
+    return areaSyntaxError;
+}
+
+/* ---------------END OF DIFFERENT AREA SYNTAX ERRORS--------------- */

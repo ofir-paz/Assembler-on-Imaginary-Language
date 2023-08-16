@@ -379,9 +379,38 @@ label_type_t getLabelTypeForTable(ast_t *ast)
  *
  * @return  The sentence from the given AST.
  */
-sentence_t getSentence(ast_t *ast)
+sentence_t getSentence(ast_t *ast) {return ast -> sentenceNode -> sentence; }
+
+/*
+ * Gets the opcode from the Abstract Syntax Tree (AST).
+ *
+ * @param   *ast    The Abstract Syntax Tree to extract the opcode from.
+ *
+ * @return  The opcode extracted from the given AST.
+ */
+opcodes_t getOpcodeFromAST(ast_t *ast)
 {
-    return ast -> sentenceNode -> sentence;
+    opcodes_t opcode = NO_OPCODE;
+    if (ast -> sentenceNode -> sentence.sentenceType == DIRECTION_SENTENCE)
+        opcode = ast -> sentenceNode -> sentence.sentence.opcode;
+
+    return opcode;
+}
+
+/*
+ * Gets the guidance from the Abstract Syntax Tree (AST).
+ *
+ * @param   *ast    The Abstract Syntax Tree to extract the guidance from.
+ *
+ * @return  The guidance extracted from the given AST.
+ */
+guidance_t getGuidanceFromAST(ast_t *ast)
+{
+    guidance_t guidance = NO_GUIDANCE;
+    if (ast -> sentenceNode -> sentence.sentenceType == GUIDANCE_SENTENCE)
+        guidance = ast -> sentenceNode -> sentence.sentence.guidance;
+
+    return guidance;
 }
 
 /*
