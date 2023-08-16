@@ -141,3 +141,9 @@
 /cmake-build-debug/.cmake/api/v1/reply/codemodel-v2-772dd77656190cd5ce94.json
 /cmake-build-debug/.cmake/api/v1/reply/index-2023-08-16T18-08-17-0126.json
 /cmake-build-debug/.cmake/api/v1/reply/target-mmn_14-Debug-8a7dd8fb495347f9e0e7.json
+/cmake-build-debug/CMakeFiles/mmn_14.dir/diagnoses/assembler_diagnoses.c.o
+/cmake-build-debug/CMakeFiles/mmn_14.dir/diagnoses/assembler_line_diagnoses.c.o
+/cmake-build-debug/CMakeFiles/mmn_14.dir/errors/FirstTransitionErrors/FirstTransitionLogicalAndImgSystemErrors.c.o
+/cmake-build-debug/CMakeFiles/mmn_14.dir/errors/FirstTransitionErrors/FirstTransitionSyntaxErrorCheckUtil.c.o
+/cmake-build-debug/CMakeFiles/mmn_14.dir/errors/FirstTransitionErrors/FirstTransitionSyntaxErrors.c.o
+/cmake-build-debug/CMakeFiles/mmn_14.dir/errors/assembler_errors.c.o

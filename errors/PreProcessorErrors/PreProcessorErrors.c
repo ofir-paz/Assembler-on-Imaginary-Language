@@ -24,47 +24,47 @@
 /* ------------ */
 
 /* ---------------Prototypes--------------- */
-Error getSyntaxPreProcessERR(const char *line, const char *macro_name,
+SyntaxError getSyntaxPreProcessERR(const char *line, const char *macro_name,
                              boolean wasInMacroDef, boolean isInMacroDef);
+boolean isMissingMacroERR(const char *macro_name, boolean wasInMacroDef, boolean isInMacroDef);
 boolean isInvalidMacroNameERR(const char *macro_name, boolean wasInMacroDef, boolean isInMacroDef);
 boolean isExtraneousTextInMacroLineERR(const char *line,
                                        boolean wasInMacroDef, boolean isInMacroDef);
 /* ---------------------------------------- */
 
-Error handlePreProcessErrors(const char *file_name, const char *line, int lineNumber,
+Error checkPreProcessErrors(const char *file_name, const char *line, int lineNumber,
                              const char *macro_name, boolean wasInMacroDef, boolean isInMacroDef)
 {
-    Error error = NO_ERROR; /* Value to return. Will represent the found error, or NO_ERROR. */
+    Error macroError = NO_ERROR; /* Value to return. Will represent the found error, or NO_ERROR. */
 
     /* ---Error diagnoses process--- */
 
     /* Check for syntax errors */
-    error = getSyntaxPreProcessERR(line, macro_name, wasInMacroDef, isInMacroDef);
+    macroError = getSyntaxPreProcessERR(line, macro_name, wasInMacroDef, isInMacroDef);
 
     /* ----------------------------- */
 
-    if (error != NO_ERROR) /* Print error if there is */
-        handle_assembler_error(file_name, lineNumber, error);
-
-    return error; /* Return error */
+    return macroError; /* Return error */
 }
 
-Error getSyntaxPreProcessERR(const char *line, const char *macro_name,
+SyntaxError getSyntaxPreProcessERR(const char *line, const char *macro_name,
                              boolean wasInMacroDef, boolean isInMacroDef)
 {
-    Error error = NO_ERROR;
+    SyntaxError macroError = NO_ERROR;
 
     /* ---Error diagnoses process--- */
+    if (isMissingMacroERR(macro_name, wasInMacroDef, isInMacroDef) == TRUE)
+        macroError = EXPECTED_MACRO_ERR;
 
-    if (isInvalidMacroNameERR(macro_name, wasInMacroDef, isInMacroDef) == TRUE)
-        error = INVALID_MACRO_NAME_ERR;
+    else if (isInvalidMacroNameERR(macro_name, wasInMacroDef, isInMacroDef) == TRUE)
+        macroError = INVALID_MACRO_NAME_ERR;
 
     else if (isExtraneousTextInMacroLineERR(line, wasInMacroDef, isInMacroDef) == TRUE)
-        error = EXTRANEOUS_TEXT_IN_MACRO_LINE_ERR;
+        macroError = EXTRANEOUS_TEXT_IN_MACRO_LINE_ERR;
 
     /* ----------------------------- */
 
-    return error;
+    return macroError;
 }
 
 /* Checks if an input line is too long ( > 80).
@@ -73,6 +73,11 @@ Error getSyntaxPreProcessERR(const char *line, const char *macro_name,
 boolean isLineTooLong(const char *line)
 {
     return (strlen(line) > MAX_LINE_LEN && line[MAX_LINE_LEN] != ENTER_KEY)? TRUE : FALSE;
+}
+
+boolean isMissingMacroERR(const char *macro_name, boolean wasInMacroDef, boolean isInMacroDef)
+{
+    return (isInNewMacroDef(wasInMacroDef, isInMacroDef) && macro_name == NULL)? TRUE : FALSE;
 }
 
 boolean isInvalidMacroNameERR(const char *macro_name, boolean wasInMacroDef, boolean isInMacroDef)

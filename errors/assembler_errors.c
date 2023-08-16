@@ -49,6 +49,7 @@ void print_assembler_ERR(Error error, const char *file_name, int lineNumber)
                     /* Indicates no error. !! add new errors after this one !! */
                 "NO_ERROR",
                     /* Macro related syntax errors */
+                "Expected macro!",
                 "Invalid macro name! a macro name cannot be a saved word.",
                 "Extraneous text in a macro definition line !!",
 

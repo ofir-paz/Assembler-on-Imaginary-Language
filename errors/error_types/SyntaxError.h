@@ -16,7 +16,7 @@ typedef enum
         SYNTAX_ERR_START = start_of_error(2),
 
     /* Macro related syntax errors */
-        INVALID_MACRO_NAME_ERR, EXTRANEOUS_TEXT_IN_MACRO_LINE_ERR,
+        EXPECTED_MACRO_ERR, INVALID_MACRO_NAME_ERR, EXTRANEOUS_TEXT_IN_MACRO_LINE_ERR,
 
     /* Label related syntax errors */
         EXPECTED_LABEL_ERR, EMPTY_BETWEEN_LABEL_AND_COLON_ERR, LABEL_START_WITH_NUM_ERR,

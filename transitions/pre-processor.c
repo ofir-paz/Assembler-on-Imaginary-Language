@@ -13,6 +13,7 @@
 #include "../general-enums/programFinals.h"
 #include "../FileHandling/readFromFile.h"
 #include "../FileHandling/writeToFile.h"
+#include "../errors/assembler_errors.h"
 #include "../errors/PreProcessorErrors/PreProcessorErrors.h"
 #include "../diagnoses/diagnose_line.h"
 #include "../diagnoses/assembler_line_diagnoses.h"
@@ -31,11 +32,9 @@
 process_result traverse_before_macro_file(const char *file_name,
                                           char **amFileContents, NameTable *macro_table);
 Error handleLineInPreProc(const char *file_name, const char *line, int lineNumber,
-                          char **macro_name, char **amFileContents, NameTable *macro_table,
-                          boolean *wasError);
+                          char **macro_name, char **amFileContents, NameTable *macro_table);
 Error preProcessorAssemblerAlgo(const char *file_name, const char *line, int lineNumber,
-                                char **macro_name, char **amFileContents, NameTable *macro_table,
-                                boolean *wasError);
+                                char **macro_name, char **amFileContents, NameTable *macro_table);
 boolean isInMcroDef(const char *line, boolean wasInMacroDef);
 void getMacroName(const char *line, char **macro_name, boolean wasInMacroDef, boolean isInMacroDef);
 void addToTablesIfNeededInPreProc(const char *line, char *macro_name, boolean wasInMacroDef,
@@ -94,8 +93,9 @@ process_result traverse_before_macro_file(const char *file_name,
         if (readCode == UNABLE_TO_OPEN_FILE) break;
 
         lineCount++; /* Increasing line counter by 1 since we reached a new line */
-        (void) handleLineInPreProc(file_name, line, lineCount, &macro_name, amFileContents,
-                                   macro_table, &wasError);
+        if (handleLineInPreProc(file_name, line, lineCount, &macro_name, amFileContents,
+                                   macro_table) != NO_ERROR)
+            wasError = TRUE;
 
         (void) clear_ptr(line) /* Next line */
     }
@@ -113,13 +113,11 @@ process_result traverse_before_macro_file(const char *file_name,
  * @param   **macro_name        Pointer to the current macro name.
  * @param   **amFileContents    Pointer to string that holds the contents of the .am file.
  * @param   *macro_table        Data structure to hold the macro names and contents.
- * @param   *wasError           Pointer to flag indicating if there was an error.
  *
  * @return  The error code of the found error in the line, or NO_ERROR (0) if there wasn't.
  */
 Error handleLineInPreProc(const char *file_name, const char *line, int lineNumber,
-                          char **macro_name, char **amFileContents, NameTable *macro_table,
-                          boolean *wasError)
+                          char **macro_name, char **amFileContents, NameTable *macro_table)
 {
     Error lineError = NO_ERROR; /* Value to return. Represents the error in the line. */
 
@@ -128,7 +126,10 @@ Error handleLineInPreProc(const char *file_name, const char *line, int lineNumbe
 
     else if (isSkipLine(line) == FALSE) /* Go to next line if we can skip this one */
         lineError = preProcessorAssemblerAlgo(file_name, line, lineNumber, macro_name,
-                                              amFileContents, macro_table, wasError);
+                                              amFileContents, macro_table);
+
+    if (lineError != NO_ERROR) /* Print error if there are. */
+        handle_assembler_error(file_name, lineNumber, lineError);
 
     return lineError;
 }
@@ -142,13 +143,11 @@ Error handleLineInPreProc(const char *file_name, const char *line, int lineNumbe
  * @param   **macro_name        Pointer to the current macro name.
  * @param   **amFileContents    Pointer to string that holds the contents of the .am file.
  * @param   *macro_table        Data structure to hold the macro names and contents.
- * @param   *wasError           Pointer to flag indicating if there was an error.
  *
  * @return  The error code of the found error in the line, or NO_ERROR (0) if there wasn't.
  */
 Error preProcessorAssemblerAlgo(const char *file_name, const char *line, int lineNumber,
-                                char **macro_name, char **amFileContents, NameTable *macro_table,
-                                boolean *wasError)
+                                char **macro_name, char **amFileContents, NameTable *macro_table)
 {
     static boolean wasInMacroDef = FALSE; /* See if last line was in a mcro def. */
 
@@ -158,12 +157,11 @@ Error preProcessorAssemblerAlgo(const char *file_name, const char *line, int lin
     boolean isInMacroDef = isInMcroDef(line, wasInMacroDef); /* Is curr line in mcro def */
     getMacroName(line, macro_name, wasInMacroDef, isInMacroDef); /* Get curr macro name */
 
-    lineError = handlePreProcessErrors(file_name, line, lineNumber, *macro_name,
-                                       wasInMacroDef, isInMacroDef);
-    if (lineError != NO_ERROR)
-        *wasError = TRUE;
+    lineError = checkPreProcessErrors(file_name, line, lineNumber, *macro_name,
+                                      wasInMacroDef, isInMacroDef);
 
-    if (lineError == INVALID_MACRO_NAME_ERR) /* Address a specific error */
+    /* Address a specific error */
+    if (lineError == INVALID_MACRO_NAME_ERR || lineError == EXPECTED_MACRO_ERR)
     {
         isInMacroDef = FALSE;
         (void) clear_ptr(*macro_name)

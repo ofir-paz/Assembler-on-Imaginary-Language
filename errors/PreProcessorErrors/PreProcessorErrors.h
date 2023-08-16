@@ -12,8 +12,8 @@
 
 /* ---------------Prototypes--------------- */
 
-Error handlePreProcessErrors(const char *file_name, const char *line, int lineNumber,
-                             const char *macro_name, boolean wasInMacroDef, boolean isInMacroDef);
+Error checkPreProcessErrors(const char *file_name, const char *line, int lineNumber,
+                            const char *macro_name, boolean wasInMacroDef, boolean isInMacroDef);
 
 /* Checks if an input line is too long ( > 80).
  * param const char *line is the input line.

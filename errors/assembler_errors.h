@@ -8,6 +8,8 @@
 #ifndef MMN_14_ASSEMBLER_ERRORS_H
 #define MMN_14_ASSEMBLER_ERRORS_H
 
+#include "error_types/error_types.h"
+
 /* ---------------Prototypes--------------- */
 
 /*
