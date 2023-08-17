@@ -162,7 +162,7 @@ guidance_t getGuidance(const char *word)
 opcodes_t getOpcode(const char *word)
 {
     /* Array to save all the opcodes. */
-    const char *opcodes_list[] = {"mov", "cmp", "add", "sub",
+    const char *opcodes_list[OPCODE_AMOUNT] = {"mov", "cmp", "add", "sub",
                                    "not", "clr", "lea", "inc",
                                    "dec", "jmp", "bne", "red",
                                    "prn", "jsr", "rts", "stop"};
@@ -213,7 +213,7 @@ int getCommandStartIndex(const char *line, boolean isLabelDef)
                              nextSpecificCharIndex(line, ZERO_INDEX, COLON) :
                              MINUS_ONE_INDEX;
 
-    return endIndexOfLabelDef + 1;
+    return nextCharIndex(line, endIndexOfLabelDef);
 }
 
 /*
@@ -452,13 +452,25 @@ void getArgDataFromString(const char *arg, data_t *argData)
  * @param   argumentNum     The number of argument to get the data off.
  * @param   isLabel         Flag indicating if the line has a label definition.
  * @param   *argData        Pointer to store the found data.
+ * @param   isStrArg        Flag indicating if the argument is a string (special case).
  */
-void getArgDataFromLine(const char *line, int argumentNum, boolean isLabel, data_t *argData)
+void getArgDataFromLine(const char *line, int argumentNum, boolean isLabel, data_t *argData,
+                        boolean isStrArg)
 {
     char *arg; /* Will hold the argument in string type. */
-    findArg(line, &arg, argumentNum, isLabel); /* Find the string containing the argument. */
 
-    getArgDataTypeFromString(arg, &(argData -> dataType)); /* Get the data type. */
+    if (isStrArg == TRUE) /* Get string arg (special case). */
+    {
+        int quotesIndex1 = nextSpecificCharIndex(line, ZERO_INDEX, QUOTES);
+        int quotesIndex2 = nextSpecificCharIndex(line, quotesIndex1, QUOTES);
+
+        /* Add one to include closing quotes as well. */
+        arg = strcpyPart(line, quotesIndex1, quotesIndex2 + 1);
+    }
+    else /* Get normal arg. */
+        findArg(line, &arg, argumentNum, isLabel); /* Find the string containing the argument. */
+
+    getArgDataTypeFromString(arg, &(argData->dataType)); /* Get the data type. */
     getArgDataFromString(arg, argData); /* Get the data. */
 
     (void) clear_ptr(arg) /* Free unnecessary variable. */

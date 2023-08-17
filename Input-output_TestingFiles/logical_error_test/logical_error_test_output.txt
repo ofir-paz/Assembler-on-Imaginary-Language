@@ -1,0 +1,43 @@
+Assembler state: Starting assembling source assembly file On file: "../Input-output_TestingFiles/logical_error_test/logical_error_test"
+
+Assembler state: Starting pre-process stage On file: "../Input-output_TestingFiles/logical_error_test/logical_error_test"
+
+Assembler state: Starting first transition stage On file: "../Input-output_TestingFiles/logical_error_test/logical_error_test"
+
+ERROR: Label already defined! Try to use a different label name.
+In file: "../Input-output_TestingFiles/logical_error_test/logical_error_test", On line: 2
+
+ERROR: Argument is not a label! Expected a label name argument.
+In file: "../Input-output_TestingFiles/logical_error_test/logical_error_test", On line: 3
+
+ERROR: Argument is not a label! Expected a label name argument.
+In file: "../Input-output_TestingFiles/logical_error_test/logical_error_test", On line: 4
+
+ERROR: Argument is not a number! Expected a data number argument!
+In file: "../Input-output_TestingFiles/logical_error_test/logical_error_test", On line: 5
+
+ERROR: Illegal addressing method for destination argument!
+In file: "../Input-output_TestingFiles/logical_error_test/logical_error_test", On line: 6
+
+ERROR: Illegal addressing method for source argument!
+In file: "../Input-output_TestingFiles/logical_error_test/logical_error_test", On line: 7
+
+ERROR: Label was already defined as entry label!
+In file: "../Input-output_TestingFiles/logical_error_test/logical_error_test", On line: 8
+
+ERROR: Label was already defined as entry label!
+In file: "../Input-output_TestingFiles/logical_error_test/logical_error_test", On line: 9
+
+ERROR: Label was already defined as external label!
+In file: "../Input-output_TestingFiles/logical_error_test/logical_error_test", On line: 10
+
+ERROR: Label was already defined as external label!
+In file: "../Input-output_TestingFiles/logical_error_test/logical_error_test", On line: 11
+
+ERROR: Label was defined in the file and is external!
+In file: "../Input-output_TestingFiles/logical_error_test/logical_error_test", On line: 12
+
+ERROR: Label was defined both as entry and extern!
+In file: "../Input-output_TestingFiles/logical_error_test/logical_error_test", On line: 13
+
+Assembler state: Finished assembling (due to errors or not) On file: "../Input-output_TestingFiles/logical_error_test/logical_error_test"

@@ -11,8 +11,8 @@ add_executable(mmn_14 main.c new-data-types/boolean.h
         transitions/first-transition.h
         encoding/encoding-finals/encoding_types.h
         encoding/encoding-finals/encoding_types.h
-        encoding/encoding-finals/encoding_types.h assembler.c assembler.h errors/warnings.c
-        errors/warnings.h general-enums/indexes.h diagnoses/diagnose_line.c
+        encoding/encoding-finals/encoding_types.h assembler.c assembler.h
+        general-enums/indexes.h diagnoses/diagnose_line.c
         diagnoses/diagnose_line.h encoding/encoding-finals/guidance.h
         new-data-types/process_result.h errors/system_errors.c errors/system_errors.h
         errors/assembler_errors.c errors/assembler_errors.h FileHandling/fileHelpMethods.c
@@ -50,4 +50,6 @@ add_executable(mmn_14 main.c new-data-types/boolean.h
         diagnoses/assembler_diagnoses.h
         errors/FirstTransitionErrors/FirstTransitionLogicalAndImgSystemErrors.c
         errors/FirstTransitionErrors/FirstTransitionLogicalAndImgSystemErrors.h
+        errors/warnings.c
+        errors/warnings.h
 )

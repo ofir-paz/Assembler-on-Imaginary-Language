@@ -1,0 +1,43 @@
+: stop
+        label   :stop
+1label:stop
+-label:stop
+labe-l:stop
+l012345678901234567890123456789m:stop
+stop:stop
+ label: :
+ label:,stop
+label:
+mov,
+l:.
+..
+.sTring "a"
+.guidance
+entry a
+mOv a , a
+operation
+ l:mov @r0
+mov @r0 @r0
+cmp @r0,
+.data 1,,,,,,2
+.string abc"
+.string "abc
+.string "♔♔♔"
+.data 1,+,2
+cmp --2,@r1
+mov -132.1,@r0
+.data +2,-2,32.2.2
+mov @r0,l012345678901234567890123456789z
+lea l1.d,
+mov @,@r0
+lea @@r1
+mov @r0, @0
+mov @R0,@r0
+add @t0, @r1
+sub @r, @r1
+lea @r8
+mov @r123,@r1
+mov @r0,@r0,
+stop ,dads
+.data 1,+2 -2
+.entry a,

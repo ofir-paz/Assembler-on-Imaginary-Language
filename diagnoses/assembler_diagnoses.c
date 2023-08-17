@@ -6,8 +6,12 @@
  */
 
 /* ---Include header files--- */
+#include <stddef.h>
 #include "../new-data-types/boolean.h"
+#include "../general-enums/indexes.h"
 #include "../encoding/encoding-finals/encoding_finals.h"
+#include "../assembler_ast/assembler_ast.h"
+#include "../encoding/wordHandling.h"
 /* -------------------------- */
 
 /* ---Finals--- */
@@ -16,6 +20,10 @@
 #define VALID_ARG 0
 #define INVALID_ARG_MTD (-1)
 #define INVALID_ARG_NUMBER (-2)
+#define MAX_SIZE_FOR_DATA 12
+#define MAX_BITS_FOR_INSTANT_VAL 10
+
+enum {src, dest};
 /* ------------ */
 
 /* ---Macros--- */
@@ -66,24 +74,25 @@ op_group_t getOpGroup(opcodes_t opcode)
             opGroup = ZERO_ARGS; break;
 
         default:
-            opGroup = ZERO_ARGS;
+            opGroup = NO_OPCODE;
     }
 
     return opGroup;
 }
 
 /*
- * Validates the argument for the given opcode, argument number, and addressing method.
+ * Validates the argument for the given opcode, type of argument (dest or src)
+ * and addressing method.
  *
  * @param   opcode          The opcode to validate the argument against.
- * @param   argumentNum     The argument number to validate.
+ * @param   isDest          Flag indicating if the argument is the destination argument.
  * @param   addMtd          The addressing method of the argument.
  *
  * @return  The validation result: VALID_ARG (0) if the argument is valid,
  *          INVALID_ARG_MTD (-1) if the addressing method is invalid,
- *          INVALID_ARG_NUMBER (-2) if the argument number is invalid.
+ *          INVALID_ARG_NUMBER (-2) if the isDest flag is not matching the opcode.
  */
-int validArg(opcodes_t opcode, int argumentNum, addressing_method_t addMtd)
+int validArg(opcodes_t opcode, boolean isDest, addressing_method_t addMtd)
 {
     /* Table representing valid addressing method for every operation. */
     char addressingMethodsTable[OPCODE_AMOUNT][MAX_PARAM_COUNT] =
@@ -106,19 +115,35 @@ int validArg(opcodes_t opcode, int argumentNum, addressing_method_t addMtd)
                     {ZERO_ADD_MTD, ZERO_ADD_MTD},                           /* stop */
             };
 
-    int validArg = INVALID_ARG_NUMBER; /* Value to return, assume the number is invalid. */
+    int validArg; /* Value to return. */
+    int argIndex = (isDest)? ONE_INDEX : ZERO_INDEX; /* Index of argument in table. */
 
-    /* Decrease argumentNum because index of argument starts in 1. */
-    if (argumentNum-- < MAX_PARAM_COUNT) /* Check if the number is valid. */
-    {
-        /* Check if the argument addressing method matches the one in the table. */
-        if (addressingMethodsTable[opcode][argumentNum] & (ONE_BIT << addMtd))
-            validArg = VALID_ARG;
-        else
-            validArg = INVALID_ARG_MTD;
-    }
+    if (addressingMethodsTable[opcode][argIndex] == ZERO_ADD_MTD)
+        validArg = INVALID_ARG_NUMBER;
+
+    /* Check if the argument addressing method matches the one in the table. */
+    else if (addressingMethodsTable[opcode][argIndex] & (ONE_BIT << addMtd))
+        validArg = VALID_ARG;
+    else
+        validArg = INVALID_ARG_MTD;
 
     return validArg;
+}
+
+/*
+ * Checks if the operation with the given opcode requires the argument
+ * with the give number.
+ *
+ * @param   opcode          The opcode of the operation to check.
+ * @param   argumentNum     The argument number to check if needed.
+ *
+ * @return  TRUE if the argument is needed, otherwise FALSE.
+ */
+boolean isNeedArgument(opcodes_t opcode, int argumentNum)
+{
+    op_group_t opGroup = getOpGroup(opcode);
+
+    return (argumentNum <= opGroup)? TRUE : FALSE;
 }
 
 /*
@@ -139,12 +164,87 @@ area_status_t getAreaStatus(opcodes_t opcode, boolean isStrGuidance, int argumen
     if (opcode == NO_OPCODE)
         areaStatus = (isStrGuidance == TRUE)? LAST_ARG : CAN_BE_ANOTHER_ARG;
 
-        /* The command is an operation. If there can't be another argument - */
-    else if (validArg(opcode, argumentNum + 1, ZERO_ADD_MTD) == INVALID_ARG_NUMBER)
-        areaStatus = LAST_ARG;
-
-    else /* The command is an operation and there must be another argument. */
+    /* The command is an operation. If need another argument - */
+    else if (isNeedArgument(opcode, argumentNum + 1) == TRUE)
         areaStatus = MUST_BE_ANOTHER_ARG;
 
+    else /* The command is an operation and there can't be another argument. */
+        areaStatus = LAST_ARG;
+
     return areaStatus;
+}
+
+/*
+ * Checks if all arguments in the given argument node have a specific data type.
+ *
+ * @param   *argNode        The first of the arguments to check.
+ * @param   dataType        The specific data type to check against.
+ *
+ * @return  TRUE if all arguments have the specified data type, otherwise FALSE.
+ */
+boolean isAllArgsSpecificDataType(arg_node_t *argNode, data_type_t dataType)
+{
+    boolean isAllArgsSpecificDataType = TRUE; /* Value to return. */
+
+    /* Go through all the arguments and check for a mismatch in the data type. */
+    while (argNode != NULL && isAllArgsSpecificDataType == TRUE)
+    {
+        if (getArgData(argNode).dataType != dataType)
+            isAllArgsSpecificDataType = FALSE;
+        argNode = getNextNode(argNode);
+    }
+
+    return isAllArgsSpecificDataType;
+}
+
+/*
+ * Checks if the given argument node has number overflow.
+ * For data number, 12 bits can be used and for an instant value number, 10 bits.
+ *
+ * @param   *argNode        The argument node to check.
+ * @param   isData          Indicates whether the argument is for data or not.
+ *
+ * @return  TRUE if the given argument node has number overflow, otherwise FALSE.
+ */
+boolean isOverflowNumber(arg_node_t *argNode, boolean isData)
+{
+    boolean isOverflowNumber = FALSE; /* Value to return. */
+
+    /* Check if there is a possibility for an overflow. */
+    if (argNode != NULL && getArgData(argNode).dataType == INT)
+    {
+        /* Check if there is an overflow. */
+        if (isData == TRUE)
+            isOverflowNumber = isOverflow(MAX_SIZE_FOR_DATA, getArgData(argNode).data.num);
+        else
+            isOverflowNumber = isOverflow(MAX_BITS_FOR_INSTANT_VAL, getArgData(argNode).data.num);
+    }
+
+    return isOverflowNumber;
+}
+
+/*
+ * Checks if the given and in the next argument nodes there is a number overflow.
+ * For data number, 12 bits can be used and for an instant value number, 10 bits.
+ *
+ * @param   *argNode        The argument node to check from.
+ * @param   isData          Indicates whether the arguments are for data or not.
+ *
+ * @return  TRUE if the given and in the next argument nodes there is a number overflow,
+ *          otherwise FALSE.
+ */
+boolean isAnyOverflowNumber(arg_node_t *argNode, boolean isData)
+{
+    boolean isAnyOverflowNumber = FALSE; /* Value to return. */
+
+    /* Go through all arguments while we haven't found an overflow. */
+    while (argNode != NULL && isAnyOverflowNumber == FALSE)
+    {
+        /* Check for overflow in the current argument. */
+        isAnyOverflowNumber = isOverflowNumber(argNode, isData);
+
+        argNode = getNextNode(argNode); /* Check next argument. */
+    }
+
+    return isAnyOverflowNumber;
 }

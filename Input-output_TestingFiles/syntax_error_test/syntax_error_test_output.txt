@@ -1,0 +1,136 @@
+Assembler state: Starting assembling source assembly file On file: "../Input-output_TestingFiles/syntax_error_test/syntax_error_test"
+
+Assembler state: Starting pre-process stage On file: "../Input-output_TestingFiles/syntax_error_test/syntax_error_test"
+
+Assembler state: Starting first transition stage On file: "../Input-output_TestingFiles/syntax_error_test/syntax_error_test"
+
+ERROR: Expected label name !!
+In file: "../Input-output_TestingFiles/syntax_error_test/syntax_error_test", On line: 1
+
+ERROR: Empty space between label and colon! Label and colon can't be seperated.
+In file: "../Input-output_TestingFiles/syntax_error_test/syntax_error_test", On line: 2
+
+ERROR: Label starts with a number! It must start with a letter.
+In file: "../Input-output_TestingFiles/syntax_error_test/syntax_error_test", On line: 3
+
+ERROR: Label starts with an illegal character! It must start with a letter.
+In file: "../Input-output_TestingFiles/syntax_error_test/syntax_error_test", On line: 4
+
+ERROR: Label Contains illegal characters! It can include only letters and numbers.
+In file: "../Input-output_TestingFiles/syntax_error_test/syntax_error_test", On line: 5
+
+ERROR: Label Is too long! Max label length is 31 characters long.
+In file: "../Input-output_TestingFiles/syntax_error_test/syntax_error_test", On line: 6
+
+ERROR: Label Is a saved word! A label name cannot be a saved word.
+In file: "../Input-output_TestingFiles/syntax_error_test/syntax_error_test", On line: 7
+
+ERROR: Multiple consecutive colons after label name! Label definition needs one colon.
+In file: "../Input-output_TestingFiles/syntax_error_test/syntax_error_test", On line: 8
+
+ERROR: Unneeded comma after label definition!
+In file: "../Input-output_TestingFiles/syntax_error_test/syntax_error_test", On line: 9
+
+ERROR: Expected command (operation or guidance)!
+In file: "../Input-output_TestingFiles/syntax_error_test/syntax_error_test", On line: 10
+
+ERROR: Unneeded comma after command!
+In file: "../Input-output_TestingFiles/syntax_error_test/syntax_error_test", On line: 11
+
+ERROR: Expected guidance after dot!
+In file: "../Input-output_TestingFiles/syntax_error_test/syntax_error_test", On line: 12
+
+ERROR: Multiple consecutive dots in guidance!
+In file: "../Input-output_TestingFiles/syntax_error_test/syntax_error_test", On line: 13
+
+ERROR: Guidance name is wrong case (try to use lower case letters)!
+In file: "../Input-output_TestingFiles/syntax_error_test/syntax_error_test", On line: 14
+
+ERROR: Undefined guidance!
+In file: "../Input-output_TestingFiles/syntax_error_test/syntax_error_test", On line: 15
+
+ERROR: Expected dot before guidance!
+In file: "../Input-output_TestingFiles/syntax_error_test/syntax_error_test", On line: 16
+
+ERROR: Operation is wrong case (try to use lower case letters)!
+In file: "../Input-output_TestingFiles/syntax_error_test/syntax_error_test", On line: 17
+
+ERROR: Undefined operation!
+In file: "../Input-output_TestingFiles/syntax_error_test/syntax_error_test", On line: 18
+
+ERROR: Expected comma and argument!
+In file: "../Input-output_TestingFiles/syntax_error_test/syntax_error_test", On line: 19
+
+ERROR: Expected comma!
+In file: "../Input-output_TestingFiles/syntax_error_test/syntax_error_test", On line: 20
+
+ERROR: Expected argument!
+In file: "../Input-output_TestingFiles/syntax_error_test/syntax_error_test", On line: 21
+
+ERROR: Multiple consecutive commas!
+In file: "../Input-output_TestingFiles/syntax_error_test/syntax_error_test", On line: 22
+
+ERROR: Expected open quotes in string argument!
+In file: "../Input-output_TestingFiles/syntax_error_test/syntax_error_test", On line: 23
+
+ERROR: Expected closing quotes in string argument!
+In file: "../Input-output_TestingFiles/syntax_error_test/syntax_error_test", On line: 24
+
+ERROR: String contains unprintable characters!
+In file: "../Input-output_TestingFiles/syntax_error_test/syntax_error_test", On line: 25
+
+ERROR: Number is only a sign!
+In file: "../Input-output_TestingFiles/syntax_error_test/syntax_error_test", On line: 26
+
+ERROR: Multiple consecutive signs in number argument!
+In file: "../Input-output_TestingFiles/syntax_error_test/syntax_error_test", On line: 27
+
+ERROR: Number is not an integer! This machine supports only integers.
+In file: "../Input-output_TestingFiles/syntax_error_test/syntax_error_test", On line: 28
+
+ERROR: Supposed value is an illegal number!
+In file: "../Input-output_TestingFiles/syntax_error_test/syntax_error_test", On line: 29
+
+ERROR: Supposed label argument is too long! Max label name length is 31.
+In file: "../Input-output_TestingFiles/syntax_error_test/syntax_error_test", On line: 30
+
+ERROR: Illegal characters in supposed label argument!
+In file: "../Input-output_TestingFiles/syntax_error_test/syntax_error_test", On line: 31
+
+ERROR: Expected register argument!
+In file: "../Input-output_TestingFiles/syntax_error_test/syntax_error_test", On line: 32
+
+ERROR: Multiple consecutive ats ('@') !
+In file: "../Input-output_TestingFiles/syntax_error_test/syntax_error_test", On line: 33
+
+ERROR: Expected register letter! Register letter is the letter 'r'.
+In file: "../Input-output_TestingFiles/syntax_error_test/syntax_error_test", On line: 34
+
+ERROR: Capital register letter! Try to use 'r' instead of 'R'.
+In file: "../Input-output_TestingFiles/syntax_error_test/syntax_error_test", On line: 35
+
+ERROR: Wrong register letter! The only register letter is 'r'.
+In file: "../Input-output_TestingFiles/syntax_error_test/syntax_error_test", On line: 36
+
+ERROR: Expected register number!
+In file: "../Input-output_TestingFiles/syntax_error_test/syntax_error_test", On line: 37
+
+ERROR: Illegal register number! Register numbers range from 0 to 7.
+In file: "../Input-output_TestingFiles/syntax_error_test/syntax_error_test", On line: 38
+
+ERROR: Extraneous text after register argument! Try to remove text after @rx (x=number)
+In file: "../Input-output_TestingFiles/syntax_error_test/syntax_error_test", On line: 39
+
+ERROR: Extraneous comma!
+In file: "../Input-output_TestingFiles/syntax_error_test/syntax_error_test", On line: 40
+
+ERROR: Extraneous text!
+In file: "../Input-output_TestingFiles/syntax_error_test/syntax_error_test", On line: 41
+
+ERROR: Expected comma (or might be extraneous text)!
+In file: "../Input-output_TestingFiles/syntax_error_test/syntax_error_test", On line: 42
+
+ERROR: Expected argument after last comma (or might be extraneous comma)!
+In file: "../Input-output_TestingFiles/syntax_error_test/syntax_error_test", On line: 43
+
+Assembler state: Finished assembling (due to errors or not) On file: "../Input-output_TestingFiles/syntax_error_test/syntax_error_test"

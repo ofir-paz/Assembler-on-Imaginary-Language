@@ -430,11 +430,11 @@ arg_node_t *getArgList(ast_t *ast)
  *
  * @param   *argNode    The argument node to get the next one from.
  *
- * @return  The next argument node from the given one.
+ * @return  The next argument node from the given one, or NULL if the argument is NULL.
  */
 arg_node_t *getNextNode(arg_node_t *argNode)
 {
-    return argNode -> nextArg;
+    return (argNode != NULL)? argNode -> nextArg : NULL;
 }
 
 /*
@@ -454,11 +454,11 @@ data_t getArgData(arg_node_t *argNode)
  *
  * @param   *argNode    The given argument to retrieve its addressing method.
  *
- * @return  The addressing method of the given argument.
+ * @return  The addressing method of the given argument, or 0 if the argument is NULL.
  */
 addressing_method_t getArgAddressingMethod(arg_node_t *argNode)
 {
-    return argNode -> addressingMethod;
+    return (argNode != NULL)? argNode -> addressingMethod : ZERO_ADD_MTD;
 }
 
 /*
@@ -536,6 +536,19 @@ arg_node_t *gotoLastArgNode(ast_t *ast)
             lastNode != NULL && lastNode -> nextArg != NULL; lastNode = lastNode -> nextArg);
 
     return lastNode;
+}
+
+/*
+ * Deletes the label from the ast (if there is).
+ *
+ * @param   *ast    The ast with the label to delete.
+ *
+ * @return  0 on success, -1 if the label was NULL.
+ */
+int deleteLabel(ast_t *ast)
+{
+    int retCode = clear_ptr(ast -> label) /* Delete the label name (if there is). */
+    return retCode;
 }
 
 /*

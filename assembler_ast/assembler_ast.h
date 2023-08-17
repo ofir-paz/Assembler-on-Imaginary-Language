@@ -29,6 +29,11 @@ typedef struct
     data_type_t dataType; /* Will hold the type of data of the argument. */
 } data_t; /* Will be the data of the argument (data; label name; register) */
 
+/* ---Function return codes--- */
+#define SUCCESS_CODE 0
+#define INVALID_GIVEN_PARAM_CODE (-1)
+/* --------------------------- */
+
 /* ---------------Prototypes--------------- */
 
 /* ---Data types prototypes--- */
@@ -186,7 +191,7 @@ arg_node_t *getArgList(ast_t *ast);
  *
  * @param   *argNode    The argument node to get the next one from.
  *
- * @return  The next argument node from the given one.
+ * @return  The next argument node from the given one, or NULL if the argument is NULL.
  */
 arg_node_t *getNextNode(arg_node_t *argNode);
 
@@ -204,7 +209,7 @@ data_t getArgData(arg_node_t *argNode);
  *
  * @param   *argNode    The given argument to retrieve its addressing method.
  *
- * @return  The addressing method of the given argument.
+ * @return  The addressing method of the given argument, or 0 if the argument is NULL.
  */
 addressing_method_t getArgAddressingMethod(arg_node_t *argNode);
 
@@ -234,6 +239,15 @@ boolean isLabel(ast_t *ast);
  * @return  The addressing method to be used for the given data type in the AST.
  */
 addressing_method_t findAddressingMethod(ast_t *ast, data_type_t dataType);
+
+/*
+ * Deletes the label from the ast (if there is).
+ *
+ * @param   *ast    The ast with the label to delete.
+ *
+ * @return  0 on success, -1 if the label was NULL.
+ */
+int deleteLabel(ast_t *ast);
 
 /*
  * Deletes the AST and set the pointer to NULL.

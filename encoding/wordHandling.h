@@ -10,6 +10,11 @@
 
 /* ---------------Prototypes--------------- */
 
+#include "encodingDataStructures/word.h"
+
+/* ---Typedef prototype for encapsulation--- */
+/* ----------------------------------------- */
+
 /*
  * Checks if the given signed value fits inside a bit array of the given size.
  *

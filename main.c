@@ -8,18 +8,16 @@
 #include "new-data-types/boolean.h"
 #include "general-enums/indexes.h"
 #include "assembler.h"
-#include "stdio.h"
 /* -------------------------- */
 
 int main(int argc, char *argv[]) {
-    int i = ONE_INDEX; /* Loop variable */
+    int i; /* Loop variable */
 
     //if (argument_error(argc) == TRUE) /* Check for errors with the arguments */
     //    handle_argument_error(); /* Handle it */
 
-    while (i < argc){
+    for (i = ONE_INDEX; i < argc; i++)
         assemble(argv[i]);
-        i++;
-    }
+
     return 0;
 }

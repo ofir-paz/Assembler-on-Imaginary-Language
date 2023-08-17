@@ -121,11 +121,13 @@ Error addArgumentsFromLineToAST(ast_t *lineAST, const char *line)
                 line, argumentNum, isLabelDef, opcode, isStrGuidance)) == NO_ERROR)
         {
             data_t *argData = (data_t *) allocate_space(sizeof(data_t));
-            getArgDataFromLine(line, argumentNum, isLabel(lineAST), argData);
+            getArgDataFromLine(line, argumentNum, isLabel(lineAST), argData, isStrGuidance);
             addArgumentToAst(lineAST, argData);
             if (isLastArg(line, argumentNum, isLabel(lineAST)) == TRUE) break;
             argumentNum++;
         }
+    else
+        foundError = checkErrorInMissingArg(lineAST);
 
     return foundError;
 }
@@ -142,7 +144,7 @@ void addLabelToOtherTable(char *label, NameTable *labelsMap[], label_type_t tabl
 
 Error addLabelToEntryTable(char *label, NameTable *entLabels, NameTable *extLabels)
 {
-    Error argLabelError = getLogicalErrorInAddToEntryTable(label, entLabels, extLabels);
+    Error argLabelError = checkAddToEntryTableError(label, entLabels, extLabels);
 
     if (argLabelError == NO_ERROR)
         addLabelToTable(entLabels, label, ZERO_NUMBER);
@@ -152,7 +154,7 @@ Error addLabelToEntryTable(char *label, NameTable *entLabels, NameTable *extLabe
 
 Error addLabelToExternTable(char *label, NameTable *labelsMap[])
 {
-    Error argLabelError = getLogicalErrorInAddToExternTable(label, labelsMap);
+    Error argLabelError = checkAddToExternTableError(label, labelsMap);
 
     if (argLabelError == NO_ERROR)
         addLabelToTable(labelsMap[EXTERN], label, ZERO_NUMBER);

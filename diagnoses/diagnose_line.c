@@ -6,15 +6,11 @@
  * */
 
 /* ---Include header files--- */
-#include <stdlib.h>
-#include <string.h>
+#include <ctype.h>
 #include "../new-data-types/word_number.h"
-#include "../general-enums/programFinals.h"
 #include "../general-enums/indexes.h"
 #include "../general-enums/neededKeys.h"
 #include "diagnose_util.h"
-#include "../util/memoryUtil.h"
-#include "../util/stringsUtil.h"
 /* -------------------------- */
 
 /* -----Finals----- */
@@ -71,7 +67,9 @@ boolean isStrInteger(const char *str)
 {
     int currIndex = (isPlusOrMinus(str[ZERO_INDEX]))? ONE_INDEX : ZERO_INDEX;
 
-    while (isCharNumber(str[currIndex++])); /* Go to the first char that is not a number. */
+    /* Go to the first char that is not a number. */
+    while (isCharNumber(str[currIndex]))
+        currIndex++;
 
     /* Return TRUE if we reached '\0', otherwise FALSE. */
     return (str[currIndex] == NULL_TERMINATOR)? TRUE : FALSE;
@@ -90,7 +88,7 @@ boolean isStrFloat(const char *str)
     boolean wasDot = FALSE;
 
     /* While curr char is a number or there has been less than one dot. */
-    while (isCharNumber(str[currIndex]))
+    while (isCharNumber(str[currIndex]) || str[currIndex] == DOT)
     {
         if (str[currIndex] == DOT)
         {
@@ -125,4 +123,21 @@ boolean isCharAfterCommas(const char *line, int commaIndex)
         currChar = nextCharIndex(line, currChar); /* Go to next char */
 
     return (line[currChar] != NULL_TERMINATOR)? TRUE : FALSE;
+}
+
+/*
+ * Checks if the given string contains only printable characters.
+ *
+ * @param   *str    The string to check for printable characters.
+ *
+ * @return  TRUE if the given string contains only printable characters, otherwise FALSE.
+ */
+boolean isPrintable(const char *str)
+{
+    int i = MINUS_ONE_INDEX; /* Start from -1 because we add one before every iteration. */
+
+    /* Go through the string until we reached '\0' or an unprintable character. */
+    while (str[++i] != NULL_TERMINATOR && isprint(str[i]));
+
+    return (str[i] == NULL_TERMINATOR)? TRUE : FALSE;
 }

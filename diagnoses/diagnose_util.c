@@ -92,7 +92,7 @@ int nextEmptyIndex(const char *str, int i)
         /* Increasing i by 1 until we get to an index of char that is empty or null. */
         do
             i++; /* Go to the next index */
-        while (isEmpty(str[i]) == FALSE && str[i] != NULL_TERMINATOR);
+        while ((isEmpty(str[i]) == FALSE || str[i] == ENTER_KEY) && str[i] != NULL_TERMINATOR);
 
     }
 

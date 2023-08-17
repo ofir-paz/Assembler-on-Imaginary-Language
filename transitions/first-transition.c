@@ -17,6 +17,7 @@
 #include "../errors/error_types/error_types.h"
 #include "../errors/FirstTransitionErrors/FirstTransitionLogicalAndImgSystemErrors.h"
 #include "../errors/assembler_errors.h"
+#include "../errors/warnings.h"
 #include "../util/memoryUtil.h"
 #include "../util/stringsUtil.h"
 #include "first_transition_util.h"
@@ -31,6 +32,7 @@
 
 /* ---Finals--- */
 #define AFTER_MACRO ".am" /* File end of after pre-processor type file */
+#define NO_LINE 0
 /* ------------ */
 
 /* ---------------Prototypes--------------- */
@@ -60,7 +62,15 @@ process_result first_transition(const char *file_name, NameTable *labelsMap[],
     labelsMap[EXTERN] = createNameTable(INT_TYPE); /* Will hold the .extern labels. */
     *astList = createAstList(); /* Data structure to help diagnose and encode each line. */
 
-    return firstFileTraverse(file_name, labelsMap, *astList);
+    process_result firstTransRes = firstFileTraverse(file_name, labelsMap, *astList);
+    ImgSystemError imgSystemError = checkFileMemoryOverflow(*astList);
+
+    if (imgSystemError != NO_ERROR){
+        handle_assembler_error(file_name, NO_LINE, imgSystemError);
+        firstTransRes = FAILURE;
+    }
+
+    return firstTransRes;
 }
 
 /*
@@ -126,7 +136,10 @@ ast_t *firstAssemblerAlgo(const char *file_name, const char *line, int lineNumbe
     ast_t *lineAst = buildAstFromLine(line, &lineError);
 
     if (lineAst != NULL) /* If the tree was built (there were no errors in the line itself) */
+    {
+        handleWarnings(file_name, lineNumber, lineAst); /* Handle warnings. */
         lineError = addToTablesIfNeededInFirstTrans(lineAst, labelsMap, *IC, *DC);
+    }
 
     if (lineError == NO_ERROR)
         updateCounters(lineAst, IC, DC);

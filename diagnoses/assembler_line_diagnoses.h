@@ -211,8 +211,10 @@ void findArg(const char *line, char **arg, int argumentNum, boolean isLabel);
  * @param   argumentNum     The number of argument to get the data off.
  * @param   isLabel         Flag indicating if the line has a label definition.
  * @param   *argData        Pointer to store the found data.
+ * @param   isStrArg        Flag indicating if the argument is a string (special case).
  */
-void getArgDataFromLine(const char *line, int argumentNum, boolean isLabel, data_t *argData);
+void getArgDataFromLine(const char *line, int argumentNum, boolean isLabel, data_t *argData,
+                        boolean isStrArg);
 
 /*
  * Check if the current argument is the last one in the assembly code line.

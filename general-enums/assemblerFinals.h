@@ -22,6 +22,8 @@ enum {IC_, DC_, COUNTERS_AMOUNT};
 
 #define MAX_LABEL_LEN 31
 
+#define IMG_SYSTEM_MEMORY_SIZE 1024
+
 /* ------------------------------ */
 
 #endif /* MMN_14_ASSEMBLERFINALS_H */

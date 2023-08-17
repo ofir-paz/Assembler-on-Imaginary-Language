@@ -40,6 +40,7 @@ typedef enum
 
     /* String argument syntax errors. */
         MISSING_OPEN_QUOTES_IN_STRING, MISSING_CLOSING_QUOTES_IN_STRING,
+        UNPRINTABLE_CHARS_IN_STRING_ERR,
 
     /* Instant value argument syntax errors. */
         VALUE_IS_ONLY_SIGN_ERR, MULTIPLE_SIGNS_IN_VALUE_ERR, INSTANT_VALUE_IS_FLOAT_ERR,

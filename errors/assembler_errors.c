@@ -40,8 +40,13 @@ void print_assembler_ERR(Error error, const char *file_name, int lineNumber)
     /* Arrays to hold all the different error messages. */
     const char *imgSystemErrorMSG[IMG_SYSTEM_ERROR_SIZE - IMG_SYSTEM_ERR_START] =
             {
+                    /* Indicates no error. !! add new errors after this one !! */
                 "NO_ERROR",
-                "Line overflow error! a line must be 80 or less characters long."
+
+                    /* Memory limitations errors */
+                "Line overflow error! A line must be 80 or less characters long.",
+                "Instant value overflow error! Instant value must be: -512 <= x <= 511.",
+                "Data value overflow error! Data value must be: -2048 <= x 2047.",
             };
 
     const char *syntaxErrorMSG[SYNTAX_ERROR_SIZE - SYNTAX_ERR_START] =
@@ -88,6 +93,7 @@ void print_assembler_ERR(Error error, const char *file_name, int lineNumber)
                     /* String argument syntax errors. */
                 "Expected open quotes in string argument!",
                 "Expected closing quotes in string argument!",
+                "String contains unprintable characters!",
 
                     /* Instant value argument syntax errors. */
                 "Number is only a sign!",
@@ -107,7 +113,7 @@ void print_assembler_ERR(Error error, const char *file_name, int lineNumber)
                 "Wrong register letter! The only register letter is 'r'.",
                 "Expected register number!",
                 "Illegal register number! Register numbers range from 0 to 7.",
-                "Extraneous text after register argument! Try to remove text after @rx",
+                "Extraneous text after register argument! Try to remove text after @rx (x=number)",
 
                     /* Extraneous text errors */
                 "Extraneous comma!",
@@ -118,8 +124,29 @@ void print_assembler_ERR(Error error, const char *file_name, int lineNumber)
 
     const char *logicalErrorMSG[] =
             {
-                    "NO_ERROR",
-                    ""
+                    /* Indicates no error. !! add new errors after this one !! */
+                "NO_ERROR",
+
+                    /* Label related logical errors. */
+                "Label already defined! Try to use a different label name.",
+
+                    /* Guidance related logical errors. */
+                "Argument is not a label! Expected a label name argument.",
+                "Argument is not a number! Expected a data number argument!",
+
+                    /* Addressing methods related logical errors. */
+                "Illegal addressing method for destination argument!",
+                "Illegal addressing method for source argument!",
+
+                    /* Entry label related logical errors */
+                "Label was already defined as entry label!",
+
+                    /* Extern label related logical errors */
+                "Label was already defined as external label!",
+
+                    /* Label tables related logical errors */
+                "Label was defined in the file and is external!",
+                "Label was defined both as entry and extern!"
             };
     const char **errorMSG[] = {imgSystemErrorMSG, syntaxErrorMSG, logicalErrorMSG};
 

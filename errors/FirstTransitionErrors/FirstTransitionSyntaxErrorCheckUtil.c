@@ -212,7 +212,7 @@ boolean isCommaAfterCmd(const char *commandLine)
  */
 boolean isMissingGuidance(const char *guidanceLine)
 {
-    return isEmpty(guidanceLine[ONE_INDEX]);
+    return isEmpty(guidanceLine[ONE_INDEX]) || guidanceLine[ONE_INDEX] == COMMA;
 }
 
 /*

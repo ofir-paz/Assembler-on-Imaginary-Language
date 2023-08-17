@@ -1,0 +1,13 @@
+label: .data 1
+label: .data 1
+.entry 1
+.extern @r0
+.data label
+mov @r0,0
+lea @r0, @r0
+.entry label, label
+.entry label
+.extern ext1, ext1
+.extern ext1
+ext1:.string ""
+.entry ext1

@@ -82,6 +82,15 @@ boolean isStrFloat(const char *str);
  */
 boolean isCharAfterCommas(const char *line, int commaIndex);
 
+/*
+ * Checks if the given string contains only printable characters.
+ *
+ * @param   *str    The string to check for printable characters.
+ *
+ * @return  TRUE if the given string contains only printable characters, otherwise FALSE.
+ */
+boolean isPrintable(const char *str);
+
 /* ------------------------------ */
 
 #endif /* MMN_22_DIAGNOSE_INPUT_H */

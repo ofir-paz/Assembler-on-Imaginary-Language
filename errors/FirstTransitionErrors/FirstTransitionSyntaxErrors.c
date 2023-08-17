@@ -19,6 +19,7 @@
 #include "../../diagnoses/assembler_diagnoses.h"
 #include "../../diagnoses/diagnose_util.h"
 #include "../../util/memoryUtil.h"
+#include "../../util/stringsUtil.h"
 #include "../../util/numberUtil.h"
 /* -------------------------- */
 
@@ -31,10 +32,10 @@
 /* ---------------Prototypes--------------- */
 SyntaxError checkSyntaxErrorInGuidance(const char *guidanceLine);
 SyntaxError checkSyntaxErrorInOperation(const char *operationLine);
-SyntaxError checkSyntaxErrorInArg(const char *argument, boolean isStrGuidance);
+SyntaxError checkSyntaxErrorInArg(const char *line, int argumentNum, boolean isLabelDef);
 SyntaxError checkSyntaxErrorInInstantArg(const char *argument);
 SyntaxError checkSyntaxErrorInDirectRegArg(const char *argument);
-SyntaxError checkSyntaxErrorInStringArg(const char *argument);
+SyntaxError checkSyntaxErrorInStringArg(const char *line);
 SyntaxError checkSyntaxErrorInDirectArg(const char *argument);
 SyntaxError checkSyntaxErrorBetweenArgs(const char *emptyAfterArgLine, area_status_t areaStatus);
 /* ---------------------------------------- */
@@ -188,13 +189,14 @@ SyntaxError checkSyntaxErrorInArgAndBetween(const char *line, int argumentNum, b
 {
     SyntaxError argOrSpaceSyntaxError; /* Syntax error to return. */
 
-    char *arg; /* Will hold the argument. */
-    findArg(line, &arg, argumentNum, isLabelDef); /* Find the argument. */
+    if (isStrGuidance) /* Special case for string argument. */
+        argOrSpaceSyntaxError = checkSyntaxErrorInStringArg(line +
+                getArgumentIndex(line, ONE_INDEX, isLabelDef));
+    else /* Get normal argument errors. */
+        argOrSpaceSyntaxError = checkSyntaxErrorInArg(line, argumentNum, isLabelDef);
 
-    argOrSpaceSyntaxError = checkSyntaxErrorInArg(arg, isStrGuidance); /* Get argument errors. */
-
-    /* If found no errors, check errors in the area after. */
-    if (argOrSpaceSyntaxError == NO_ERROR)
+    /* If found no errors, check errors in the area after (no need to check if it's string). */
+    if (argOrSpaceSyntaxError == NO_ERROR && !isStrGuidance)
     {
         int startIndexOfArea = nextEmptyCommaIndex(
                 line, getArgumentIndex(line, argumentNum, isLabelDef));
@@ -203,32 +205,33 @@ SyntaxError checkSyntaxErrorInArgAndBetween(const char *line, int argumentNum, b
         argOrSpaceSyntaxError = checkSyntaxErrorBetweenArgs(line + startIndexOfArea, areaStatus);
     }
 
-    (void) clear_ptr(arg) /* Free unnecessary variable. */
     return argOrSpaceSyntaxError;
 }
 
 /*
  * Checks for a syntax error in the argument in the given line.
  *
- * @param   *argument   The argument to check for a syntax error in it.
- * @param   isStrGuidance   Flag indicating if the line has a .string guidance.
+ * @param   *line           The line containing the argument to check for a syntax error in it.
+ * @param   argumentNum     The number of argument to check.
+ * @param   isLabelDef      Indicates whether the line has a label definition or not,
+ *                          will be used to detect the argument.
  *
  * @return  The argument syntax error found in the argument, or NO_ERROR if there isn't.
  */
-SyntaxError checkSyntaxErrorInArg(const char *argument, boolean isStrGuidance)
+SyntaxError checkSyntaxErrorInArg(const char *line, int argumentNum, boolean isLabelDef)
 {
     SyntaxError argumentError; /* Syntax error to return. */
+    char *argument; /* Will hold the argument. */
+    findArg(line, &argument, argumentNum, isLabelDef); /* Find the argument. */
 
-    if (isStrGuidance == TRUE) /* Special case, different argument format. */
-        argumentError = checkSyntaxErrorInStringArg(argument);
-
-    else if (isPartOfNumber(argument, ZERO_INDEX) == TRUE) /* Is number */
+    if (isPartOfNumber(argument, ZERO_INDEX) == TRUE) /* Is number */
         argumentError = checkSyntaxErrorInInstantArg(argument);
     else if (argument[ZERO_INDEX] == AT) /* Is register */
         argumentError = checkSyntaxErrorInDirectRegArg(argument);
     else /* Otherwise, label. */
         argumentError = checkSyntaxErrorInDirectArg(argument);
 
+    (void) clear_ptr(argument) /* Free unnecessary variable. */
     return argumentError;
 }
 
@@ -273,10 +276,10 @@ SyntaxError checkSyntaxErrorInInstantArg(const char *argument)
     SyntaxError instantArgError = NO_ERROR; /* Syntax error to return, assume no error. */
 
     /* Check for a specific error. */
-    if (argument[ONE_INDEX] == NULL_TERMINATOR)
+    if (isPlusOrMinus(argument[ZERO_INDEX]) && argument[ONE_INDEX] == NULL_TERMINATOR)
         instantArgError = VALUE_IS_ONLY_SIGN_ERR;
 
-    else if (isPlusOrMinus(argument[ONE_INDEX]))
+    else if (isPlusOrMinus(argument[ZERO_INDEX]) && isPlusOrMinus(argument[ONE_INDEX]))
         instantArgError = MULTIPLE_SIGNS_IN_VALUE_ERR;
 
     else if (isStrFloat(argument))
@@ -319,7 +322,7 @@ SyntaxError checkSyntaxErrorInDirectRegArg(const char *argument)
         regArgSyntaxError = EXPECTED_REGISTER_NUMBER_ERR;
 
     else if (!between(argument[TWO_INDEX] - CHAR_ZERO, r0, r7) ||
-                isCharNumber(argument[THREE_INDEX]))
+            (isCharNumber(argument[THREE_INDEX]) && !isCharNumber(argument[FOUR_INDEX])))
         regArgSyntaxError = ILLEGAL_REGISTER_NUMBER_ERR;
 
     else if (argument[THREE_INDEX] != NULL_TERMINATOR)
@@ -331,26 +334,33 @@ SyntaxError checkSyntaxErrorInDirectRegArg(const char *argument)
 /*
  * Checks for a syntax error in the string argument
  * (the one that comes after the .string guidance).
+ * Assume that the given line string starts in the string argument.
  *
- * @param   *argument   The string argument to check for a syntax error.
+ * @param   *line   The line string starting from the string argument to check for errors in it.
  *
  * @return  The specific syntax error in the string argument, or NO_ERROR if there isn't.
  */
-SyntaxError checkSyntaxErrorInStringArg(const char *argument)
+SyntaxError checkSyntaxErrorInStringArg(const char *line)
 {
     SyntaxError stringArgSyntaxError = NO_ERROR; /* Syntax error to return, assume no error. */
-    int secondQuotesIndex = nextSpecificCharIndex(argument, ZERO_INDEX, QUOTES);
+    int closeQuotesIndex = nextSpecificCharIndex(line, ZERO_INDEX, QUOTES);
+    /* Add one for close quote. */
+    char *strArg = strcpyPart(line, ZERO_INDEX, closeQuotesIndex + 1);
 
     /* Check all the specific errors. */
-    if (argument[ZERO_INDEX] != QUOTES)
+    if (strArg[ZERO_INDEX] != QUOTES)
         stringArgSyntaxError = MISSING_OPEN_QUOTES_IN_STRING;
 
-    else if (argument[secondQuotesIndex] != QUOTES)
+    else if (strArg[closeQuotesIndex] != QUOTES)
         stringArgSyntaxError = MISSING_CLOSING_QUOTES_IN_STRING;
 
-    else if (argument[secondQuotesIndex + 1] != NULL_TERMINATOR)
+    else if (checkLastArgSyntaxError(line + closeQuotesIndex + 1) != NO_ERROR)
         stringArgSyntaxError = EXTRANEOUS_TXT_ERR;
 
+    else if (isPrintable(strArg) == FALSE)
+        stringArgSyntaxError = UNPRINTABLE_CHARS_IN_STRING_ERR;
+
+    (void) clear_ptr(strArg)
     return stringArgSyntaxError;
 }
 
