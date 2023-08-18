@@ -38,26 +38,27 @@ void printData(ast_list_t *astList, NameTable *labelsMap[]);
 
 void assemble(const char *file_name)
 {
-    process_result processResult = FAILURE;
+    process_result processResult;
     NameTable *labelsMap[TYPES_OF_LABELS] = {NULL};
     ast_list_t *astList = NULL;
 
     printAssemblerState(file_name, ASSEMBLER);
 
-    //if (handle_filename_error(file_name) == NO_ERROR)
-    //{
     printAssemblerState(file_name, PRE_PROCESSOR);
     processResult = pre_process(file_name);
-    if (processResult == SUCCESS) {
+
+    if (processResult == SUCCESS)
+    {
         printAssemblerState(file_name, FIRST_TRANSITION);
         processResult = first_transition(file_name, labelsMap, &astList);
     }
-    if (processResult == SUCCESS) {
+
+    if (processResult == SUCCESS)
+    {
         printAssemblerState(file_name, SECOND_TRANSITION);
         processResult = second_transition(file_name, labelsMap, astList);
     }
-    //}
-    //printData(astList, labelsMap);
+
     clearDataStructures(labelsMap, &astList);
     printAssemblerState(file_name, FINISH);
 }

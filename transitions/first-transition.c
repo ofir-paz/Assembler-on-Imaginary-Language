@@ -141,10 +141,14 @@ ast_t *firstAssemblerAlgo(const char *file_name, const char *line, int lineNumbe
         lineError = addToTablesIfNeededInFirstTrans(lineAst, labelsMap, *IC, *DC);
     }
 
-    if (lineError == NO_ERROR)
-        updateCounters(lineAst, IC, DC);
-    else
+    if (lineError != NO_ERROR)
+    {
         handle_assembler_error(file_name, lineNumber, lineError);
+        deleteAst(&lineAst);
+    }
+    else
+        updateCounters(lineAst, IC, DC);
+
 
     return lineAst;
 }
@@ -197,8 +201,8 @@ Error addToOtherTable(ast_t *lineAst, NameTable *labelsMap[], label_type_t table
     arg_node_t *currArg = getArgList(lineAst);
     while (currArg != NULL)
     {
-        addLabelToOtherTable(my_strdup(getArgData(currArg).data.string),
-                             labelsMap, table, &lineError);
+        addLabelToOtherTable(getArgData(currArg).data.string, labelsMap, table, &lineError);
+
         currArg = getNextNode(currArg);
     }
 

@@ -11,6 +11,20 @@
 #include "encodingDataStructures/word.h"
 /* -------------------------- */
 
+/* ---Finals--- */
+#define FIRST_BIT_ON 1
+#define FIRST_PART_OF_WORD 0
+#define SECOND_PART_OF_WORD 1
+#define SIX_NUMBER 6
+#define TWO_NUMBER 2
+#define FOUR_NUMBER 4
+#define ZERO_BYTE 0
+#define FULL_1_BYTE ((unsigned ) 0xff)
+#define BITS_IN_BYTE 8
+#define START_WORD_RANGE 0
+#define END_WORD_RANGE 11
+/* ------------ */
+
 /* ---Macros--- */
 
 /* ---Masking operations--- */
@@ -33,20 +47,6 @@
 
 /* ------------ */
 
-/* ---Finals--- */
-#define FIRST_BIT_ON ((unsigned ) 1)
-#define FIRST_PART_OF_WORD 0
-#define SECOND_PART_OF_WORD 1
-#define SIX_NUMBER 6
-#define TWO_NUMBER 2
-#define FOUR_NUMBER 4
-#define ZERO_BYTE 0
-#define FULL_1_BYTE ((unsigned ) 0xff)
-#define BITS_IN_BYTE 8
-#define START_WORD_RANGE 0
-#define END_WORD_RANGE 11
-/* ------------ */
-
 /* ---------------Prototypes--------------- */
 /* ---------------------------------------- */
 
@@ -54,11 +54,27 @@
  * Checks if the given signed value fits inside a bit array of the given size.
  *
  * @param   size    The size of the bit array.
- * @param   val     The given value to check if it overflows.
+ * @param   val     The given signed value to check if it overflows.
  *
  * @return  TRUE if the value overflows, otherwise FALSE.
  */
-boolean isOverflow(int size, unsigned long int val)
+boolean isSignedOverflow(int size, long int val)
+{
+    long int maxPossibleValue = ((long int) FIRST_BIT_ON << (size - 1)) - 1;
+    long int minPossibleValue = - ((long int) FIRST_BIT_ON << (size - 1));
+
+    return ((val > maxPossibleValue) || (val < minPossibleValue))? TRUE : FALSE;
+}
+
+/*
+ * Checks if the given unsigned value fits inside a bit array of the given size.
+ *
+ * @param   size    The size of the bit array.
+ * @param   val     The given unsigned value to check if it overflows.
+ *
+ * @return  TRUE if the value overflows, otherwise FALSE.
+ */
+boolean isUnsignedOverflow(int size, unsigned long int val)
 {
     boolean isOverFlow = (size >= sizeof(unsigned long int))? FALSE : TRUE;
 
@@ -78,7 +94,7 @@ boolean isOverflow(int size, unsigned long int val)
  */
 void setBitsInRangeToVal(word_t word, int low, int high, int val)
 {
-    if (isValidWordRange(low, high) == TRUE && isOverflow(range(low, high), val) == FALSE)
+    if (isValidWordRange(low, high) == TRUE && isUnsignedOverflow(range(low, high), val) == FALSE)
     {
         if (high < BITS_IN_BYTE) /* If the range is just in the first part. */
             set_bits_to_val(word[FIRST_PART_OF_WORD], low, high, val);

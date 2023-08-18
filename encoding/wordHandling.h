@@ -19,11 +19,11 @@
  * Checks if the given signed value fits inside a bit array of the given size.
  *
  * @param   size    The size of the bit array.
- * @param   val     The given value to check if it overflows.
+ * @param   val     The given signed value to check if it overflows.
  *
  * @return  TRUE if the value overflows, otherwise FALSE.
  */
-boolean isOverflow(int size, int val);
+boolean isSignedOverflow(int size, long int val);
 
 /*
  * Sets a range of bits in a word to the specified value.

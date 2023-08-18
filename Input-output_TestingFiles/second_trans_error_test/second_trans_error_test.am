@@ -1,0 +1,4 @@
+.entry label1
+.entry label2
+label1:dec label2
+.extern label1

@@ -17,6 +17,7 @@
 #include "../errors/FirstTransitionErrors/FirstTransitionLogicalAndImgSystemErrors.h"
 #include "../diagnoses/assembler_line_diagnoses.h"
 #include "../util/memoryUtil.h"
+#include "../util/stringsUtil.h"
 /* -------------------------- */
 
 /* ---Macros--- */
@@ -135,11 +136,15 @@ Error addArgumentsFromLineToAST(ast_t *lineAST, const char *line)
 void addLabelToOtherTable(char *label, NameTable *labelsMap[], label_type_t table,
                           Error *argError)
 {
+    Error newError;
+
     if (table == ENTRY)
-        *argError = addLabelToEntryTable(label, labelsMap[ENTRY],
-                                         labelsMap[EXTERN]);
+        newError = addLabelToEntryTable(label, labelsMap[ENTRY], labelsMap[EXTERN]);
     else /* table == EXTERN */
-        *argError = addLabelToExternTable(label, labelsMap);
+        newError = addLabelToExternTable(label, labelsMap);
+
+    if (*argError == NO_ERROR)
+        *argError = newError;
 }
 
 Error addLabelToEntryTable(char *label, NameTable *entLabels, NameTable *extLabels)
@@ -147,7 +152,7 @@ Error addLabelToEntryTable(char *label, NameTable *entLabels, NameTable *extLabe
     Error argLabelError = checkAddToEntryTableError(label, entLabels, extLabels);
 
     if (argLabelError == NO_ERROR)
-        addLabelToTable(entLabels, label, ZERO_NUMBER);
+        addLabelToTable(entLabels, my_strdup(label), ZERO_NUMBER);
 
     return argLabelError;
 }
@@ -157,7 +162,7 @@ Error addLabelToExternTable(char *label, NameTable *labelsMap[])
     Error argLabelError = checkAddToExternTableError(label, labelsMap);
 
     if (argLabelError == NO_ERROR)
-        addLabelToTable(labelsMap[EXTERN], label, ZERO_NUMBER);
+        addLabelToTable(labelsMap[EXTERN], my_strdup(label), ZERO_NUMBER);
 
     return argLabelError;
 }

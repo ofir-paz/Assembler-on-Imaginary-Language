@@ -215,9 +215,10 @@ boolean isOverflowNumber(arg_node_t *argNode, boolean isData)
     {
         /* Check if there is an overflow. */
         if (isData == TRUE)
-            isOverflowNumber = isOverflow(MAX_SIZE_FOR_DATA, getArgData(argNode).data.num);
+            isOverflowNumber = isSignedOverflow(MAX_SIZE_FOR_DATA, getArgData(argNode).data.num);
         else
-            isOverflowNumber = isOverflow(MAX_BITS_FOR_INSTANT_VAL, getArgData(argNode).data.num);
+            isOverflowNumber = isSignedOverflow(MAX_BITS_FOR_INSTANT_VAL,
+                                                getArgData(argNode).data.num);
     }
 
     return isOverflowNumber;

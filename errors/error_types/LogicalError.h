@@ -28,13 +28,14 @@ typedef enum
         ILLEGAL_DEST_ARG_MTD_ERR, ILLEGAL_SRC_ARG_MTD_ERR,
 
     /* Entry label related logical errors */
-        MULTIPLE_ENTRY_LABEL_DEF_ERR,
+        MULTIPLE_ENTRY_LABEL_DEF_ERR, ENTRY_LABEL_NOT_DEFINED_IN_FILE_ERR,
 
     /* Extern label related logical errors */
         MULTIPLE_EXTERN_LABEL_DEF_ERR,
 
     /* Label tables related logical errors */
         LABEL_DEFINED_AS_NORMAL_AND_EXT_ERR, LABEL_DEFINED_AS_ENT_AND_EXT_ERR,
+        USE_OF_UNDEFINED_LABEL_ERR,
 
     /* Amount of logical errors. !! add new errors before this one !! */
         LOGICAL_ERROR_SIZE

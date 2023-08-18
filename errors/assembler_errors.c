@@ -47,6 +47,7 @@ void print_assembler_ERR(Error error, const char *file_name, int lineNumber)
                 "Line overflow error! A line must be 80 or less characters long.",
                 "Instant value overflow error! Instant value must be: -512 <= x <= 511.",
                 "Data value overflow error! Data value must be: -2048 <= x 2047.",
+                "Program memory overflow! Keep in mind that this system has 1024 words of memory."
             };
 
     const char *syntaxErrorMSG[SYNTAX_ERROR_SIZE - SYNTAX_ERR_START] =
@@ -122,7 +123,7 @@ void print_assembler_ERR(Error error, const char *file_name, int lineNumber)
                 "Expected argument after last comma (or might be extraneous comma)!"
             };
 
-    const char *logicalErrorMSG[] =
+    const char *logicalErrorMSG[LOGICAL_ERROR_SIZE - LOGICAL_ERR_START] =
             {
                     /* Indicates no error. !! add new errors after this one !! */
                 "NO_ERROR",
@@ -140,13 +141,15 @@ void print_assembler_ERR(Error error, const char *file_name, int lineNumber)
 
                     /* Entry label related logical errors */
                 "Label was already defined as entry label!",
+                "Declared entry label is not defined in the file!",
 
                     /* Extern label related logical errors */
                 "Label was already defined as external label!",
 
                     /* Label tables related logical errors */
                 "Label was defined in the file and is external!",
-                "Label was defined both as entry and extern!"
+                "Label was defined both as entry and extern!",
+                "Argument is a label that is not defined in this file and not declared as extern!"
             };
     const char **errorMSG[] = {imgSystemErrorMSG, syntaxErrorMSG, logicalErrorMSG};
 

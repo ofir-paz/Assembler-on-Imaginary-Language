@@ -70,8 +70,6 @@ process_result second_transition(const char *file_name, NameTable *labelsMap[],
     process_result secondTransitionRes =
             secondFileTraverse(file_name, astList, labelsMap, memoryImage, &extFileContents);
 
-    printMemImage(memoryImage);
-
     if (secondTransitionRes == SUCCESS)
         createOutputFiles(file_name, memoryImage, labelsMap[ENTRY], &extFileContents);
 
@@ -115,6 +113,8 @@ void handleLineInSecondTrans(const char *file_name, int currLine, ast_t *lineAst
 {
     Error lineError = updateTablesIfNeededInSecondTrans(lineAst,
                                                         labelsMap[NORMAL], labelsMap[ENTRY]);
+    if (lineError == NO_ERROR)
+        lineError = checkUndefinedLabelArgumentError(lineAst, labelsMap[NORMAL], labelsMap[EXTERN]);
 
     handleLineErrorInSecondTrans(file_name, currLine, lineError, wasError);
 
@@ -147,11 +147,11 @@ Error updateEntTable(NameTable *normalLabels, NameTable *entLabels, arg_node_t *
 {
     char *entLabel = getArgData(entLabelArgNode).data.string;
 
-    Error lineError = checkEntryLabelErr(entLabel, normalLabels, entLabels);
+    Error lineError = checkEntryLabelError(entLabel, normalLabels);
 
     if (lineError == NO_ERROR)
         (void) setNumberInData(entLabels, entLabel,
-                               getDataByName(normalLabels, entLabel)->num);
+                               getDataByName(normalLabels, entLabel) -> num);
 
     return lineError;
 }
