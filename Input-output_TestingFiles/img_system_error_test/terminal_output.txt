@@ -1,0 +1,17 @@
+
+Assembler state: Starting assembling source assembly file On file: "../Input-output_TestingFiles/img_system_error_test/img_system_error_test"
+
+Assembler state: Starting pre-process stage On file: "../Input-output_TestingFiles/img_system_error_test/img_system_error_test"
+
+Assembler state: Starting first transition stage On file: "../Input-output_TestingFiles/img_system_error_test/img_system_error_test"
+
+ERROR: Instant value overflow error! Instant value must be: -512 <= x <= 511.
+In file: "../Input-output_TestingFiles/img_system_error_test/img_system_error_test", On line: 1
+
+ERROR: Data value overflow error! Data value must be: -2048 <= x 2047.
+In file: "../Input-output_TestingFiles/img_system_error_test/img_system_error_test", On line: 2
+
+ERROR: Program memory overflow! Keep in mind that this system has 1024 words of memory.
+In file: "../Input-output_TestingFiles/img_system_error_test/img_system_error_test", On line: 0
+
+Assembler state: Failed to assemble source file. On file: "../Input-output_TestingFiles/img_system_error_test/img_system_error_test"

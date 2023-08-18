@@ -1,0 +1,15 @@
+Assembler state: Starting assembling source assembly file On file: "../Input-output_TestingFiles/second_trans_error_test/second_trans_error_test"
+
+Assembler state: Starting pre-process stage On file: "../Input-output_TestingFiles/second_trans_error_test/second_trans_error_test"
+
+Assembler state: Starting first transition stage On file: "../Input-output_TestingFiles/second_trans_error_test/second_trans_error_test"
+
+Assembler state: Starting second transition stage On file: "../Input-output_TestingFiles/second_trans_error_test/second_trans_error_test"
+
+ERROR: Declared entry label is not defined in the file!
+In file: "../Input-output_TestingFiles/second_trans_error_test/second_trans_error_test", On line: 1
+
+ERROR: Argument is a label that is not defined in this file and not declared as extern!
+In file: "../Input-output_TestingFiles/second_trans_error_test/second_trans_error_test", On line: 2
+
+Assembler state: Failed to assemble source file. On file: "../Input-output_TestingFiles/second_trans_error_test/second_trans_error_test"

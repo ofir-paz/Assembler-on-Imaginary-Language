@@ -1,0 +1,17 @@
+Assembler state: Starting assembling source assembly file On file: "../Input-output_TestingFiles/pre_processor_error_test/pre_processor_error_test"
+
+Assembler state: Starting pre-process stage On file: "../Input-output_TestingFiles/pre_processor_error_test/pre_processor_error_test"
+
+ERROR: Invalid macro name! a macro name cannot be a saved word.
+In file: "../Input-output_TestingFiles/pre_processor_error_test/pre_processor_error_test", On line: 10
+
+ERROR: Extraneous text in a macro definition line !!
+In file: "../Input-output_TestingFiles/pre_processor_error_test/pre_processor_error_test", On line: 16
+
+ERROR: Extraneous text in a macro definition line !!
+In file: "../Input-output_TestingFiles/pre_processor_error_test/pre_processor_error_test", On line: 18
+
+ERROR: Line overflow error! A line must be 80 or less characters long.
+In file: "../Input-output_TestingFiles/pre_processor_error_test/pre_processor_error_test", On line: 22
+
+Assembler state: Failed to assemble source file. On file: "../Input-output_TestingFiles/pre_processor_error_test/pre_processor_error_test"

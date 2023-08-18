@@ -73,7 +73,7 @@ typedef struct
 typedef struct ast_list_node_t
 {
     ast_t *ast;
-    struct ast_node_list_t *next;
+    struct ast_list_node_t *next;
 } ast_list_node_t; /* ast list type. */
 
 /* List of abstract syntax trees. */

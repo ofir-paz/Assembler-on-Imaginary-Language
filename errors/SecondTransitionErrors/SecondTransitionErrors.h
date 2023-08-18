@@ -15,8 +15,6 @@
 /* ---Typedef prototype for encapsulation--- */
 typedef struct NameTable NameTable;
 typedef struct ast_t ast_t;
-typedef int Error;
-typedef enum LogicalError LogicalError;
 /* ----------------------------------------- */
 
 /*

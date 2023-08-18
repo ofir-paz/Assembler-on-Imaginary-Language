@@ -1,0 +1,7 @@
+.string ""
+mcro stop
+.data 1
+endmcro
+stop
+.string ""
+mov @r0, @r1

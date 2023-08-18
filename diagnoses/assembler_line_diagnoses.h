@@ -11,16 +11,12 @@
 /* Include very basic data types. */
 #include "../new-data-types/boolean.h"
 #include "../new-data-types/word_number.h"
+#include "../assembler_ast/assembler_ast.h"
 
 /* ---------------Prototypes--------------- */
 
 /* ---Data types prototypes--- */
 typedef struct NameTable NameTable;
-typedef enum opcodes_t opcodes_t;
-typedef enum guidance_t guidance_t;
-typedef enum reg_t reg_t;
-typedef enum sentence_type_t sentence_type_t;
-typedef struct data_t data_t;
 /* --------------------------- */
 
 /*

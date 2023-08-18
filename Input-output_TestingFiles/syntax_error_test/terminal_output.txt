@@ -133,4 +133,4 @@ In file: "../Input-output_TestingFiles/syntax_error_test/syntax_error_test", On 
 ERROR: Expected argument after last comma (or might be extraneous comma)!
 In file: "../Input-output_TestingFiles/syntax_error_test/syntax_error_test", On line: 43
 
-Assembler state: Finished assembling (due to errors or not) On file: "../Input-output_TestingFiles/syntax_error_test/syntax_error_test"
+Assembler state: Failed to assemble source file. On file: "../Input-output_TestingFiles/syntax_error_test/syntax_error_test"

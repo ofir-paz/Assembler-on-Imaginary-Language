@@ -12,6 +12,7 @@
 /* -------------------------- */
 
 /* ---Finals--- */
+#define SUCCESS_CODE 0
 #define UNABLE_TO_OPEN_FILE (-2)
 #define READ_MODE "r"
 #define BUFFER 82
@@ -41,6 +42,8 @@ int readNextLineFromFile(const char *file_name, const char *fileType, char **lin
             closeFile(&fileToRead);
             returnCode = EOF;
         }
+        else
+            returnCode = SUCCESS_CODE;
     }
 
     return returnCode;

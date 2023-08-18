@@ -1,0 +1,9 @@
+Assembler state: Starting assembling source assembly file On file: "../Input-output_TestingFiles/Test2/Test2"
+
+Assembler state: Starting pre-process stage On file: "../Input-output_TestingFiles/Test2/Test2"
+
+Assembler state: Starting first transition stage On file: "../Input-output_TestingFiles/Test2/Test2"
+
+Assembler state: Starting second transition stage On file: "../Input-output_TestingFiles/Test2/Test2"
+
+Assembler state: Successfully assembled source file! On file: "../Input-output_TestingFiles/Test2/Test2"
