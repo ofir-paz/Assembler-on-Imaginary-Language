@@ -1,8 +1,11 @@
 /*
  * @author Ofir Paz
- * @version (15/08/2023)
+ * @version (18/08/2023)
  *
- * This file ...
+ * assembler_diagnoses.c
+ *
+ * This file contains various functions that can be used to diagnose elements
+ * related to the imaginary assembly language.
  */
 
 /* ---Include header files--- */

@@ -1,8 +1,11 @@
 /*
  * @author Ofir Paz
- * @version (28/07/2023)
+ * @version (18/08/2023)
  *
- * This file ...
+ * assembler_ast.c
+ *
+ * This file contains the implementation of the Abstract Syntax Tree (AST)
+ * and functions to create, manipulate, and traverse the AST.
  */
 
 /* ---Include header files--- */
@@ -14,9 +17,6 @@
 #include "../util/stringsUtil.h"
 /* -------------------------- */
 
-/* ---Macros--- */
-/* ------------ */
-
 /* ---Finals--- */
 #define ZERO_INITIALIZE 0
 #define SUCCESS_CODE 0
@@ -24,6 +24,9 @@
 #define UNKNOWN_NUMBER 0
 #define ZERO_ARGUMENTS 0
 #define FIRST_ARG 1
+/* ------------ */
+
+/* ---Macros--- */
 /* ------------ */
 
 /* ---------------Abstract syntax tree--------------- */
@@ -73,6 +76,7 @@ typedef struct ast_list_node_t
     struct ast_node_list_t *next;
 } ast_list_node_t; /* ast list type. */
 
+/* List of abstract syntax trees. */
 typedef struct
 {
     ast_list_node_t *head;
@@ -682,7 +686,8 @@ int deleteAstList(ast_list_t **pAstList)
     return returnCode;
 }
 
-/* !!! -----DEBUGGING----- !!! */
+/* !!! -----DEBUGGING------IGNORE------- !!! */
+/*
 #include <stdio.h>
 
 void printArgRec(arg_node_t *argNode)
@@ -736,4 +741,4 @@ void printAstList(ast_list_t *astList)
     }
 
     puts("\n*************************FINISH PRINT AST*************************");
-}
+} */

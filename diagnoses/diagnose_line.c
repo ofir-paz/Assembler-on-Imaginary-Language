@@ -1,9 +1,12 @@
 /*
  * @author Ofir Paz
- * @Version (27/04/2023)
+ * @version (18/08/2023)
+ *
+ * diagnose_line.c
+ *
  * This file has the functions that will be used to
  * diagnose the user's input.
- * */
+ */
 
 /* ---Include header files--- */
 #include <ctype.h>
@@ -16,6 +19,9 @@
 /* -----Finals----- */
 #define EMPTY_DELIM " \t\n"
 /* ---------------- */
+
+/* ---Macros--- */
+/* ------------ */
 
 /*
  * Finds the specified word in the given line and stores it in the provided pointer.
@@ -31,25 +37,37 @@ void findWord(const char *line, char **word, word_number wordNumber)
     findTokenFromStr(line, word, wordNumber, EMPTY_DELIM);
 }
 
-/* Checks if the given line is an empty line (contains spaces and tabs only).
- * param const char *line is the line to check if it is empty or not
- * Returns TRUE if the line is empty, otherwise FALSE. */
+/*
+ * Checks if the given line is an empty line (contains spaces and tabs only).
+ *
+ * @param   *line   The line to check if it is empty or not
+ *
+ * Returns TRUE if the line is empty, otherwise FALSE.
+ */
 boolean isEmptyLine(const char *line)
 {
     return (getNextChar(line, MINUS_ONE_INDEX) == NULL_TERMINATOR)? TRUE : FALSE;
 }
 
-/* Checks if the given line is a comment line (first character is ';').
- * param const char *line is the line to check if it is a comment line
- * Returns TRUE if the line is a comment line, otherwise FALSE. */
+/*
+ * Checks if the given line is a comment line (first character is ';').
+ *
+ * @param   *line   The line to check if it is a comment line
+ *
+ * Returns TRUE if the line is a comment line, otherwise FALSE.
+ */
 boolean isCommentLine(const char *line)
 {
-    return (*line == SEMICOLON)? TRUE : FALSE;
+    return (line[ZERO_INDEX] == SEMICOLON)? TRUE : FALSE;
 }
 
-/* Checks if the line needs to be skipped.
- * param const char *line is the line to check
- * Return TRUE if the line needs to be skipped, otherwise FALSE. */
+/*
+ * Checks if the line needs to be skipped.
+ *
+ * @param   *line The line to check if it needs to be skipped.
+ *
+ * Return TRUE if the line needs to be skipped, otherwise FALSE.
+ */
 boolean isSkipLine(const char *line)
 {
     return (isEmptyLine(line) || isCommentLine(line) == TRUE)? TRUE : FALSE;

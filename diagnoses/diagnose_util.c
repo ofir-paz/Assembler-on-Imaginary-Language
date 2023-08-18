@@ -1,8 +1,11 @@
 /*
  * @author Ofir Paz
- * @Version (27/04/2023)
- * This file has help methods to assist various other files in this program.
- * */
+ * @version (18/08/2023)
+ *
+ * diagnose_util.c
+ *
+ * This file has the help method for diagnosing strings.
+ */
 
 /* ---Includes--- */
 #include <string.h>
@@ -15,12 +18,12 @@
 #include "../util/stringsUtil.h"
 /* -------------- */
 
-/* ---Macros--- */
-#define MIN(a, b) ((a) < (b))? a : b
-/* ------------ */
-
 /* ---Finals--- */
 #define ZERO_COUNT 0
+/* ------------ */
+
+/* ---Macros--- */
+#define MIN(a, b) ((a) < (b))? a : b
 /* ------------ */
 
 /*
@@ -52,23 +55,44 @@ void findTokenFromStr(const char *str, char **token, word_number tokenNumber, co
     }
 }
 
-/* Checks if the param int i is an index of param const char *str.
- * Returns TRUE if i is an index of the given string, otherwise FALSE. */
+/*
+ * Checks if the given index parameter is an index of the given string.
+ * (Index of null-terminator is also accepted)
+ *
+ * @param   *str    The string to check if the index is a part of.
+ * @param   i       The index to check for its validity.
+ *
+ * @return  TRUE if the given index is an index of the given string, otherwise FALSE.
+ */
 boolean isIndexInStr(const char *str, int i)
 {
     /* Note that strlen(str) is also an index, and the value is '\0'. */
     return (ZERO_INDEX <= i && i <= strlen(str))? TRUE : FALSE;
 }
 
-/* Returns TRUE if param char ch is empty (space; tab; enter), otherwise FALSE */
+/*
+ * Checks if a given char is an empty space char.
+ * Empty space counts as space, tab, enter or null-terminator.
+ *
+ * @param   ch  The char to check if it's empty.
+ *
+ * @return  TRUE if the given char is empty (space; tab; enter; '\0'), otherwise FALSE.
+ */
 boolean isEmpty(char ch)
 {
     return ch == SPACE_KEY || ch == TAB_KEY || ch == ENTER_KEY || ch == NULL_TERMINATOR;
 }
 
-/* Finds the next index in param const char *str where it is not an empty space (tab/space/enter).
- * If param int i is not an index of str returns i, otherwise returns
- * the index of the next non-empty space in str (index of null if there isn't). */
+/*
+ * Finds the index of the next character in a string starting from a given index.
+ * The meaning of the next char is the next non-empty character.
+ *
+ * @param   *str    The input string.
+ * @param   i       The starting index.
+ *
+ * @return  The index of the next character, or index of null-terminator
+ *          if the end of the string is reached.
+ */
 int nextCharIndex(const char *str, int i)
 {
     if (isIndexInStr(str, i + ONE_INDEX) == TRUE) /* If the next index exists */
@@ -82,9 +106,15 @@ int nextCharIndex(const char *str, int i)
     return i;
 }
 
-/* Finds the next index in param const char *str where it is an empty space (tab/space/enter).
- * If param int i is not an index of str returns i,
- * otherwise returns the index of the next empty space in str (index of null if there isn't) */
+/*
+ * Finds the index of the next empty space (whitespace) in a string starting from a given index.
+ * white spaces can be space, tab, enter or null-terminator.
+ *
+ * @param   *str    The input string.
+ * @param   i       The starting index.
+ *
+ * @return  The index of the next empty space.
+ */
 int nextEmptyIndex(const char *str, int i)
 {
     if (isIndexInStr(str, i + ONE_INDEX) == TRUE) /* If the next index exists */
@@ -106,6 +136,7 @@ int nextEmptyIndex(const char *str, int i)
  *
  * @param   *str The line string.
  * @param   i The given index.
+ *
  * @return  The next word index from i in str, or i if i > len(str).
  */
 int nextWordIndex(const char *str, int i)
@@ -115,9 +146,17 @@ int nextWordIndex(const char *str, int i)
         nextCharIndex(str, nextEmptyIndex(str, i));
 }
 
-/* Finds the next index in param const char *str where it is the given char ch.
- * If param int i is not an index of str returns i,
- * otherwise returns the index of the next ch in str or (index of null if there isn't) */
+/*
+ * Finds the index of the next occurrence of a specific character
+ * in a string starting from a given index.
+ *
+ * @param   *str    The input string.
+ * @param   i       The starting index.
+ * @param   ch      The specific character to search for.
+ *
+ * @return  The index of the next occurrence of the specified character,
+ *          or index of '\0' if the character is not found.
+ */
 int nextSpecificCharIndex(const char *str, int i, char ch)
 {
     int index = i; /* Value to return */
@@ -131,10 +170,15 @@ int nextSpecificCharIndex(const char *str, int i, char ch)
     return index; /* Returning the found index */
 }
 
-/* Finds the start of a specific word in a given line string.
- * param const char *line is the line that holds the word
- * param word_number wordNumber is the number of the word to find its start index
- * Returns the found start index of the specific word in line. */
+/*
+ * Finds the starting index of a specific word within a given line of text.
+ *
+ * @param   *line       The input line of text.
+ * @param   wordNumber  The ordinal number of the word to find (1-based index).
+ *
+ * @return  The starting index of the specified word within the line,
+ *          or index of '\0' if the word does not exist.
+ */
 int findStartIndexOfWord(const char *line, word_number wordNumber)
 {
     int start = MINUS_ONE_INDEX; /* Value to return */
@@ -147,35 +191,29 @@ int findStartIndexOfWord(const char *line, word_number wordNumber)
     return start;
 }
 
-/* Gets the next non-empty char from a given index in a given string.
- * param const char *str is the string to seek for the next char in
- * param int i is the index to start the search from
- * Returns the next non-empty char, or 0 ('\0') if there isn't. */
+/*
+ * Gets the next non-empty char from a given index in a given string.
+ *
+ * @param   *str    The string to seek for the next char in.
+ * @param   i       The index to start the search from.
+ *
+ * @return  The next non-empty char, or 0 ('\0') if there isn't.
+ */
 char getNextChar(const char *str, int i)
 {
     return str[nextCharIndex(str, i)];
 }
 
-/* Returns TRUE if const char ch = '+' or '-', otherwise FALSE. */
+/*
+ * Checks if a given character is a plus or minus sign.
+ *
+ * @param   ch  The character to check if it's a plus or minus sign.
+ *
+ * @return  TRUE if ch = '+' or ch = '-', otherwise FALSE.
+ */
 boolean isPlusOrMinus(char ch)
 {
     return (ch == PLUS || ch == MINUS)? TRUE : FALSE;
-}
-
-/* Counts the dots in param const char *str from index
- * int start to index int end.
- * Return the amount of found dots. */
-int countDots(const char *str, int start, int end)
-{
-    int cntDots = ZERO_COUNT; /* Dot counter, value to return. */
-    int currIndex = start; /* Will be used to traverse through str */
-
-    while (isIndexInStr(str, currIndex) && currIndex < end) {
-        if (str[currIndex] == DOT) /* Check if we found a dot */
-            cntDots++; /* Adding one to the counter */
-        currIndex++;
-    }
-    return cntDots; /* Returning the counter */
 }
 
 /*
@@ -190,20 +228,13 @@ boolean isLetter(char ch)
     return (between(ch, CHAR_a, CHAR_z) || between(ch, CHAR_A, CHAR_Z))? TRUE : FALSE;
 }
 
-/* Returns TRUE if the char in index int index of param const char *str
- * is a comma, otherwise FALSE. */
-boolean isCurrCharComma(const char *str, int index)
-{
-    boolean isComma = FALSE; /* We assume the current char is not a comma */
-
-    /* Checks if the index is an index of str and if the char is a comma */
-    if (isIndexInStr(str, index) && str[index] == COMMA)
-        isComma = TRUE; /* Assign the value to return to TRUE if so */
-
-    return isComma;
-}
-
-/* Returns TRUE if the param char ch is a number, otherwise FALSE. */
+/*
+ * Checks if a given character is a number.
+ *
+ * @param   ch  The character to check if it's a number.
+ *
+ * @return  TRUE if ch is a number, otherwise FALSE.
+ */
 boolean isCharNumber(char ch)
 {
     return between(ch, CHAR_ZERO, CHAR_NINE);
@@ -221,28 +252,14 @@ boolean isLegalChar(char ch)
     return (isLetter(ch) || isCharNumber(ch))? TRUE : FALSE;
 }
 
-/* Returns TRUE if the char in index int index of param const char *str
- * is a number, otherwise FALSE. */
-boolean isCurrCharNumber(const char *str, int index)
-{
-    return (isIndexInStr(str, index) == TRUE && isCharNumber(str[index]))? TRUE : FALSE;
-}
-
-/* Returns TRUE if the char in index int index of param const char *str
- * is a dot, otherwise FALSE. */
-boolean isCurrCharDot(const char *str, int index)
-{
-    boolean isDot = FALSE; /* We assume the current char is not a dot */
-
-    /* Checks if the index is an index of str and if the char is a dot */
-    if (isIndexInStr(str, index) && str[index] == DOT)
-        isDot = TRUE; /* Assign the value to return to TRUE if so */
-
-    return isDot;
-}
-
-/* Returns TRUE if the char in param const char *str at index param int index is an
- * element of an integer (+; -; 0-9), otherwise FALSE. */
+/*
+ * Checks if a character at a specified index within a string is part of a number.
+ *
+ * @param   *str    The input string.
+ * @param   index   The index of the character to check.
+ *
+ * @return  TRUE if the character at the specified index is part of a number, otherwise FALSE.
+ */
 boolean isPartOfNumber(const char *str, int index)
 {
     boolean isPartOfNumber = FALSE; /* Value to return, assume ch is not a part of a number. */
@@ -256,9 +273,14 @@ boolean isPartOfNumber(const char *str, int index)
     return isPartOfNumber;
 }
 
-/* Searches for the next empty space or comma in param const char *str
- * from the starting index param in index.
- * Return the index of the found empty space or comma, or end index of str if there are not. */
+/*
+ * Searches for the next empty space or comma in the given string.
+ *
+ * @param   *str    The string to check for the first empty space or comma in.
+ * @param   index   The index to start the search from.
+ *
+ * @return  The index of the found empty space or comma, or end index of str if there are not.
+ */
 int nextEmptyCommaIndex(const char *str, int index)
 {
     int nextCommaEmptyIndex; /* Value to return */

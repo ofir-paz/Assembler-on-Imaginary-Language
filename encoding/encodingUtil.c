@@ -1,8 +1,8 @@
 /*
  * @author Ofir Paz
- * @version (09/08/2023)
+ * @version (18/08/2023)
  *
- * This file ...
+ * This file has the functions to help with the encoding process.
  */
 
 /* ---Include header files--- */
@@ -10,17 +10,16 @@
 #include "../new-data-types/boolean.h"
 #include "../NameTable/NameTable.h"
 #include "../assembler_ast/assembler_ast.h"
-#include "encodingDataStructures/MemoryImage.h"
 #include "encoding-finals/ranges.h"
 #include "wordHandling.h"
 #include "../util/stringsUtil.h"
 /* -------------------------- */
 
-/* ---Macros--- */
-/* ------------ */
-
 /* ---Finals--- */
 #define ZERO_BYTE 0
+/* ------------ */
+
+/* ---Macros--- */
 /* ------------ */
 
 /* ---------------Prototypes--------------- */

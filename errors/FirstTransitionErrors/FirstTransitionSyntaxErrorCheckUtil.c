@@ -1,8 +1,9 @@
 /*
  * @author Ofir Paz
- * @version (14/08/2023)
+ * @version (18/08/2023)
  *
- * This file ...
+ * This file has the utility functions to check for syntax errors
+ * in an assembly source line of code.
  */
 
 /* ---Include header files--- */
@@ -11,6 +12,8 @@
 #include "../../new-data-types/word_number.h"
 #include "../../general-enums/neededKeys.h"
 #include "../../general-enums/indexes.h"
+#include "../../encoding/encoding-finals/encoding_finals.h"
+#include "../../errors/error_types/error_types.h"
 #include "../../diagnoses/diagnose_line.h"
 #include "../../diagnoses/assembler_line_diagnoses.h"
 #include "../../diagnoses/assembler_diagnoses.h"
@@ -225,7 +228,7 @@ boolean isMissingGuidance(const char *guidanceLine)
  */
 boolean isMultConsDotsInGuidance(const char *guidanceLine)
 {
-    return isCurrCharDot(guidanceLine, ONE_INDEX);
+    return (guidanceLine[ONE_INDEX] == DOT)? TRUE : FALSE;
 }
 
 /*

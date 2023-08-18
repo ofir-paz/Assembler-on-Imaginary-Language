@@ -3,7 +3,7 @@ project(mmn_14 C)
 
 set(CMAKE_C_STANDARD 90)
 
-add_executable(mmn_14 main.c new-data-types/boolean.h
+add_executable(mmn_14 assembler.c new-data-types/boolean.h
         transitions/pre-processor.c  transitions/pre-processor.h FileHandling/readFromFile.c
         FileHandling/readFromFile.h
         FileHandling/writeToFile.c FileHandling/writeToFile.h encoding/encoding-finals/opcodes.h
@@ -11,7 +11,7 @@ add_executable(mmn_14 main.c new-data-types/boolean.h
         transitions/first-transition.h
         encoding/encoding-finals/encoding_types.h
         encoding/encoding-finals/encoding_types.h
-        encoding/encoding-finals/encoding_types.h assembler.c assembler.h
+        encoding/encoding-finals/encoding_types.h assembler_algorithm.c assembler_algorithm.h
         general-enums/indexes.h diagnoses/diagnose_line.c
         diagnoses/diagnose_line.h encoding/encoding-finals/guidance.h
         new-data-types/process_result.h errors/system_errors.c errors/system_errors.h

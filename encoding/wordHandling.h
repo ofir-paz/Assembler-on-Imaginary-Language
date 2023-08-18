@@ -8,12 +8,9 @@
 #ifndef MMN_14_WORDHANDLING_H
 #define MMN_14_WORDHANDLING_H
 
-/* ---------------Prototypes--------------- */
-
 #include "encodingDataStructures/word.h"
 
-/* ---Typedef prototype for encapsulation--- */
-/* ----------------------------------------- */
+/* ---------------Prototypes--------------- */
 
 /*
  * Checks if the given signed value fits inside a bit array of the given size.

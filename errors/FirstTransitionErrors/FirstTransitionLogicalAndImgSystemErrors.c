@@ -1,8 +1,9 @@
 /*
  * @author Ofir Paz
- * @version (16/08/2023)
+ * @version (18/08/2023)
  *
- * This file ...
+ * This file has the functions to check for logical and imaginary system errors
+ * in an assembly source line of code.
  */
 
 /* ---Include header files--- */

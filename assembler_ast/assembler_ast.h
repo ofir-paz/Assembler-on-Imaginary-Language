@@ -1,6 +1,6 @@
 /*
  * @author Ofir Paz
- * @version (28/07/2023)
+ * @version (18/08/2023)
  *
  * Header file for the assembler_ast.c file.
  */
@@ -266,9 +266,13 @@ int deleteAst(ast_t **pAst);
  */
 int deleteAstList(ast_list_t **pAstList);
 
+/*
+
+ FUNCTIONS FOR DEBUGGING --- IGNORE
+
 void printAst(ast_t *ast);
 void printAstList(ast_list_t *astList);
-
+*/
 /* ---------------------------------------- */
 
 #endif /* MMN_14_ASSEMBLER_AST_H */

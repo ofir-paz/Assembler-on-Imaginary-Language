@@ -1,6 +1,6 @@
 /*
  * @author Ofir Paz
- * @version (12/08/2023)
+ * @version (18/08/2023)
  *
  * Header file for the SecondTransitionErrors.c file.
  */
@@ -9,12 +9,15 @@
 #define MMN_14_SECONDTRANSITIONERRORS_H
 
 #include "../../new-data-types/boolean.h"
-#include "../error_types/error_types.h"
 
 /* ---------------Prototypes--------------- */
 
+/* ---Typedef prototype for encapsulation--- */
 typedef struct NameTable NameTable;
 typedef struct ast_t ast_t;
+typedef int Error;
+typedef enum LogicalError LogicalError;
+/* ----------------------------------------- */
 
 /*
  * Handles a line error during the second transition phase, updating the error status.

@@ -1,8 +1,8 @@
 /*
  * @author Ofir Paz
- * @version (10/08/2023)
+ * @version (18/08/2023)
  *
- * Header file for the word.c file.
+ * This file contains the new data type 'word_t'.
  */
 
 #ifndef MMN_14_WORD_H

@@ -1,21 +1,21 @@
 /*
  * @author Ofir Paz
- * @version (04/08/2023)
+ * @version (18/08/2023)
  *
- * This file ...
+ * This file has the function to assist with number related issues.
  */
 
 /* ---Include header files--- */
 #include "../new-data-types/boolean.h"
 /* -------------------------- */
 
-/* ---Macros--- */
-#define remove_right_digit(num) ((num) /= 10)
-/* ------------ */
-
 /* ---Finals--- */
 #define ONE_DIGIT 1
 #define ZERO_NUMBER 0
+/* ------------ */
+
+/* ---Macros--- */
+#define remove_right_digit(num) ((num) /= 10)
 /* ------------ */
 
 /* ---------------Prototypes--------------- */
@@ -24,11 +24,11 @@
 /*
  * Checks if a given integer is between the specified low and high values (inclusive).
  *
- * @param num     The integer to check.
- * @param low     The lower bound of the range.
- * @param high    The upper bound of the range.
+ * @param   num     The integer to check.
+ * @param   low     The lower bound of the range.
+ * @param   high    The upper bound of the range.
  *
- * @return        TRUE if the given integer is between low and high (inclusive), otherwise FALSE.
+ * @return  TRUE if the given integer is between low and high (inclusive), otherwise FALSE.
  */
 boolean between(int num, int low, int high)
 {

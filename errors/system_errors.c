@@ -1,11 +1,13 @@
 /*
  * @author Ofir Paz
- * @Version (27/04/2023)
- * This file contains functions to check errors
+ * @version (18/08/2023)
+ *
+ * This file contains functions to check errors regarding the operating system
  * that can occur in the program.
+ *
  * This file handles system errors, so if any system error is caught,
  * the program will be terminated !
- * */
+ */
 
 /* ---Include header files--- */
 #include <stdio.h>
@@ -13,9 +15,11 @@
 #include "error_types/SystemError.h"
 /* -------------------------- */
 
-/* Prints an error message regarding the given error and terminating the program.
- * param SystemError sysErr is the given error type.
- * Returns nothing. */
+/*
+ * Prints an error message regarding the given error and terminating the program.
+ *
+ * @param   sysErr  The system error to print.
+ */
 void system_error(SystemError sysErr)
 {
     /* This array of strings holds all the system related error messages that can be used. */

@@ -1,6 +1,6 @@
 /*
  * @author Ofir Paz
- * @Version (27/04/2023)
+ * @version (18/08/2023)
  *
  * Header file for the pre-processor.c file.
  */
@@ -14,7 +14,7 @@
  * Main method of pre-processor stage. will process the file with
  * the given file name.
  *
- * @param   *file_name The name of the file to process.
+ * @param   *file_name  The name of the file to process.
  *
  * @return  SUCCESS (1) if there were no errors, otherwise FAILURE (0).
  */

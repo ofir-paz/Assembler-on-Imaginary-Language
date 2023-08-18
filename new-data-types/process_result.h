@@ -1,8 +1,9 @@
 /*
  * @author Ofir Paz
- * @Version (27/04/2023)
+ * @version (18/08/2023)
+ *
  * This file contains the new data type 'process_result'.
- * */
+ */
 
 #ifndef MMN_14_PROCESS_RESULT
 #define MMN_14_PROCESS_RESULT

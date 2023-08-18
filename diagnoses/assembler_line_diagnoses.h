@@ -1,6 +1,6 @@
 /*
  * @author Ofir Paz
- * @version (26/07/2023)
+ * @version (18/08/2023)
  *
  * Header file for the assembler_lang_related_diagnoses.c file.
  */
@@ -8,14 +8,19 @@
 #ifndef MMN_14_ASSEMBLER_LINE_DIAGNOSES_H
 #define MMN_14_ASSEMBLER_LINE_DIAGNOSES_H
 
+/* Include very basic data types. */
 #include "../new-data-types/boolean.h"
-#include "../NameTable/NameTable.h"
 #include "../new-data-types/word_number.h"
-#include "../assembler_ast/assembler_ast.h"
 
 /* ---------------Prototypes--------------- */
 
 /* ---Data types prototypes--- */
+typedef struct NameTable NameTable;
+typedef enum opcodes_t opcodes_t;
+typedef enum guidance_t guidance_t;
+typedef enum reg_t reg_t;
+typedef enum sentence_type_t sentence_type_t;
+typedef struct data_t data_t;
 /* --------------------------- */
 
 /*

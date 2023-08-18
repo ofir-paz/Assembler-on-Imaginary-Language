@@ -1,6 +1,6 @@
 /*
  * @author Ofir Paz
- * @Version (27/04/2023)
+ * @version (18/08/2023)
  *
  * This file has the method for handling the entire pre-processor stage of the assembler.
  */
@@ -13,6 +13,7 @@
 #include "../general-enums/programFinals.h"
 #include "../FileHandling/readFromFile.h"
 #include "../FileHandling/writeToFile.h"
+#include "../errors/error_types/error_types.h"
 #include "../errors/assembler_errors.h"
 #include "../errors/PreProcessorErrors/PreProcessorErrors.h"
 #include "../diagnoses/diagnose_line.h"
@@ -46,7 +47,7 @@ char *getMacroIfCalling(const char *line, NameTable *macro_table);
  * Main method of pre-processor stage. will process the file with
  * the given file name.
  *
- * @param   *file_name The name of the file to process.
+ * @param   *file_name  The name of the file to process.
  *
  * @return  SUCCESS (1) if there were no errors, otherwise FAILURE (0).
  */
@@ -84,7 +85,7 @@ process_result traverse_before_macro_file(const char *file_name,
     boolean wasError = FALSE; /* Will indicate if there was an error. */
     char *line = NULL; /* This will hold the current line */
     char *macro_name = NULL; /* This will hold the current macro name we are working with. */
-    ssize_t readCode; /* Will hold the current line's read code. */
+    int readCode; /* Will hold the current line's read code. */
     int lineCount = ZERO_COUNT;
 
     /* Read the file line-by-line and handle it. */
@@ -157,8 +158,7 @@ Error preProcessorAssemblerAlgo(const char *file_name, const char *line, int lin
     boolean isInMacroDef = isInMcroDef(line, wasInMacroDef); /* Is curr line in mcro def */
     getMacroName(line, macro_name, wasInMacroDef, isInMacroDef); /* Get curr macro name */
 
-    lineError = checkPreProcessErrors(file_name, line, lineNumber, *macro_name,
-                                      wasInMacroDef, isInMacroDef);
+    lineError = checkPreProcessErrors(line, *macro_name, wasInMacroDef, isInMacroDef);
 
     /* Address a specific error */
     if (lineError == INVALID_MACRO_NAME_ERR || lineError == EXPECTED_MACRO_ERR)

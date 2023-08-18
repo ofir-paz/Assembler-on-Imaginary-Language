@@ -1,6 +1,6 @@
 /*
  * @author Ofir Paz
- * @Version (27/04/2023)
+ * @version (18/08/2023)
  *
  * This file has the methods to write to files.
  */

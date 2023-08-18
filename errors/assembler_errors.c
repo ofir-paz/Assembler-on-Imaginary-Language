@@ -1,8 +1,8 @@
 /*
  * @author Ofir Paz
- * @version (28/06/2023)
+ * @version (18/08/2023)
  *
- * This file ...
+ * This file has the functions to handle found assembler errors.
  */
 
 /* ---Include header files--- */
@@ -35,9 +35,16 @@ void handle_assembler_error(const char *file_name, int lineNumber, Error lineErr
     print_assembler_ERR(lineError, file_name, lineNumber);
 }
 
+/*
+ * Prints an assembler-related error message along with file and line information.
+ *
+ * @param   error       The error code indicating the type of error.
+ * @param   *file_name  The name of the source file where the error occurred.
+ * @param   lineNumber  The line number in the source file where the error occurred.
+ */
 void print_assembler_ERR(Error error, const char *file_name, int lineNumber)
 {
-    /* Arrays to hold all the different error messages. */
+    /* Imaginary system error messages array. */
     const char *imgSystemErrorMSG[IMG_SYSTEM_ERROR_SIZE - IMG_SYSTEM_ERR_START] =
             {
                     /* Indicates no error. !! add new errors after this one !! */
@@ -50,6 +57,7 @@ void print_assembler_ERR(Error error, const char *file_name, int lineNumber)
                 "Program memory overflow! Keep in mind that this system has 1024 words of memory."
             };
 
+    /* Syntax error messages array. */
     const char *syntaxErrorMSG[SYNTAX_ERROR_SIZE - SYNTAX_ERR_START] =
             {
                     /* Indicates no error. !! add new errors after this one !! */
@@ -123,6 +131,7 @@ void print_assembler_ERR(Error error, const char *file_name, int lineNumber)
                 "Expected argument after last comma (or might be extraneous comma)!"
             };
 
+    /* Logical error messages array. */
     const char *logicalErrorMSG[LOGICAL_ERROR_SIZE - LOGICAL_ERR_START] =
             {
                     /* Indicates no error. !! add new errors after this one !! */
@@ -151,6 +160,7 @@ void print_assembler_ERR(Error error, const char *file_name, int lineNumber)
                 "Label was defined both as entry and extern!",
                 "Argument is a label that is not defined in this file and not declared as extern!"
             };
+    /* Array including all the different error messages. */
     const char **errorMSG[] = {imgSystemErrorMSG, syntaxErrorMSG, logicalErrorMSG};
 
     /* Printing the errors. */

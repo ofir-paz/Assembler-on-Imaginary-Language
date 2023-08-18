@@ -1,6 +1,6 @@
 /*
  * @author Ofir Paz
- * @version (28/06/2023)
+ * @version (18/08/2023)
  *
  * This file contains general constants that different files from the program can use.
  */

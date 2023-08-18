@@ -1,8 +1,8 @@
 /*
  * @author Ofir Paz
- * @version (02/07/2023)
+ * @version (18/08/2023)
  *
- * Header file for the error_types.c file.
+ * This file contains all the error types.
  */
 
 #ifndef MMN_14_ERROR_TYPES_H

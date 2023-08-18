@@ -1,8 +1,8 @@
 /*
  * @author Ofir Paz
- * @version (29/07/2023)
+ * @version (18/08/2023)
  *
- * This file ...
+ * This function has the utility methods to assist with the first transition.
  */
 
 /* ---Include header files--- */
@@ -66,6 +66,15 @@ ast_t *buildAstFromLine(const char *line, Error *lineError)
     return lineAST;
 }
 
+/*
+ * Adds data from the processed line to an abstract syntax tree (AST)
+ * during the first transition phase.
+ *
+ * @param   *lineAST  The abstract syntax tree (AST) representing the processed line.
+ * @param   *line     The input line of assembly code.
+ *
+ * @return  An error code indicating the outcome of the operation, or NO_ERROR if successful.
+ */
 Error addDataFromLineToAST(ast_t *lineAST, const char *line)
 {
     Error lineError; /* Value to return, will represent the error found in the line. */
@@ -80,10 +89,18 @@ Error addDataFromLineToAST(ast_t *lineAST, const char *line)
     return lineError;
 }
 
+/*
+ * Adds a label from the given assembly line to an abstract syntax tree (AST)
+ *
+ * @param   *lineAST  The abstract syntax tree (AST) representing the processed line.
+ * @param   *line     The input line of assembly code.
+ *
+ * @return  An error code indicating the outcome of the operation, or NO_ERROR if successful.
+ */
 Error addLabelFromLineToAST(ast_t *lineAST, const char *line)
 {
     Error foundError = NO_ERROR; /* Error to return, assume success. */
-    char *label = NULL;
+    char *label = NULL; /* Will hold the label to add. */
 
     if (isColonInLineForLabel(line) == TRUE)
         if ((foundError = checkSyntaxErrorInLabel(line)) == NO_ERROR)
@@ -92,10 +109,19 @@ Error addLabelFromLineToAST(ast_t *lineAST, const char *line)
     /* Add label (will do nothing if there was an error or there was no label). */
     addLabelToAst(lineAST, label);
 
-    (void) clear_ptr(label) /* Free unnecessary variable. */
+    (void) clear_ptr(label) /* Free unnecessary variable (The AST is adding a duplicate) . */
     return foundError;
 }
 
+/*
+ * Adds a sentence from the given line to an abstract syntax tree (AST)
+ * during the first transition phase.
+ *
+ * @param   *lineAST  The abstract syntax tree (AST) representing the processed line.
+ * @param   *line     The input line of assembly code.
+ *
+ * @return  An error code indicating the outcome of the operation, or NO_ERROR if successful.
+ */
 Error addSentenceFromLineToAST(ast_t *lineAST, const char *line)
 {
     Error foundError; /* Error to return. */
@@ -112,12 +138,15 @@ Error addSentenceFromLineToAST(ast_t *lineAST, const char *line)
 Error addArgumentsFromLineToAST(ast_t *lineAST, const char *line)
 {
     Error foundError = NO_ERROR; /* Error to return, assume success. */
-    int argumentNum = FIRST_ARGUMENT;
+    int argumentNum = FIRST_ARGUMENT; /* Will hold the number of argument to add. */
     boolean isLabelDef = isLabel(lineAST);
     opcodes_t opcode = getOpcodeFromAST(lineAST);
+
+    /* Special case for .string guidance. */
     boolean isStrGuidance = (getGuidanceFromAST(lineAST) == str)? TRUE : FALSE;
 
     if (isLastArg(line, ZERO_NUMBER, isLabel(lineAST)) == FALSE)
+        /* Add arguments to AST while an error was not found. */
         while ((foundError = checkSyntaxErrorInArgAndBetween(
                 line, argumentNum, isLabelDef, opcode, isStrGuidance)) == NO_ERROR)
         {
@@ -127,16 +156,24 @@ Error addArgumentsFromLineToAST(ast_t *lineAST, const char *line)
             if (isLastArg(line, argumentNum, isLabel(lineAST)) == TRUE) break;
             argumentNum++;
         }
-    else
+    else /* No arguments, check if it's an error. */
         foundError = checkErrorInMissingArg(lineAST);
 
     return foundError;
 }
 
+/*
+ * Adds a label to the specified symbol table during the first transition phase.
+ *
+ * @param   *label       The label to be added.
+ * @param   *labelsMap   An array of symbol tables for label management.
+ * @param   table        The type of symbol table to add the label to (NORMAL or EXTERN).
+ * @param   *argError    Pointer to an error variable for recording the outcome of the operation.
+ */
 void addLabelToOtherTable(char *label, NameTable *labelsMap[], label_type_t table,
                           Error *argError)
 {
-    Error newError;
+    Error newError; /* Will hold the found error (if there is). */
 
     if (table == ENTRY)
         newError = addLabelToEntryTable(label, labelsMap[ENTRY], labelsMap[EXTERN]);
@@ -147,6 +184,15 @@ void addLabelToOtherTable(char *label, NameTable *labelsMap[], label_type_t tabl
         *argError = newError;
 }
 
+/*
+ * Adds a label to the entry symbol table during the first transition phase.
+ *
+ * @param   *label       The label to be added.
+ * @param   *entLabels   The entry symbol table for label management.
+ * @param   *extLabels   The external symbol table for reference management.
+ *
+ * @return  An error code indicating the outcome of the operation, or NO_ERROR if successful.
+ */
 Error addLabelToEntryTable(char *label, NameTable *entLabels, NameTable *extLabels)
 {
     Error argLabelError = checkAddToEntryTableError(label, entLabels, extLabels);
@@ -157,6 +203,14 @@ Error addLabelToEntryTable(char *label, NameTable *entLabels, NameTable *extLabe
     return argLabelError;
 }
 
+/*
+ * Adds a label to the external symbol table during the first transition phase.
+ *
+ * @param   *label       The label to be added.
+ * @param   *labelsMap   An array symbol tables for label management.
+ *
+ * @return  An error code indicating the outcome of the operation, or NO_ERROR if successful.
+ */
 Error addLabelToExternTable(char *label, NameTable *labelsMap[])
 {
     Error argLabelError = checkAddToExternTableError(label, labelsMap);
@@ -167,6 +221,13 @@ Error addLabelToExternTable(char *label, NameTable *labelsMap[])
     return argLabelError;
 }
 
+/*
+ * Adds a label with an associated address to a symbol table during the first transition phase.
+ *
+ * @param   *labelMap     The symbol table to which the label is added.
+ * @param   *labelName    The name of the label to be added.
+ * @param   address       The address associated with the label.
+ */
 void addLabelToTable(NameTable *labelMap, char *labelName, int address)
 {
     (void) addNameToTable(labelMap, labelName);
@@ -175,8 +236,7 @@ void addLabelToTable(NameTable *labelMap, char *labelName, int address)
 
 /*
  * Updates one of the give counters IC or DC based on the amount of words
- * needs to encode the line of code represented by lienAst.
- *
+ * needs to encode the line of code represented by lineAst.
  * Assumes that lineAst represents a valid line of code !!
  *
  * @param   *lineAst    The AST representing the line of code.
@@ -191,6 +251,15 @@ void updateCounters(ast_t *lineAst, int *IC, int *DC)
         *DC += howManyWordsForData(lineAst);
 }
 
+/*
+ * Calculates the number of words required to represent an instruction in memory.
+ * Assumes that lineAst represents a valid line of code !!
+ *
+ * @param   *lineAst    The abstract syntax tree (AST) representing the processed line
+ *                      with the instruction.
+ *
+ * @return  The number of words needed to store the instruction.
+ */
 int howManyWordsForInstruction(ast_t *lineAst)
 {
     int amountOfWords = ZERO_WORDS; /* Value to return, reset it to zero. */
@@ -211,20 +280,35 @@ int howManyWordsForInstruction(ast_t *lineAst)
     return amountOfWords;
 }
 
+/*
+ * Calculates the number of words required to represent data in memory.
+ *
+ * @param   *lineAst  The abstract syntax tree (AST) representing the processed line.
+ *
+ * @return  The number of words needed to store the data.
+ */
 int howManyWordsForData(ast_t *lineAst)
 {
     unsigned short amountOfWords = ZERO_WORDS; /* Value to return, reset it to zero. */
 
-    if (getSentence(lineAst).sentence.guidance == data)
+    /* Count how many words based on the type of data (numbers or string). */
+    if (getSentence(lineAst).sentence.guidance == data) /* Numbers. */
         amountOfWords = getArgAmount(lineAst);
 
-    else if (getSentence(lineAst).sentence.guidance == str)
+    else if (getSentence(lineAst).sentence.guidance == str) /* String. */
         amountOfWords = strlen(getArgData(getArgList(lineAst)).data.string)
                 - TWO_QUOTES + SIZE_FOR_NULL;
 
     return amountOfWords;
 }
 
+/*
+ * Updates all the data labels addresses.
+ * Basically, separates between the data image and the instruction image.
+ *
+ * @param   *labels     List of all labels defined in the file.
+ * @param   finalIC     The amount of words needed for the instructions in the file.
+ */
 void updateDataLabels(NameTable *labels, int finalIC)
 {
     (void) changeToPosAndAdd(labels, finalIC);

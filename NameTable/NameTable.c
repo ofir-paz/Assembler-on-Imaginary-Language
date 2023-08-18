@@ -1,6 +1,6 @@
 /*
  * @author Ofir Paz
- * @Version (27/04/2023)
+ * @version (18/08/2023)
  *
  * Interface of a NameTable data structure.
  * The NameTable holds string names and for each name it's associated data.
@@ -14,16 +14,16 @@
 #include "../util/numberUtil.h"
 /* -------------------------- */
 
-/* ---Macros--- */
-#define SWITCH_SIGN_AND_ADD(x, add) ((x) = (x) * (-1) + (add))
-/* ------------ */
-
 /* ---Finals--- */
 #define SUCCESS_CODE 0
 #define TABLE_IS_NULL_CODE (-1)
 #define NAME_ALREADY_IN_TABLE_CODE (-2)
 #define NAME_NOT_IN_TABLE_CODE (-1)
 #define NOT_MATCHING_DATA_CODE (-2)
+/* ------------ */
+
+/* ---Macros--- */
+#define SWITCH_SIGN_AND_ADD(x, add) ((x) = (x) * (-1) + (add))
 /* ------------ */
 
 /* ---------------Name table--------------- */
@@ -249,6 +249,7 @@ boolean isNameInTable(const NameTable *table, const char *name)
  * Finds the last node of the given linked list.
  *
  * @param   *name_table The given linked list to search for the last node in it.
+ *
  * @return  The last node of the linked list, or NULL if the list is empty or has the head
  *          node only.
  */
@@ -362,7 +363,10 @@ void deleteTable(NameTable **table)
     }
 }
 
-/* !!! -----DEBUGGING----- !!! */
+
+/*
+
+!!! -----DEBUGGING----- !!! IGNORE !!!
 #include <stdio.h>
 
 void printIntTable(NameTable *name_table, char *tableName)
@@ -385,3 +389,5 @@ void printIntTableList(NameTable *nameTableList[3])
     printIntTable(nameTableList[1], "entry");
     printIntTable(nameTableList[2], "extern");
 }
+
+*/

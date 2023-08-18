@@ -1,6 +1,6 @@
 /*
  * @author Ofir Paz
- * @version (28/06/2023)
+ * @version (18/08/2023)
  *
  * Header file for the encode-line.c file.
  */
@@ -23,7 +23,7 @@ MemoryImage *createMemoryImage(int IC, int DC);
 
 /*
  * Gets encoding information.
- * Encoding information is the following string: {IC [tab] DC}.
+ * Encoding information is the following string: {IC [tab] DC [new line]}.
  *
  * @param   *memoryImage    The memory image with the encoding to get its information.
  */
@@ -63,7 +63,11 @@ char *getEncodedWords(MemoryImage *memoryImage, boolean isWordsInstructions);
  */
 void clearMemoryImage(MemoryImage **pMemoryImage);
 
+/*
+ ---DEBUGGING---IGNORE--- !!
+
 void printMemImage(MemoryImage *memoryImage);
+*/
 
 /* ---------------------------------------- */
 

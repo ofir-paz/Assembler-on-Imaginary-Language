@@ -1,8 +1,20 @@
 /*
  * @author Ofir Paz
- * @version (28/06/2023)
+ * @version (18/08/2023)
  *
- * This file ...
+ * first_transition.c
+ *
+ * This file contains functions and logic for the first transition phase of an assembler.
+ * During the first transition, the assembler processes the source code to build symbol tables
+ * and identify any errors that may affect further processing.
+ *
+ * The functions in this file contribute to the preliminary analysis of the source code,
+ * focusing on preparing data structures for subsequent phases. This includes identifying labels,
+ * and performing syntax checks that set the stage for further processing.
+ *
+ * As the first step in the assembly process, this phase plays a critical role in setting up the
+ * groundwork for subsequent phases. The code in this file aims to ensure that the source code is
+ * ready for further analysis, translation, and machine code generation.
  */
 
 /* ---Include header files--- */
@@ -19,20 +31,19 @@
 #include "../errors/assembler_errors.h"
 #include "../errors/warnings.h"
 #include "../util/memoryUtil.h"
-#include "../util/stringsUtil.h"
 #include "first_transition_util.h"
 /* -------------------------- */
+
+/* ---Finals--- */
+#define AFTER_MACRO ".am" /* File end of after pre-processor type file */
+#define NO_LINE 0
+/* ------------ */
 
 /* ---Macros--- */
 
 /* Will be used to distinguish between data labels and instruction labels. */
 #define DATA_TEMP_ADDRESS(address) (-1 * (address))
 
-/* ------------ */
-
-/* ---Finals--- */
-#define AFTER_MACRO ".am" /* File end of after pre-processor type file */
-#define NO_LINE 0
 /* ------------ */
 
 /* ---------------Prototypes--------------- */
@@ -48,11 +59,13 @@ Error addToOtherTable(ast_t *lineAst, NameTable *labelsMap[], label_type_t table
 /* ---------------------------------------- */
 
 /*
- * Main method of first transition stage. will process the file with
- * the given file name.
+ * Performs the first transition phase of an assembler on the given source file.
  *
- * @param   *file_name The name of the file to process.
- * @return
+ * @param   *file_name  The name of the source file to be processed.
+ * @param   *labelsMap  An array of pointers to symbol tables for label management.
+ * @param   **astList   A pointer to the list of abstract syntax trees for line processing.
+ *
+ * @return  A process_result indicating the outcome of the first transition phase.
  */
 process_result first_transition(const char *file_name, NameTable *labelsMap[],
                                 ast_list_t **astList)
@@ -63,9 +76,11 @@ process_result first_transition(const char *file_name, NameTable *labelsMap[],
     *astList = createAstList(); /* Data structure to help diagnose and encode each line. */
 
     process_result firstTransRes = firstFileTraverse(file_name, labelsMap, *astList);
+
+    /* Check if the program is too big (memory overflow). */
     ImgSystemError imgSystemError = checkFileMemoryOverflow(*astList);
 
-    if (imgSystemError != NO_ERROR){
+    if (imgSystemError != NO_ERROR) {
         handle_assembler_error(file_name, NO_LINE, imgSystemError);
         firstTransRes = FAILURE;
     }
@@ -74,11 +89,13 @@ process_result first_transition(const char *file_name, NameTable *labelsMap[],
 }
 
 /*
- * Traverses the file with the given file name and processes it.
+ * Initiates the traversal and processing of the source file during the first transition phase.
  *
- * @param   *file_name The name of the file to process.
- * @param   *amFile The data structure to hold the contents of the .am file.
- * @param   *macro_table The data structure to hold the macros and their contents.
+ * @param   *file_name      The name of the source file to be processed.
+ * @param   *labelsMap[]    An array of symbol tables for label management.
+ * @param   *astList        A pointer to the list of abstract syntax trees for line processing.
+ *
+ * @return  A process_result indicating the outcome of the first transition phase.
  */
 process_result firstFileTraverse(const char *file_name, NameTable *labelsMap[],
                                  ast_list_t *astList)
@@ -86,10 +103,10 @@ process_result firstFileTraverse(const char *file_name, NameTable *labelsMap[],
     boolean wasError = FALSE;
     int *IC = getCounterPointer(astList, IC_), *DC = getCounterPointer(astList, DC_);
     char *line = NULL; /* This will hold the current line */
-    ssize_t readCode; /* Will hold the current line's read code. */
+    int readCode; /* Will hold the current line's read code. */
     int lineCount = ZERO_COUNT;
 
-    *IC = *DC = PROGRAM_MEM_START;
+    *IC = *DC = PROGRAM_MEM_START; /* Initializing IC and DC. */
     /* Read the file line-by-line and handle it. */
     while ((readCode = readNextLineFromFile(file_name, AFTER_MACRO, &line)) != EOF)
     {
@@ -111,12 +128,18 @@ process_result firstFileTraverse(const char *file_name, NameTable *labelsMap[],
 }
 
 /*
- * Handles the given line string in the pre-process.
+ * Handles a line of assembly code during the first transition phase.
  *
- * @param   *line Current line string.
- * @param   **macro_name Pointer to the current macro name.
- * @param   *amFile Data structure to hold the file to print.
- * @param   *macro_table Data structure to hold the macro names and contents.
+ * @param   *file_name    The name of the source file being processed.
+ * @param   *line         The input line of assembly code.
+ * @param   lineNumber    The line number in the source file.
+ * @param   *astList      A pointer to the list of abstract syntax trees for line processing
+ *                        (The created AST from the line will be added to the list).
+ * @param   *labelsMap    An array of symbol tables for label management.
+ * @param   *IC           A pointer to the Instruction Counter.
+ * @param   *DC           A pointer to the Data Counter.
+ *
+ * @return  TRUE if the line is successfully handled, otherwise FALSE.
  */
 boolean handleLineInFirstTrans(const char *file_name, const char *line, int lineNumber,
                                ast_list_t *astList, NameTable *labelsMap[], int *IC, int *DC)
@@ -127,6 +150,19 @@ boolean handleLineInFirstTrans(const char *file_name, const char *line, int line
     return (lineAst == NULL)? TRUE : FALSE;
 }
 
+/*
+ * Initiates the first transition algorithm for processing an assembly file.
+ *
+ * @param   *file_name    The name of the source file being processed.
+ * @param   *line         The input line of assembly code.
+ * @param   lineNumber    The line number in the source file.
+ * @param   *labelsMap    An array of symbol tables for label management.
+ * @param   *IC           A pointer to the Instruction Counter.
+ * @param   *DC           A pointer to the Data Counter.
+ *
+ * @return  The abstract syntax tree (AST) representing the processed line,
+ *          or NULL if there was an error during processing.
+ */
 ast_t *firstAssemblerAlgo(const char *file_name, const char *line, int lineNumber,
                           NameTable *labelsMap[], int *IC, int *DC)
 {
@@ -141,12 +177,12 @@ ast_t *firstAssemblerAlgo(const char *file_name, const char *line, int lineNumbe
         lineError = addToTablesIfNeededInFirstTrans(lineAst, labelsMap, *IC, *DC);
     }
 
-    if (lineError != NO_ERROR)
+    if (lineError != NO_ERROR) /* If there was an error. */
     {
         handle_assembler_error(file_name, lineNumber, lineError);
         deleteAst(&lineAst);
     }
-    else
+    else /* Update the counters if there were no errors. */
         updateCounters(lineAst, IC, DC);
 
 
@@ -154,19 +190,18 @@ ast_t *firstAssemblerAlgo(const char *file_name, const char *line, int lineNumbe
 }
 
 /*
- * Adds content to the data structure if needed.
- * Will know if any addition is needed based on the given flags and line string.
+ * Adds relevant entries to symbol tables if needed during the first transition phase.
  *
- * @param   *line The line string which the program is currently processing.
- * @param   *macro_name The macro name which is the program is currently working with.
- * @param   wasInMacroDef Flag to indicate if the last line was in a macro definition.
- * @param   inMacroDef Flag to indicate if the current line is in a macro definition.
- * @param   *amFile The data structure to hold the contents of the .am file.
- * @param   *macro_table The data structure to hold the macros and their contents.
+ * @param   *lineAst     The abstract syntax tree (AST) representing the processed line.
+ * @param   *labelsMap   An array of symbol tables for label management.
+ * @param   IC           The Instruction Counter value.
+ * @param   DC           The Data Counter value.
+ *
+ * @return  An error code indicating the outcome of the operation, or NO_ERROR if successful.
  */
 Error addToTablesIfNeededInFirstTrans(ast_t *lineAst, NameTable *labelsMap[], int IC, int DC)
 {
-    Error lineError = NO_ERROR;
+    Error lineError = NO_ERROR; /* Value to return. */
 
     label_type_t labelType = getLabelTypeForTable(lineAst);
 
@@ -179,6 +214,17 @@ Error addToTablesIfNeededInFirstTrans(ast_t *lineAst, NameTable *labelsMap[], in
     return lineError;
 }
 
+/*
+ * Adds an entry to the normal symbol table if needed during the first transition phase.
+ *
+ * @param   *lineAst      The abstract syntax tree (AST) representing the processed line.
+ * @param   *normalTable  The normal symbol table for label management.
+ * @param   *extTable     The external symbol table for reference management.
+ * @param   IC            The Instruction Counter value.
+ * @param   DC            The Data Counter value.
+ *
+ * @return  An error code indicating the outcome of the operation, or NO_ERROR if successful.
+ */
 Error addToNormalTable(ast_t *lineAst, NameTable *normalTable, NameTable *extTable, int IC, int DC)
 {
     Error lineError = checkLabelDefTableError(lineAst, normalTable, extTable);
@@ -194,10 +240,20 @@ Error addToNormalTable(ast_t *lineAst, NameTable *normalTable, NameTable *extTab
     return lineError;
 }
 
+/*
+ * Adds an entry to the specified symbol table if needed during the first transition phase.
+ *
+ * @param   *lineAst     The abstract syntax tree (AST) representing the processed line.
+ * @param   *labelsMap   An array of pointers to symbol tables for label management.
+ * @param   table        The type of symbol table to add the entry to (NORMAL or EXTERN).
+ *
+ * @return  An error code indicating the outcome of the operation, or NO_ERROR if successful.
+ */
 Error addToOtherTable(ast_t *lineAst, NameTable *labelsMap[], label_type_t table)
 {
     Error lineError = NO_ERROR; /* Value to return, assume no error. */
 
+    /* Add all arguments of .entry or .extern guidance to the specific table. */
     arg_node_t *currArg = getArgList(lineAst);
     while (currArg != NULL)
     {

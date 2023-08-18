@@ -1,8 +1,8 @@
 /*
  * @author Ofir Paz
- * @version (29/07/2023)
+ * @version (18/08/2023)
  *
- * This file ...
+ * This file has the function to assist with memory related functions.
  */
 
 /* ---Include header files--- */
@@ -10,24 +10,25 @@
 #include "../errors/system_errors.h"
 /* -------------------------- */
 
-/* ---Macros--- */
-/* ------------ */
-
 /* ---Finals--- */
 #define WAS_NULL_RETURN_CODE (-1)
 #define FREED_RETURN_CODE 0
+/* ------------ */
+
+/* ---Macros--- */
 /* ------------ */
 
 /* ---------------Prototypes--------------- */
 /* ---------------------------------------- */
 
 /*
- * Allocates space in the memory for a given pointer.
+ * Gets a pointer with allocated space in the memory with the given size.
  * Terminates the program on allocation error !
  *
- * @param   *ptr    The pointer to allocate space for
- * param size_t size is the size of the space to allocate
- * Returns nothing. */
+ * @param   size    The size of the pointer.
+ *
+ * @return  Allocated pointer with the given size.
+ */
 void *allocate_space(size_t size)
 {
     void *ptr = malloc(size); /* Allocating the space */

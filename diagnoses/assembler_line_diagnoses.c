@@ -1,8 +1,10 @@
 /*
  * @author Ofir Paz
- * @version (26/07/2023)
+ * @version (18/08/2023)
  *
- * This file ...
+ * assembler_line_diagnoses.c
+ *
+ * This file contains functions related to assembly source code lines diagnoses.
  */
 
 /* ---Include header files--- */
@@ -28,7 +30,6 @@
 #define REG_LEN 3
 #define FIRST_REGISTER 0
 #define LAST_REGISTER 7
-#define NO_SAVED_WORD (-1)
 #define COMMA_DELIM ","
 /* ------------ */
 

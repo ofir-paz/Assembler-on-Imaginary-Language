@@ -1,2 +1,1 @@
-
-TASK: write README for FileHandling interface !
+File handling interface.

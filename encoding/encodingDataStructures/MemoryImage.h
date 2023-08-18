@@ -1,8 +1,8 @@
 /*
  * @author Ofir Paz
- * @version (10/08/2023)
+ * @version (18/08/2023)
  *
- * Header file for the MemoryImage.c file.
+ * This file contains the new data type 'MemoryImage'.
  */
 
 #ifndef MMN_14_MEMORYIMAGE_H

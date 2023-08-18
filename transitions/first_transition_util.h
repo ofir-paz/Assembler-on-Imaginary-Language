@@ -1,14 +1,12 @@
 /*
  * @author Ofir Paz
- * @version (29/07/2023)
+ * @version (18/08/2023)
  *
  * Header file for the first_transition_util.c file.
  */
 
 #ifndef MMN_14_FIRST_TRANSITION_UTIL_H
 #define MMN_14_FIRST_TRANSITION_UTIL_H
-
-#include "../assembler_ast/assembler_ast.h"
 
 /* ---------------Prototypes--------------- */
 
@@ -25,10 +23,37 @@ void updateDataLabels(NameTable *labels, int finalIC);
  */
 ast_t *buildAstFromLine(const char *line, Error *lineError);
 
+/*
+ * Adds a label with an associated address to a symbol table during the first transition phase.
+ *
+ * @param   *labelMap     The symbol table to which the label is added.
+ * @param   *labelName    The name of the label to be added.
+ * @param   address       The address associated with the label.
+ */
 void addLabelToTable(NameTable *labelMap, char *labelName, int address);
+
+/*
+ * Adds a label to the specified symbol table during the first transition phase.
+ *
+ * @param   *label       The label to be added.
+ * @param   *labelsMap   An array of symbol tables for label management.
+ * @param   table        The type of symbol table to add the label to (NORMAL or EXTERN).
+ * @param   *argError    Pointer to an error variable for recording the outcome of the operation.
+ */
 void addLabelToOtherTable(char *label, NameTable *labelsMap[], label_type_t table,
                           Error *argError);
+
+/*
+ * Updates one of the give counters IC or DC based on the amount of words
+ * needs to encode the line of code represented by lineAst.
+ * Assumes that lineAst represents a valid line of code !!
+ *
+ * @param   *lineAst    The AST representing the line of code.
+ * @param   *IC         Instruction counter.
+ * @param   *DC         Data counter.
+ */
 void updateCounters(ast_t *lineAst, int *IC, int *DC);
+
 /* ---------------------------------------- */
 
 #endif /* MMN_14_FIRST_TRANSITION_UTIL_H */

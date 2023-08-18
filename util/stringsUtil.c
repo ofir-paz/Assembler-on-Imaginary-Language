@@ -1,8 +1,8 @@
 /*
  * @author Ofir Paz
- * @version (29/07/2023)
+ * @version (18/08/2023)
  *
- * This file ...
+ * This file has the functions to assist with handling strings.
  */
 
 /* ---Include header files--- */
@@ -17,14 +17,14 @@
 #include "numberUtil.h"
 /* -------------------------- */
 
-/* ---Macros--- */
-/* ------------ */
-
 /* ---Finals--- */
 #define SAME_STRINGS 0
 #define SIZE_FOR_NEW_LINE 1
 #define SIZE_FOR_TAB 1
 #define SIZE_FOR_STR 31
+/* ------------ */
+
+/* ---Macros--- */
 /* ------------ */
 
 /* ---------------Prototypes--------------- */
@@ -34,7 +34,8 @@ char *my_strdup(const char *str);
 /*
  * Creates a dynamically allocated string from a given string.
  *
- * @param   *str The string to recreate dynamically.
+ * @param   *str    The string to recreate dynamically.
+ *
  * @return  The newly dynamically created string with the contents of str.
  */
 char *getDynamicString(const char *str)
@@ -42,8 +43,13 @@ char *getDynamicString(const char *str)
     return my_strdup(str);
 }
 
-/* Turns every char in the given param char *str to lower case.
- * Returns the created lower case string */
+/*
+ * Create a string with every char in the given string in lower case.
+ *
+ * @param   *str    The string to copy to lower case.
+ *
+ * @return  The created lower case string.
+ */
 char *strToLowerCase(const char *str)
 {
     int i, len = (int) strlen(str); /* Loop variables */
@@ -59,7 +65,14 @@ char *strToLowerCase(const char *str)
     return lowerCase_str;
 }
 
-/* Return TRUE if str1 == str2, otherwise FALSE. */
+/*
+ * Checks if two given strings are the same.
+ *
+ * @param   *str1   The first string.
+ * @param   *str2   The second string.
+ *
+ * @return  TRUE if str1 == str2, otherwise FALSE.
+ */
 boolean sameStrings(const char *str1, const char *str2)
 {
     return (str1 != NULL && str2 != NULL && strcmp(str1, str2) == SAME_STRINGS)? TRUE : FALSE;
@@ -70,6 +83,7 @@ boolean sameStrings(const char *str1, const char *str2)
  *
  * @param   *str1 The first string to connect.
  * @param   *str2 The second string to connect.
+ *
  * @return  The new created string str1 + str2, or NULL if str1 or str2 is NULL.
  */
 char *connectTwoStrings(const char *str1, const char *str2)
@@ -121,6 +135,7 @@ void addTwoStrings(char **str1, const char *str2)
  * Duplicates a given string.
  *
  * @param   str The input string to be duplicated.
+ *
  * @return      A pointer to the newly duplicated string if 'str' is not NULL.
  *              Returns NULL if 'str' is NULL.
  */
@@ -144,6 +159,7 @@ char *my_strdup(const char *str)
  * @param   arr   The array of strings to search.
  * @param   size  The size of the array.
  * @param   str   The string to search for in the array.
+ *
  * @return  The index of an occurrence of the string in the array,
  *          or -1 if the string is not found.
  */

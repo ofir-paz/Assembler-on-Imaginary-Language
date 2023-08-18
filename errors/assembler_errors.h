@@ -1,14 +1,12 @@
 /*
  * @author Ofir Paz
- * @version (28/06/2023)
+ * @version (18/08/2023)
  *
- * Header file for the errors.c file.
+ * Header file for the assembler_errors.c file.
  */
 
 #ifndef MMN_14_ASSEMBLER_ERRORS_H
 #define MMN_14_ASSEMBLER_ERRORS_H
-
-#include "error_types/error_types.h"
 
 /* ---------------Prototypes--------------- */
 
@@ -20,8 +18,6 @@
  * @param   lineError       The specific error that occurred.
  */
 void handle_assembler_error(const char *file_name, int lineNumber, Error lineError);
-
-int handle_lineTooLong_error(const char *line, int lineIndex);
 
 /* ---------------------------------------- */
 

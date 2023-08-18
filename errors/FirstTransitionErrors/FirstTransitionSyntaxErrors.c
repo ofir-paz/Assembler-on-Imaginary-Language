@@ -1,18 +1,19 @@
 /*
  * @author Ofir Paz
- * @version (07/08/2023)
+ * @version (18/08/2023)
  *
- * This file ...
+ * This file has the functions to check for syntax errors
+ * in an assembly source line of code.
  */
 
 /* ---Include header files--- */
 #include <string.h>
-#include "../error_types/error_types.h"
 #include "../../NameTable/NameTable.h"
 #include "../../assembler_ast/assembler_ast.h"
 #include "../../general-enums/indexes.h"
 #include "../../general-enums/neededKeys.h"
 #include "../../general-enums/assemblerFinals.h"
+#include "../error_types/error_types.h"
 #include "FirstTransitionSyntaxErrorCheckUtil.h"
 #include "../../diagnoses/diagnose_line.h"
 #include "../../diagnoses/assembler_line_diagnoses.h"
@@ -101,7 +102,7 @@ SyntaxError checkSyntaxErrorInCommand(const char *line, boolean isLabelDef)
     if (isMissingOpOrGui(commandLine)) /* Check if the command is missing. */
         commandError = EXPECTED_OP_GUI_ERR;
     /* Check which type of command to diagnose to error of. */
-    else if (isCurrCharDot(commandLine, ZERO_INDEX))
+    else if (commandLine[ZERO_INDEX] == DOT)
         commandError = checkSyntaxErrorInGuidance(commandLine);
     else
         commandError = checkSyntaxErrorInOperation(commandLine);

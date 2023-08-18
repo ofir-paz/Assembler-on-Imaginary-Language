@@ -1,9 +1,12 @@
 /*
  * @author Ofir Paz
- * @version (28/06/2023)
+ * @version (18/08/2023)
  *
- * This file ...
- * 
+ * This file has the functions to encode a line of assembly code using
+ * the representing AST (abstract syntax tree).
+ *
+ * Some information about bit assortment in the machine's words:
+ *
  * Direction: 11  ---  9 || 8 -- 5 || 4   ---   2 || 1     0
  *            src method || opcode || dest method || A, R, E
  *            
@@ -51,20 +54,16 @@
 #include "../util/stringsUtil.h"
 /* -------------------------- */
 
-/* ---Macros--- */
-/* ------------ */
-
 /* ---Finals--- */
 #define ZERO_BYTE 0
-#define FULL_1_BYTE 0xff
-#define BITS_IN_BYTE 8
-#define START_WORD_RANGE 0
-#define END_WORD_RANGE 11
 #define CHARS_FOR_WORD 2
 #define SIZE_FOR_NEW_LINE 1
 #define FIRST_PART_OF_WORD 0
 #define SECOND_PART_OF_WORD 1
 #define BUFFER 82
+/* ------------ */
+
+/* ---Macros--- */
 /* ------------ */
 
 /* ------------------------------------------ */
@@ -80,13 +79,13 @@ void encodeInstructionWithOneArgs(word_t *instructions, int *currWord, arg_node_
 void encodeInstructionWithTwoArgs(word_t *instructions, int *currWord, arg_node_t *firstArg,
                           arg_node_t *secondArg, NameTable *normalLabels, NameTable *extLabels,
                           char **extFileContents);
-
-
-void printWord(const word_t word);
 /* ---------------------------------------- */
 
 /*
  * Create a new MemoryImage structure.
+ *
+ * @param   IC  The number of instruction words the memory image will hold.
+ * @param   DC  The number of data words the memory image will hold.
  *
  * @return  Pointer to the newly created MemoryImage structure.
  */
@@ -363,7 +362,9 @@ void clearMemoryImage(MemoryImage **pMemoryImage)
     (void) clear_ptr(*pMemoryImage)
 }
 
-// !!! -----DEBUGGING----- !!!
+/*
+
+!!! -----DEBUGGING----- !!! IGNORE !!!
 
 void printWord(const word_t word)
 {
@@ -413,3 +414,5 @@ void printMemImage(MemoryImage *memoryImage)
     puts("*** FINISH DATA SEGMENT ***\n");
     puts("\n*************************FINISH PRINTING MEMORY IMAGE*************************\n");
 }
+
+ */

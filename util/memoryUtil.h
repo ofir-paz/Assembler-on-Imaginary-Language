@@ -1,6 +1,6 @@
 /*
  * @author Ofir Paz
- * @version (29/07/2023)
+ * @version (18/08/2023)
  *
  * Header file for the memoryUtil.c file.
  */
@@ -15,12 +15,13 @@
 /* ---------------Prototypes--------------- */
 
 /*
- * Allocates space in the memory for a given pointer.
+ * Gets a pointer with allocated space in the memory with the given size.
  * Terminates the program on allocation error !
  *
- * @param   *ptr    The pointer to allocate space for
- * param size_t size is the size of the space to allocate
- * Returns nothing. */
+ * @param   size    The size of the pointer.
+ *
+ * @return  Allocated pointer with the given size.
+ */
 void *allocate_space(size_t size);
 
 /*

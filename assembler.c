@@ -1,100 +1,53 @@
 /*
  * @author Ofir Paz
- * @Version (27/04/2023)
- * This file has help methods to assist various other files in this program.
- * */
+ * @version (18/08/2023)
+ *
+ * assembler.c
+ *
+ * This file houses the main function of the assembler program, orchestrating the complete
+ * assembly process. The assembler takes source code written in assembly language and
+ * transforms it into executable machine code for a specific target architecture.
+ *
+ * The main function in this file serves as the entry point for the assembler program. It
+ * handles command-line arguments, file processing, and manages the different phases of the
+ * assembly process. This includes the first and second transition phases, as well as the
+ * handling of errors, warnings, and the generation of output files.
+ *
+ * The assembler program integrates various modules, such as the lexical analyzer, parser,
+ * symbol table management, and code generation, to create a seamless assembly experience.
+ * It provides feedback on potential issues in the source code and produces the final
+ * machine code in Base64 format.
+ *
+ * Note: This implementation assumes the C90 standard for compatibility.
+ *
+ * This project was made by Ofir Paz for the open university of israel.
+ * The project was made through the scope of the course 'Systems Programming Lab' as
+ * the final project.
+ */
 
 /* ---Include header files--- */
 #include <stdio.h>
-#include "new-data-types/process_result.h"
-#include "NameTable/NameTable.h"
-#include "assembler_ast/assembler_ast.h"
-#include "transitions/pre-processor.h"
-#include "transitions/first-transition.h"
-#include "transitions/second_transition.h"
+#include "assembler_algorithm.h"
 /* -------------------------- */
 
 /* ---Finals--- */
-#define COLOR_GREEN "\x1B[32m"
-#define COLOR_RESET "\x1B[0m"
+#define NO_GIVEN_FILES 1
+#define FIRST_FILE_NAME 1
+#define SUCCESS_CODE 0
 /* ------------ */
 
-/* ---Macros--- */
-#define INFO_MSG(message, file) printf("\n" COLOR_GREEN "Assembler state:" COLOR_RESET \
-        " %s " COLOR_GREEN "On file:" COLOR_RESET " \"%s\"\n", (message), (file))
-/* ------------ */
-
-typedef enum {ASSEMBLER, PRE_PROCESSOR, FIRST_TRANSITION, SECOND_TRANSITION, FINISH} stage_t;
-
-/* ---------------Prototypes--------------- */
-
-void printAssemblerState(const char *file_name, stage_t stageNumber);
-void clearDataStructures(NameTable *labelsMap[], ast_list_t **pAstList);
-
-/* !!! DEBUGGING !!! */
-void printData(ast_list_t *astList, NameTable *labelsMap[]);
-
-/* ---------------------------------------- */
-
-void assemble(const char *file_name)
+/*
+ * Driver code.
+ */
+int main(int argc, char *argv[])
 {
-    process_result processResult;
-    NameTable *labelsMap[TYPES_OF_LABELS] = {NULL};
-    ast_list_t *astList = NULL;
+    int i; /* Loop variable */
 
-    printAssemblerState(file_name, ASSEMBLER);
+    if (argc == NO_GIVEN_FILES) /* Print a message if the arguments are insufficient. */
+        puts("\nPlease select the assembly source files to assemble.");
 
-    printAssemblerState(file_name, PRE_PROCESSOR);
-    processResult = pre_process(file_name);
+    for (i = FIRST_FILE_NAME; i < argc; i++) /* Assemble all the files. */
+        assemble(argv[i]);
 
-    if (processResult == SUCCESS)
-    {
-        printAssemblerState(file_name, FIRST_TRANSITION);
-        processResult = first_transition(file_name, labelsMap, &astList);
-    }
-
-    if (processResult == SUCCESS)
-    {
-        printAssemblerState(file_name, SECOND_TRANSITION);
-        processResult = second_transition(file_name, labelsMap, astList);
-    }
-
-    clearDataStructures(labelsMap, &astList);
-    printAssemblerState(file_name, FINISH);
-}
-
-void clearDataStructures(NameTable *labelsMap[], ast_list_t **pAstList)
-{
-    deleteTable(&(labelsMap[NORMAL]));
-    deleteTable(&(labelsMap[ENTRY]));
-    deleteTable(&(labelsMap[EXTERN]));
-    (void) deleteAstList(pAstList);
-}
-
-void printAssemblerState(const char *file_name, stage_t stageNumber)
-{
-    switch (stageNumber)
-    {
-        case ASSEMBLER:
-            INFO_MSG("Starting assembling source assembly file", file_name);
-            break;
-        case PRE_PROCESSOR:
-            INFO_MSG("Starting pre-process stage", file_name);
-            break;
-        case FIRST_TRANSITION:
-            INFO_MSG("Starting first transition stage", file_name);
-            break;
-        case SECOND_TRANSITION:
-            INFO_MSG("Starting second transition stage", file_name);
-            break;
-        case FINISH:
-            INFO_MSG("Finished assembling (due to errors or not)", file_name);
-    }
-}
-
-/* !!! DEBUGGING !!! */
-void printData(ast_list_t *astList, NameTable *labelsMap[])
-{
-    printAstList(astList);
-    printIntTableList(labelsMap);
+    return SUCCESS_CODE;
 }

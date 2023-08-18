@@ -1,9 +1,10 @@
 /*
  * @author Ofir Paz
- * @Version (27/04/2023)
+ * @version (18/08/2023)
+ *
  * This file contains the new data type 'SyntaxError' that will be used
  * to distinguish different syntax errors in the input file.
- * */
+ */
 
 #ifndef MMN_14_SYNTAXERROR_H
 #define MMN_14_SYNTAXERROR_H

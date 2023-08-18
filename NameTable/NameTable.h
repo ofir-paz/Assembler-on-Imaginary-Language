@@ -1,6 +1,6 @@
 /*
  * @author ofir
- * @version (21/06/23)
+ * @version (18/08/23)
  *
  * Header file for the NameTable.c file.
  */
@@ -23,7 +23,7 @@ typedef union
 {
     char *string;
     int num;
-} name_data_t; /* Data (char * or int) */
+} name_data_t; /* Data (char* or int) */
 
 /* ---------------Prototypes--------------- */
 
@@ -126,7 +126,12 @@ char *numbersNameTableToString(NameTable *nameTable);
  */
 void deleteTable(NameTable **table);
 
+/*
+
+---DEBUGGING---IGNORE--- !!!
 void printIntTableList(NameTable *nameTableList[3]);
+
+ */
 
 /* ---------------------------------------- */
 

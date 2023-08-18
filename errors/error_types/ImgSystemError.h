@@ -1,9 +1,10 @@
 /*
  * @author Ofir Paz
- * @Version (27/04/2023)
+ * @version (18/08/2023)
+ *
  * This file contains the new data type 'ImgSystemError' that will be used
  * to distinguish different system errors in the imaginary machine.
- * */
+ */
 
 #ifndef MMN_14_IMGSYSTEMERROR_H
 #define MMN_14_IMGSYSTEMERROR_H

@@ -1,8 +1,9 @@
 /*
  * @author Ofir Paz
- * @version (12/08/2023)
+ * @version (18/08/2023)
  *
- * This file ...
+ * This file has the functions to check errors in the second transition
+ * phase of the assembler.
  */
 
 /* ---Include header files--- */
@@ -14,10 +15,10 @@
 #include "../assembler_errors.h"
 /* -------------------------- */
 
-/* ---Macros--- */
+/* ---Finals--- */
 /* ------------ */
 
-/* ---Finals--- */
+/* ---Macros--- */
 /* ------------ */
 
 /* ---------------Prototypes--------------- */

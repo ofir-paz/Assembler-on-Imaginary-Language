@@ -1,8 +1,8 @@
 /*
  * @author Ofir Paz
- * @version (01/08/2023)
+ * @version (18/08/2023)
  *
- * Header file for the assemblerFinals.c file.
+ * This file contains assembler related finals.
  */
 
 #ifndef MMN_14_ASSEMBLERFINALS_H

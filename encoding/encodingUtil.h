@@ -1,6 +1,6 @@
 /*
  * @author Ofir Paz
- * @version (09/08/2023)
+ * @version (18/08/2023)
  *
  * Header file for the encodingUtil.c file.
  */

@@ -2,7 +2,7 @@
  * @author Ofir Paz
  * @version (17/08/2023)
  *
- * This file ...
+ * This file contains the functions to handle warnings that can occur.
  */
 
 /* ---Include header files--- */

@@ -1,6 +1,6 @@
 /*
  * @author Ofir Paz
- * @version (26/07/2023)
+ * @version (18/08/2023)
  *
  * Contains all the encoding finals.
  */

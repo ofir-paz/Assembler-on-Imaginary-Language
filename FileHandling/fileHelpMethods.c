@@ -1,6 +1,6 @@
 /*
  * @author Ofir Paz
- * @Version (27/04/2023)
+ * @version (18/08/2023)
  *
  * This file has help methods to assist with handling files.
  */
@@ -15,7 +15,6 @@
 
 /* ---Finals--- */
 #define BUFFER 256
-#define ZERO_CODE 0
 /* ------------ */
 
 /*
@@ -54,7 +53,7 @@ FILE *openFile(const char *file_name, const char *fileType, const char *modeType
  * Closes a file.
  * Terminates the program on error!
  *
- * @param   **file Pointer to the file to close
+ * @param   **file Pointer to the file to close.
  */
 void closeFile(FILE **file)
 {

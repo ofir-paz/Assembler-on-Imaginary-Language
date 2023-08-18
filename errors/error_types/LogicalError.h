@@ -1,9 +1,10 @@
 /*
  * @author Ofir Paz
- * @Version (27/04/2023)
+ * @version (18/08/2023)
+ *
  * This file contains the new data type 'LogicalError' that will be used
  * to distinguish different logical errors in the program to assemble that can occur.
- * */
+ */
 
 #ifndef MMN_14_LOGICALERROR_H
 #define MMN_14_LOGICALERROR_H

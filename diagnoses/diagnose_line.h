@@ -1,15 +1,21 @@
 /*
  * @author Ofir Paz
- * @Version (27/04/2023)
- * */
+ * @version (18/08/2023)
+ *
+ * Header file for the diagnose_line.c file.
+ */
 
 #ifndef MMN_22_DIAGNOSE_INPUT_H
 #define MMN_22_DIAGNOSE_INPUT_H
 
-#include "../errors/error_types/error_types.h"
+/* Include very basic data types. */
 #include "../new-data-types/word_number.h"
 
-/* ----------Prototypes---------- */
+/* ---------------Prototypes--------------- */
+
+/* ---Data types prototypes--- */
+typedef int Error;
+/* --------------------------- */
 
 /*
  * Finds the specified word in the given line and stores it in the provided pointer.
@@ -22,33 +28,13 @@
  */
 void findWord(const char *line, char **word, word_number wordNumber);
 
-/* Given the param const char *command and the param Error error,
- * Returns a string contains a suggested fix for the error in the command. */
-char *getCmdFix(const char *command, Error error);
-
-/* Finds index of parameter in const char *line.
- * param paramNum specifies the number of parameter to seek.
- * This functions presumes that the command and the commas (up to the parameter to find)
- * are valid since it is supposed to be called after they are validated.
- * Returns the index of the wanted parameter or index of last char ('\0') in line if there isn't. */
-int findParamIndex(const char *line, word_number paramNum);
-
-/* Finds the length of the parameter number paramNum with type paramtype pType
- * in const char *line.
- * Returns the length of the specific parameter. */
-int findParamLen(const char *line, word_number paramNum);// paramtype pType);
-
-/* Gets the float parameter numbered paramNum from param const char *line.
- * Returns the specified float value. */
-float getFloatParamFromLine(const char *line, word_number paramNum);
-
-/* Gets the char parameter numbered paramNum from param const char *line.
- * Returns the specified char. */
-char getCharParamFromLine(const char *line, word_number paramNum);
-
-/* Checks if the line needs to be skipped.
- * param const char *line is the line to check
- * Return TRUE if the line needs to be skipped, otherwise FALSE. */
+/*
+ * Checks if the line needs to be skipped.
+ *
+ * @param   *line The line to check if it needs to be skipped.
+ *
+ * Return TRUE if the line needs to be skipped, otherwise FALSE.
+ */
 boolean isSkipLine(const char *line);
 
 /*
@@ -91,6 +77,6 @@ boolean isCharAfterCommas(const char *line, int commaIndex);
  */
 boolean isPrintable(const char *str);
 
-/* ------------------------------ */
+/* ---------------------------------------- */
 
 #endif /* MMN_22_DIAGNOSE_INPUT_H */

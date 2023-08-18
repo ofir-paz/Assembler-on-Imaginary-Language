@@ -1,14 +1,12 @@
 /*
  * @author Ofir Paz
- * @version (07/08/2023)
+ * @version (18/08/2023)
  *
  * Header file for the FirstTransitionErrors.c file.
  */
 
 #ifndef MMN_14_FIRSTTRANSITIONSYNTAXERRORS_H
 #define MMN_14_FIRSTTRANSITIONSYNTAXERRORS_H
-
-#include "../error_types/SyntaxError.h"
 
 /* ---------------Prototypes--------------- */
 

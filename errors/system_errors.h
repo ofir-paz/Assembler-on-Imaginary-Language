@@ -1,16 +1,12 @@
 /*
  * @author Ofir Paz
- * @Version (27/04/2023)
- * This file contains functions to check errors
- * that can occur in the program.
- * This file handles system errors, so if any system error is caught,
- * the program will be terminated !
- * */
+ * @version (18/8/2023)
+ *
+ * Header file for the system_errors.c file.
+ */
 
 #ifndef MMN_14_SYSTEM_ERRORS_H
 #define MMN_14_SYSTEM_ERRORS_H
-
-#include <stdio.h>
 
 /* ---------------Prototypes--------------- */
 

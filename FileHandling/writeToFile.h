@@ -1,6 +1,6 @@
 /*
  * @author Ofir Paz
- * @Version (27/04/2023)
+ * @Version (18/08/2023)
  *
  * Header file for the writeToFile.c file.
  */
